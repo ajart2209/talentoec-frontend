@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TalentoEC — Conectando Ecuador</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --verde:#00C48C;--verde-dark:#00996E;--verde-light:#E0FFF5;
+  --negro:#0A0F0D;--gris-oscuro:#1A221E;--gris-medio:#2E3D37;
+  --gris-borde:#334039;--texto-primario:#F0FFF8;--texto-secundario:#7A9E8E;
+  --amarillo:#F5E642;--rojo:#FF4D6D;--azul:#3B82F6;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--negro);color:var(--texto-primario);min-height:100vh;overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:60px;background:rgba(10,15,13,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--gris-borde)}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--texto-primario);display:flex;align-items:center;gap:8px;cursor:pointer}
+.logo-badge{background:var(--verde);color:var(--negro);font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;letter-spacing:.05em}
+.nav-center{display:flex;gap:4px}
+.nav-right{display:flex;align-items:center;gap:10px}
+.ntab{background:transparent;border:1px solid transparent;color:var(--texto-secundario);padding:7px 14px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
+.ntab:hover,.ntab.active{background:var(--gris-oscuro);border-color:var(--gris-borde);color:var(--texto-primario)}
+.btn-nav-login{background:transparent;border:1px solid var(--gris-borde);color:var(--texto-secundario);padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-nav-login:hover{border-color:var(--verde);color:var(--verde)}
+.btn-nav-cta{background:var(--verde);border:none;color:var(--negro);padding:7px 16px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-nav-cta:hover{background:#00e0a0}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:var(--verde);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--negro);cursor:pointer}
+
+/* PAGES */
+.page{display:none;padding-top:60px;min-height:100vh}
+.page.active{display:block}
+
+/* ========== LANDING ========== */
+.hero{padding:70px 40px 50px;max-width:860px;margin:0 auto}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;background:var(--gris-oscuro);border:1px solid var(--gris-borde);padding:5px 14px;border-radius:20px;font-size:11px;color:var(--verde);margin-bottom:24px;letter-spacing:.05em}
+.hero-tag::before{content:'';width:6px;height:6px;background:var(--verde);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+h1.hero-title{font-family:'Syne',sans-serif;font-size:clamp(38px,5.5vw,66px);font-weight:800;line-height:1.05;margin-bottom:20px}
+h1.hero-title span{color:var(--verde)}
+.hero-sub{font-size:16px;color:var(--texto-secundario);line-height:1.7;max-width:560px;margin-bottom:36px}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:50px}
+.btn-primary{background:var(--verde);color:var(--negro);border:none;padding:13px 26px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-primary:hover{background:#00e0a0;transform:translateY(-1px)}
+.btn-secondary{background:transparent;color:var(--texto-primario);border:1px solid var(--gris-borde);padding:13px 26px;border-radius:10px;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-secondary:hover{border-color:var(--verde);color:var(--verde)}
+.stats-row{display:flex;gap:36px;padding:24px 0;border-top:1px solid var(--gris-borde)}
+.stat-num{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--verde)}
+.stat-label{font-size:11px;color:var(--texto-secundario);margin-top:2px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:0 40px 60px;max-width:860px;margin:0 auto}
+.step-card{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:14px;padding:24px;transition:border-color .2s}
+.step-card:hover{border-color:var(--verde)}
+.step-num{font-family:'Syne',sans-serif;font-size:42px;font-weight:800;color:var(--gris-borde);line-height:1;margin-bottom:12px}
+.step-card h3{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;margin-bottom:8px}
+.step-card p{font-size:13px;color:var(--texto-secundario);line-height:1.6}
+
+/* PLANES */
+.planes-section{padding:20px 40px 60px;max-width:860px;margin:0 auto}
+.section-label{font-size:11px;letter-spacing:.12em;color:var(--verde);text-transform:uppercase;margin-bottom:12px}
+.section-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;margin-bottom:32px}
+.planes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.plan-card{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:16px;padding:28px;transition:all .2s;position:relative}
+.plan-card.destacado{border-color:var(--verde);background:rgba(0,196,140,.06)}
+.plan-badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--verde);color:var(--negro);font-size:10px;font-weight:700;padding:3px 12px;border-radius:20px;white-space:nowrap;font-family:'Syne',sans-serif}
+.plan-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:var(--texto-secundario);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em}
+.plan-price{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;margin-bottom:4px}
+.plan-price span{font-size:14px;font-weight:400;color:var(--texto-secundario)}
+.plan-desc{font-size:12px;color:var(--texto-secundario);margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--gris-borde)}
+.plan-features{list-style:none;margin-bottom:24px}
+.plan-features li{font-size:13px;color:var(--texto-secundario);padding:5px 0;display:flex;align-items:center;gap:8px}
+.plan-features li::before{content:'✓';color:var(--verde);font-weight:700;font-size:12px}
+.btn-plan{width:100%;background:transparent;border:1px solid var(--gris-borde);color:var(--texto-primario);padding:11px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:600;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-plan:hover,.plan-card.destacado .btn-plan{background:var(--verde);border-color:var(--verde);color:var(--negro)}
+
+/* ========== AUTH MODAL ========== */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:300;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:20px;padding:36px;width:90%;max-width:440px;max-height:90vh;overflow-y:auto}
+.modal h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:6px}
+.modal .modal-sub{font-size:13px;color:var(--texto-secundario);margin-bottom:24px}
+.auth-tabs{display:flex;gap:0;margin-bottom:24px;background:var(--gris-medio);border-radius:10px;padding:4px}
+.auth-tab{flex:1;padding:8px;border-radius:7px;border:none;background:transparent;color:var(--texto-secundario);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
+.auth-tab.active{background:var(--negro);color:var(--texto-primario);font-weight:500}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field label{font-size:12px;color:var(--texto-secundario)}
+.field input,.field select,.field textarea{background:var(--negro);border:1px solid var(--gris-borde);color:var(--texto-primario);padding:10px 14px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--verde)}
+.field select option{background:var(--gris-oscuro)}
+.field textarea{resize:vertical;min-height:90px}
+.btn-full{width:100%;background:var(--verde);color:var(--negro);border:none;padding:13px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;margin-top:4px}
+.btn-full:hover{background:#00e0a0}
+.btn-full:disabled{background:var(--gris-medio);color:var(--texto-secundario);cursor:not-allowed}
+.divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--texto-secundario);font-size:12px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--gris-borde)}
+.btn-google{width:100%;background:transparent;border:1px solid var(--gris-borde);color:var(--texto-primario);padding:11px;border-radius:10px;font-size:14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-google:hover{border-color:var(--texto-secundario)}
+.tipo-selector{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.tipo-card{padding:16px;border:1px solid var(--gris-borde);border-radius:10px;cursor:pointer;text-align:center;transition:all .2s}
+.tipo-card:hover,.tipo-card.selected{border-color:var(--verde);background:rgba(0,196,140,.07)}
+.tipo-card .tipo-icon{font-size:24px;margin-bottom:6px}
+.tipo-card .tipo-label{font-size:13px;font-weight:500}
+.tipo-card .tipo-desc{font-size:11px;color:var(--texto-secundario);margin-top:3px}
+
+/* ========== CANDIDATO DASHBOARD ========== */
+.dashboard{max-width:760px;margin:0 auto;padding:36px 32px}
+.dash-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px}
+.dash-welcome{font-family:'Syne',sans-serif;font-size:24px;font-weight:700}
+.dash-sub{font-size:13px;color:var(--texto-secundario);margin-top:4px}
+.plan-pill{background:rgba(0,196,140,.12);border:1px solid rgba(0,196,140,.25);color:var(--verde);font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px}
+.dash-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+.dash-card{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:12px;padding:18px}
+.dash-card-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--verde)}
+.dash-card-label{font-size:12px;color:var(--texto-secundario);margin-top:4px}
+.section-box{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:14px;padding:24px;margin-bottom:20px}
+.section-box-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.step-indicators{display:flex;gap:8px;margin-bottom:24px}
+.step-ind{flex:1;padding:7px;border-radius:8px;border:1px solid var(--gris-borde);text-align:center;font-size:11px;color:var(--texto-secundario);transition:all .2s}
+.step-ind.done{border-color:var(--verde);color:var(--verde);background:rgba(0,196,140,.08)}
+.step-ind.current{border-color:var(--verde);color:var(--verde);font-weight:500}
+.upload-box{border:2px dashed var(--gris-borde);border-radius:14px;padding:40px 24px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:20px}
+.upload-box:hover{border-color:var(--verde);background:rgba(0,196,140,.04)}
+.upload-box h3{font-family:'Syne',sans-serif;font-size:15px;margin-bottom:8px}
+.upload-box p{font-size:13px;color:var(--texto-secundario)}
+.fmt-badge{background:var(--gris-medio);border:1px solid var(--gris-borde);color:var(--texto-secundario);font-size:10px;padding:3px 9px;border-radius:5px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ai-panel{background:var(--negro);border:1px solid var(--gris-borde);border-radius:12px;padding:20px;margin-top:20px}
+.ai-panel-header{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.ai-dot{width:7px;height:7px;background:var(--verde);border-radius:50%;animation:pulse 1.5s infinite}
+.ai-content{font-size:13px;color:var(--texto-secundario);line-height:1.8;white-space:pre-wrap}
+.spin{width:30px;height:30px;border:2.5px solid var(--gris-borde);border-top-color:var(--verde);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.searching-anim{display:none;text-align:center;padding:20px}
+.searching-anim.visible{display:block}
+.src-item{font-size:11px;color:var(--texto-secundario);padding:3px 10px;border-radius:20px;border:1px solid var(--gris-borde);animation:fadeIn .4s ease forwards;opacity:0;display:inline-block;margin:3px}
+@keyframes fadeIn{to{opacity:1}}
+.job-card{background:var(--negro);border:1px solid var(--gris-borde);border-radius:12px;padding:18px;margin-bottom:12px;transition:border-color .2s}
+.job-card:hover{border-color:var(--verde)}
+.job-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.job-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:600}
+.job-company{font-size:12px;color:var(--texto-secundario);margin-top:3px}
+.match-badge{background:rgba(0,196,140,.15);border:1px solid rgba(0,196,140,.3);color:var(--verde);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px}
+.tag{background:var(--gris-medio);border:1px solid var(--gris-borde);color:var(--texto-secundario);font-size:10px;padding:3px 9px;border-radius:5px}
+.tags-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.card-actions{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--gris-borde)}
+.btn-sm-green{background:var(--verde);color:var(--negro);border:none;padding:8px 16px;border-radius:7px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:all .2s}
+.btn-sm-green:hover{background:#00e0a0}
+.btn-sm-outline{background:transparent;color:var(--texto-secundario);border:1px solid var(--gris-borde);padding:8px 16px;border-radius:7px;font-size:12px;cursor:pointer;transition:all .2s}
+.btn-sm-outline:hover{border-color:var(--verde);color:var(--verde)}
+.cv-saved-banner{background:rgba(0,196,140,.1);border:1px solid rgba(0,196,140,.25);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.cv-saved-info{font-size:13px;color:var(--verde);font-weight:500}
+.cv-saved-date{font-size:11px;color:var(--texto-secundario);margin-top:2px}
+
+/* ========== EMPLEADOR DASHBOARD ========== */
+.emp-layout{max-width:980px;margin:0 auto;padding:36px 32px}
+.emp-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px}
+.search-bar-wrap{display:flex;gap:10px;margin-bottom:20px}
+.search-bar-wrap input{flex:1;background:var(--gris-oscuro);border:1px solid var(--gris-borde);color:var(--texto-primario);padding:13px 18px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+.search-bar-wrap input:focus{border-color:var(--verde)}
+.search-bar-wrap input::placeholder{color:var(--texto-secundario)}
+.btn-search{background:var(--verde);color:var(--negro);border:none;padding:13px 22px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-search:hover{background:#00e0a0}
+/* Advanced filters */
+.filters-panel{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:14px;padding:20px;margin-bottom:20px}
+.filters-title{font-size:12px;font-weight:500;color:var(--texto-secundario);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
+.filters-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.filter-group label{font-size:11px;color:var(--texto-secundario);display:block;margin-bottom:5px}
+.filter-group select,.filter-group input{width:100%;background:var(--negro);border:1px solid var(--gris-borde);color:var(--texto-primario);padding:8px 12px;border-radius:7px;font-size:12px;outline:none;transition:border-color .2s}
+.filter-group select:focus,.filter-group input:focus{border-color:var(--verde)}
+.filter-group select option{background:var(--negro)}
+.chips-row{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:var(--negro);border:1px solid var(--gris-borde);color:var(--texto-secundario);padding:6px 14px;border-radius:20px;font-size:11px;cursor:pointer;transition:all .2s}
+.chip:hover,.chip.on{background:var(--verde);border-color:var(--verde);color:var(--negro);font-weight:500}
+.results-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.results-count{font-size:13px;color:var(--texto-secundario)}
+.sort-select{background:var(--gris-oscuro);border:1px solid var(--gris-borde);color:var(--texto-primario);padding:7px 12px;border-radius:7px;font-size:12px;outline:none}
+.candidate-card{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:14px;padding:20px 22px;transition:border-color .2s;margin-bottom:14px}
+.candidate-card:hover{border-color:var(--verde)}
+.cc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.cc-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:700}
+.cc-role{font-size:12px;color:var(--texto-secundario);margin-top:3px}
+.cc-badges{display:flex;gap:8px;align-items:center}
+.cc-meta{display:flex;gap:18px;font-size:11px;color:var(--texto-secundario);margin-top:10px}
+.source-dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:4px}
+.sources-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.source-pill{display:flex;align-items:center;gap:5px;background:var(--gris-oscuro);border:1px solid var(--gris-borde);padding:5px 12px;border-radius:20px;font-size:11px;color:var(--texto-secundario)}
+
+/* ========== PAYPHONE MODAL ========== */
+.pp-modal{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:20px;padding:0;width:90%;max-width:480px;overflow:hidden}
+.pp-header{background:linear-gradient(135deg,#00C48C,#00996E);padding:28px;text-align:center}
+.pp-header h2{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--negro);margin-bottom:4px}
+.pp-header p{font-size:13px;color:rgba(0,0,0,.6)}
+.pp-body{padding:28px}
+.pp-plan-summary{background:var(--negro);border:1px solid var(--gris-borde);border-radius:10px;padding:16px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center}
+.pp-plan-name{font-size:13px;color:var(--texto-secundario)}
+.pp-plan-price{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--verde)}
+.pp-methods{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.pp-method{border:1px solid var(--gris-borde);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;background:var(--negro)}
+.pp-method:hover,.pp-method.selected{border-color:var(--verde);background:rgba(0,196,140,.07)}
+.pp-method-icon{font-size:20px;margin-bottom:6px}
+.pp-method-label{font-size:12px;font-weight:500}
+.pp-method-desc{font-size:10px;color:var(--texto-secundario);margin-top:2px}
+.pp-form-section{display:none}
+.pp-form-section.visible{display:block}
+.pp-phone-input{display:flex;gap:8px}
+.pp-phone-prefix{background:var(--negro);border:1px solid var(--gris-borde);color:var(--texto-primario);padding:10px 12px;border-radius:8px;font-size:14px;width:70px;text-align:center}
+.pp-security{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--texto-secundario);margin-top:16px;padding-top:16px;border-top:1px solid var(--gris-borde)}
+.pp-security::before{content:'🔒';font-size:14px}
+.btn-pp-pay{width:100%;background:var(--verde);color:var(--negro);border:none;padding:15px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:800;font-size:15px;cursor:pointer;transition:all .2s;margin-top:16px}
+.btn-pp-pay:hover{background:#00e0a0}
+.pp-success{display:none;text-align:center;padding:40px 28px}
+.pp-success.visible{display:block}
+.pp-success-icon{font-size:48px;margin-bottom:16px}
+.pp-success h3{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:8px;color:var(--verde)}
+.pp-success p{font-size:13px;color:var(--texto-secundario);line-height:1.6}
+
+/* EMAIL MODAL */
+.email-modal-inner{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:20px;padding:28px;width:90%;max-width:540px;max-height:85vh;overflow-y:auto}
+.modal-actions{display:flex;gap:10px;margin-top:16px}
+.btn-cancel{flex:1;background:transparent;color:var(--texto-secundario);border:1px solid var(--gris-borde);padding:11px;border-radius:8px;font-size:13px;cursor:pointer}
+.btn-send{flex:2;background:var(--verde);color:var(--negro);border:none;padding:11px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer}
+.btn-send:hover{background:#00e0a0}
+.ai-note{font-size:11px;color:var(--texto-secundario);background:rgba(0,196,140,.08);border:1px solid rgba(0,196,140,.2);padding:9px 13px;border-radius:7px;margin-top:8px}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--verde);color:var(--negro);padding:12px 20px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;transform:translateY(80px);opacity:0;transition:all .3s;z-index:999}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.error{background:var(--rojo);color:#fff}
+
+/* PROFILE DROPDOWN */
+.profile-menu{position:absolute;top:56px;right:20px;background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:12px;padding:8px;min-width:200px;display:none;z-index:200}
+.profile-menu.open{display:block}
+.profile-menu-item{padding:9px 14px;border-radius:8px;font-size:13px;cursor:pointer;transition:all .2s;color:var(--texto-secundario)}
+.profile-menu-item:hover{background:var(--gris-medio);color:var(--texto-primario)}
+.profile-menu-item.danger{color:var(--rojo)}
+.profile-menu-divider{height:1px;background:var(--gris-borde);margin:4px 0}
+.profile-menu-user{padding:10px 14px;font-size:12px;color:var(--texto-secundario);border-bottom:1px solid var(--gris-borde);margin-bottom:4px}
+.profile-menu-user strong{display:block;font-size:13px;color:var(--texto-primario);font-weight:500;margin-bottom:2px}
+
+/* MISC */
+.empty-state{text-align:center;padding:60px 24px;color:var(--texto-secundario)}
+.empty-state div:first-child{font-size:36px;margin-bottom:14px}
+.empty-state p{font-size:14px}
+.badge-free{background:var(--gris-medio);border:1px solid var(--gris-borde);color:var(--texto-secundario);font-size:10px;padding:3px 9px;border-radius:20px}
+.badge-pro{background:rgba(0,196,140,.12);border:1px solid rgba(0,196,140,.25);color:var(--verde);font-size:10px;padding:3px 9px;border-radius:20px}
+.badge-emp{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);color:#60a5fa;font-size:10px;padding:3px 9px;border-radius:20px}
+.limit-bar{background:var(--gris-medio);border-radius:4px;height:4px;margin-top:6px;overflow:hidden}
+.limit-fill{height:100%;background:var(--verde);border-radius:4px;transition:width .6s}
+.limit-fill.warn{background:var(--amarillo)}
+.limit-fill.full{background:var(--rojo)}
+.tab-row{display:flex;gap:4px;margin-bottom:24px;background:var(--gris-oscuro);border-radius:10px;padding:4px;border:1px solid var(--gris-borde)}
+.tab-btn{flex:1;padding:8px;border-radius:7px;border:none;background:transparent;color:var(--texto-secundario);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
+.tab-btn.active{background:var(--negro);color:var(--texto-primario);font-weight:500}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script>
+if (window.pdfjsLib) {
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+</script>
+</head>
+<body>
+
+<nav>
+  <div class="logo" onclick="goHome()">TalentoEC <span class="logo-badge">ECUADOR</span></div>
+  <div class="nav-center" id="navCenter">
+    <button class="ntab active" onclick="showPage('landing')" id="ntab-landing">Inicio</button>
+    <button class="ntab" onclick="requireAuth('candidato')" id="ntab-candidato">Candidatos</button>
+    <button class="ntab" onclick="requireAuth('empleador')" id="ntab-empleador">Empleadores</button>
+  </div>
+  <div class="nav-right" id="navRight">
+    <button class="btn-nav-login" onclick="openAuth('login')">Iniciar sesión</button>
+    <button class="btn-nav-cta" onclick="openAuth('register')">Registrarse gratis</button>
+  </div>
+</nav>
+
+<!-- ===== LANDING ===== -->
+<div id="page-landing" class="page active">
+  <div class="hero">
+    <div class="hero-tag">IA · Solo Ecuador · Gratis para candidatos</div>
+    <h1 class="hero-title">El talento ecuatoriano,<br><span>encontrado por IA</span></h1>
+    <p class="hero-sub">Sube tu CV, Claude lo analiza con web search en tiempo real, busca en toda la internet ecuatoriana y envía correos automáticos por ti.</p>
+    <div class="hero-ctas">
+      <button class="btn-primary" onclick="openAuth('register')">Crear cuenta gratis →</button>
+      <button class="btn-secondary" onclick="openAuth('login')">Ya tengo cuenta</button>
+    </div>
+    <div class="stats-row">
+      <div><div class="stat-num">24+</div><div class="stat-label">Provincias</div></div>
+      <div><div class="stat-num">50+</div><div class="stat-label">Fuentes buscadas</div></div>
+      <div><div class="stat-num">100%</div><div class="stat-label">Automatizado</div></div>
+      <div><div class="stat-num">0$</div><div class="stat-label">Para candidatos</div></div>
+    </div>
+  </div>
+
+  <div class="steps">
+    <div class="step-card"><div class="step-num">01</div><h3>Sube tu CV</h3><p>PDF, Word o texto. Claude extrae y entiende tu perfil con IA avanzada.</p></div>
+    <div class="step-card"><div class="step-num">02</div><h3>Busca en Ecuador</h3><p>Web search real en LinkedIn, Multitrabajos, redes sociales y empresas EC.</p></div>
+    <div class="step-card"><div class="step-num">03</div><h3>Correos solos</h3><p>Claude redacta y prepara correos personalizados para cada empleador.</p></div>
+  </div>
+
+  <div class="planes-section">
+    <div class="section-label">Planes para candidatos</div>
+    <div class="section-title">Más correos, más oportunidades</div>
+    <div class="planes-grid">
+
+      <!-- BÁSICO -->
+      <div class="plan-card">
+        <div class="plan-name">Básico</div>
+        <div class="plan-price">$9<span>.99 / mes</span></div>
+        <div class="plan-desc">Para quien empieza su búsqueda</div>
+        <div style="margin:14px 0 16px">
+          <div style="font-size:11px;color:var(--texto-secundario);margin-bottom:6px">Correos diarios</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="flex:1;height:5px;background:var(--gris-medio);border-radius:3px;overflow:hidden">
+              <div style="width:33%;height:100%;background:var(--verde);border-radius:3px"></div>
+            </div>
+            <span style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--verde)">10–20</span>
+          </div>
+          <div style="font-size:11px;color:var(--texto-secundario);margin-top:5px">Mínimo 10 · máximo 20 por día · ~300/mes</div>
+        </div>
+        <ul class="plan-features">
+          <li>Análisis completo de CV con IA</li>
+          <li>10 búsquedas por mes</li>
+          <li>Correos personalizados por Claude</li>
+          <li>5 fuentes de búsqueda</li>
+          <li>Historial de correos enviados</li>
+        </ul>
+        <button class="btn-plan" onclick="abrirPago('Básico','9.99')">Contratar con PayPhone</button>
+      </div>
+
+      <!-- ESTÁNDAR -->
+      <div class="plan-card destacado">
+        <div class="plan-badge">MÁS POPULAR</div>
+        <div class="plan-name">Estándar</div>
+        <div class="plan-price">$19<span>.99 / mes</span></div>
+        <div class="plan-desc">Para búsqueda activa e intensa</div>
+        <div style="margin:14px 0 16px">
+          <div style="font-size:11px;color:var(--texto-secundario);margin-bottom:6px">Correos diarios</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="flex:1;height:5px;background:var(--gris-medio);border-radius:3px;overflow:hidden">
+              <div style="width:66%;height:100%;background:var(--azul);border-radius:3px"></div>
+            </div>
+            <span style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--azul)">20–40</span>
+          </div>
+          <div style="font-size:11px;color:var(--texto-secundario);margin-top:5px">Mínimo 20 · máximo 40 por día · ~600/mes</div>
+        </div>
+        <ul class="plan-features">
+          <li>Todo del plan Básico</li>
+          <li>30 búsquedas por mes</li>
+          <li>Web search en tiempo real</li>
+          <li>15 fuentes de búsqueda</li>
+          <li>Perfil destacado para empleadores</li>
+          <li>Seguimiento de respuestas</li>
+        </ul>
+        <button class="btn-plan" onclick="abrirPago('Estándar','19.99')">Contratar con PayPhone</button>
+      </div>
+
+      <!-- PRO -->
+      <div class="plan-card">
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">$34<span>.99 / mes</span></div>
+        <div class="plan-desc">Para quien no se rinde hasta conseguirlo</div>
+        <div style="margin:14px 0 16px">
+          <div style="font-size:11px;color:var(--texto-secundario);margin-bottom:6px">Correos diarios</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="flex:1;height:5px;background:var(--gris-medio);border-radius:3px;overflow:hidden">
+              <div style="width:100%;height:100%;background:var(--amarillo);border-radius:3px"></div>
+            </div>
+            <span style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--amarillo)">30–60</span>
+          </div>
+          <div style="font-size:11px;color:var(--texto-secundario);margin-top:5px">Mínimo 30 · máximo 60 por día · ~900/mes</div>
+        </div>
+        <ul class="plan-features">
+          <li>Todo del plan Estándar</li>
+          <li>Búsquedas ilimitadas</li>
+          <li>+50 fuentes de búsqueda</li>
+          <li>Perfil destacado prioritario</li>
+          <li>Carta de presentación con IA</li>
+          <li>Reporte de aperturas de correo</li>
+          <li>Soporte prioritario WhatsApp</li>
+        </ul>
+        <button class="btn-plan" onclick="abrirPago('Pro','34.99')">Contratar con PayPhone</button>
+      </div>
+
+    </div>
+
+    <!-- Tabla comparativa rápida -->
+    <div style="margin-top:24px;background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:14px;padding:20px 24px">
+      <div style="font-size:12px;font-weight:500;color:var(--texto-secundario);text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px">Resumen comparativo</div>
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:0;font-size:12px">
+        <div style="color:var(--texto-secundario);padding:7px 0;border-bottom:1px solid var(--gris-borde)"></div>
+        <div style="color:var(--verde);padding:7px 0;border-bottom:1px solid var(--gris-borde);text-align:center;font-weight:600">Básico</div>
+        <div style="color:var(--azul);padding:7px 0;border-bottom:1px solid var(--gris-borde);text-align:center;font-weight:600">Estándar</div>
+        <div style="color:var(--amarillo);padding:7px 0;border-bottom:1px solid var(--gris-borde);text-align:center;font-weight:600">Pro</div>
+        <div style="color:var(--texto-secundario);padding:8px 0;border-bottom:1px solid var(--gris-borde)">Correos mínimos / día</div>
+        <div style="color:var(--texto-primario);padding:8px 0;border-bottom:1px solid var(--gris-borde);text-align:center">10</div>
+        <div style="color:var(--texto-primario);padding:8px 0;border-bottom:1px solid var(--gris-borde);text-align:center">20</div>
+        <div style="color:var(--texto-primario);padding:8px 0;border-bottom:1px solid var(--gris-borde);text-align:center">30</div>
+        <div style="color:var(--texto-secundario);padding:8px 0;border-bottom:1px solid var(--gris-borde)">Correos máximos / día</div>
+        <div style="color:var(--texto-primario);padding:8px 0;border-bottom:1px solid var(--gris-borde);text-align:center">20</div>
+        <div style="color:var(--texto-primario);padding:8px 0;border-bottom:1px solid var(--gris-borde);text-align:center">40</div>
+        <div style="color:var(--texto-primario);padding:8px 0;border-bottom:1px solid var(--gris-borde);text-align:center">60</div>
+        <div style="color:var(--texto-secundario);padding:8px 0;border-bottom:1px solid var(--gris-borde)">Total estimado / mes</div>
+        <div style="color:var(--texto-primario);padding:8px 0;border-bottom:1px solid var(--gris-borde);text-align:center">~300</div>
+        <div style="color:var(--texto-primario);padding:8px 0;border-bottom:1px solid var(--gris-borde);text-align:center">~600</div>
+        <div style="color:var(--texto-primario);padding:8px 0;border-bottom:1px solid var(--gris-borde);text-align:center">~900</div>
+        <div style="color:var(--texto-secundario);padding:8px 0">Precio</div>
+        <div style="color:var(--verde);padding:8px 0;text-align:center;font-weight:600">$9.99</div>
+        <div style="color:var(--azul);padding:8px 0;text-align:center;font-weight:600">$19.99</div>
+        <div style="color:var(--amarillo);padding:8px 0;text-align:center;font-weight:600">$34.99</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== CANDIDATO ===== -->
+<div id="page-candidato" class="page">
+  <div class="dashboard" id="candidatoDash">
+    <div class="dash-header">
+      <div>
+        <div class="dash-welcome" id="candWelcome">Bienvenido 👋</div>
+        <div class="dash-sub">Tu portal de empleo inteligente en Ecuador</div>
+      </div>
+      <span class="plan-pill" id="candPlanPill">BÁSICO $9.99</span>
+    </div>
+
+    <div class="dash-cards">
+      <div class="dash-card"><div class="dash-card-num" id="statBusquedas">0</div><div class="dash-card-label">Búsquedas realizadas</div></div>
+      <div class="dash-card"><div class="dash-card-num" id="statCorreos">0</div><div class="dash-card-label">Correos enviados hoy</div></div>
+      <div class="dash-card"><div class="dash-card-num" id="statMatch">—</div><div class="dash-card-label">Match promedio</div></div>
+    </div>
+
+    <!-- Barra límite correos diarios -->
+    <div style="background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:12px;padding:16px 20px;margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div>
+          <span style="font-size:13px;font-weight:500">Correos de hoy</span>
+          <span style="font-size:11px;color:var(--texto-secundario);margin-left:8px" id="planNombreLabel">Plan Básico</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:4px">
+          <span style="font-size:20px;font-weight:700;font-family:'Syne',sans-serif" id="correosDiaCount">0</span>
+          <span style="font-size:12px;color:var(--texto-secundario)">/ <span id="correosDiaMax">20</span> máx.</span>
+        </div>
+      </div>
+      <div style="height:7px;background:var(--gris-medio);border-radius:4px;overflow:hidden">
+        <div id="correosDiaBar" style="height:100%;background:var(--verde);border-radius:4px;width:0%;transition:width .5s ease"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px">
+        <span style="font-size:11px;color:var(--texto-secundario)">Mín. diario: <span id="correosDiaMin">10</span> · Máx.: <span id="correosDiaMax2">20</span></span>
+        <button onclick="showPage('landing')" style="font-size:11px;color:var(--verde);background:none;border:none;cursor:pointer;text-decoration:underline">Mejorar plan →</button>
+      </div>
+    </div>
+
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="candTab('cv')">Mi CV</button>
+      <button class="tab-btn" onclick="candTab('busqueda')">Buscar trabajo</button>
+      <button class="tab-btn" onclick="candTab('resultados')">Resultados</button>
+      <button class="tab-btn" onclick="candTab('frio')" style="color:var(--amarillo)">🎯 Correos en frío</button>
+    </div>
+
+    <!-- TAB: CV -->
+    <div id="cand-tab-cv">
+      <div id="cvSavedBanner" style="display:none" class="cv-saved-banner">
+        <div><div class="cv-saved-info">✓ CV guardado en tu cuenta</div><div class="cv-saved-date" id="cvSavedDate"></div></div>
+        <button class="btn-sm-outline" onclick="editarCV()">Editar</button>
+      </div>
+
+      <div class="section-box" id="uploadSection">
+        <div class="section-box-title">Sube o pega tu CV</div>
+        <div class="upload-box" onclick="document.getElementById('fileInput').click()"
+             ondragover="event.preventDefault();this.style.borderColor='var(--verde)'"
+             ondragleave="this.style.borderColor=''"
+             ondrop="handleDrop(event)">
+          <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt" style="display:none" onchange="handleFile(this)">
+          <div style="font-size:36px;margin-bottom:12px">📄</div>
+          <h3>Arrastra tu CV o haz clic</h3>
+          <p style="margin:6px 0 12px">PDF, Word o TXT</p>
+          <div style="display:flex;gap:6px;justify-content:center">
+            <span class="fmt-badge">PDF</span><span class="fmt-badge">DOCX</span><span class="fmt-badge">TXT</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>O pega el texto de tu CV aquí</label>
+          <textarea id="cvText" placeholder="Nombre, experiencia, habilidades, educación, contacto..."></textarea>
+        </div>
+        <div class="form-row" style="margin-top:14px">
+          <div class="field"><label>Nombre completo</label><input type="text" id="cvNombre" placeholder="Juan Pérez"></div>
+          <div class="field"><label>Email de contacto</label><input type="email" id="cvEmail" placeholder="juan@gmail.com"></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Ciudad</label>
+            <select id="cvCiudad">
+              <option>Quito</option><option>Guayaquil</option><option>Cuenca</option><option>Ambato</option>
+              <option>Manta</option><option>Loja</option><option>Ibarra</option><option>Riobamba</option>
+              <option>Toda la república</option>
+            </select>
+          </div>
+          <div class="field"><label>Área profesional</label>
+            <select id="cvArea">
+              <option>Tecnología / Sistemas</option><option>Administración</option><option>Contabilidad</option>
+              <option>Marketing / Ventas</option><option>Salud</option><option>Educación</option>
+              <option>Ingeniería</option><option>Derecho</option><option>Diseño</option><option>Otro</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-full" onclick="guardarYAnalizar()">Guardar y analizar con Claude IA →</button>
+      </div>
+
+      <div class="ai-panel" id="cvAnalysis" style="display:none">
+        <div class="ai-panel-header"><div class="ai-dot"></div><span id="analysisStatus">Analizando...</span></div>
+        <div class="ai-content" id="analysisContent"></div>
+      </div>
+    </div>
+
+    <!-- TAB: BUSQUEDA -->
+    <div id="cand-tab-busqueda" style="display:none">
+      <div class="section-box">
+        <div class="section-box-title">Buscar oportunidades en Ecuador</div>
+        <div id="cvDetectadoBanner" style="display:none;background:rgba(0,196,140,0.08);border:1px solid rgba(0,196,140,0.2);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--verde)">
+          ✦ Búsqueda autocompletada con tu CV guardado — puedes editarla
+        </div>
+        <div class="field">
+          <label>¿Qué tipo de trabajo buscas?</label>
+          <input type="text" id="busquedaQuery" placeholder="Ej: Desarrollador web full stack con React en Quito...">
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Ciudad preferida</label>
+            <select id="busquedaCiudad">
+              <option>Toda la república</option><option>Quito</option><option>Guayaquil</option>
+              <option>Cuenca</option><option>Ambato</option><option>Manta</option>
+            </select>
+          </div>
+          <div class="field"><label>Modalidad</label>
+            <select id="busquedaModalidad">
+              <option>Cualquiera</option><option>Presencial</option><option>Remoto</option><option>Híbrido</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom:14px">
+          <div class="filters-title" style="margin-bottom:10px">Fuentes a buscar</div>
+          <div class="chips-row" id="fuentesChips">
+            <span class="chip on" onclick="toggleChip(this)">LinkedIn</span>
+            <span class="chip on" onclick="toggleChip(this)">Multitrabajos</span>
+            <span class="chip on" onclick="toggleChip(this)">Indeed EC</span>
+            <span class="chip on" onclick="toggleChip(this)">OLX Ecuador</span>
+            <span class="chip on" onclick="toggleChip(this)">Computrabajo</span>
+            <span class="chip on" onclick="toggleChip(this)">Facebook Empleos</span>
+            <span class="chip" onclick="toggleChip(this)">Twitter/X</span>
+            <span class="chip" onclick="toggleChip(this)">Universidades EC</span>
+          </div>
+        </div>
+        <button class="btn-full" onclick="buscarEmpleo()">Buscar con web search real →</button>
+      </div>
+
+      <div class="searching-anim" id="candSearchAnim">
+        <div class="spin"></div>
+        <div style="font-size:13px;color:var(--texto-secundario);margin-bottom:10px">Claude buscando en internet ecuatoriano...</div>
+        <div id="candSearchSrcs" style="max-width:400px;margin:0 auto"></div>
+      </div>
+    </div>
+
+    <!-- TAB: CORREOS EN FRIO -->
+    <div id="cand-tab-frio" style="display:none">
+      <div class="section-box">
+        <div class="section-box-title">
+          <span>🎯 Correos en frío</span>
+          <span style="font-size:11px;color:var(--texto-secundario);font-weight:400">El 40% de empleos en Ecuador nunca se publican</span>
+        </div>
+        <div style="background:rgba(245,230,66,0.06);border:1px solid rgba(245,230,66,0.2);border-radius:10px;padding:14px 16px;margin-bottom:18px;font-size:13px;color:var(--texto-secundario);line-height:1.6">
+          Claude buscará empresas ecuatorianas de tu sector que <strong style="color:var(--texto-primario)">no tienen vacante publicada</strong> y les enviará correos presentando tu perfil directamente a RRHH.
+        </div>
+        <div class="form-row" style="margin-bottom:14px">
+          <div class="field">
+            <label>Sector de empresas</label>
+            <select id="frioSector">
+              <option>Tecnología / Startups</option>
+              <option>Banca y Finanzas</option>
+              <option>Telecomunicaciones</option>
+              <option>Retail y Comercio</option>
+              <option>Construcción e Ingeniería</option>
+              <option>Salud y Farmacéutica</option>
+              <option>Educación</option>
+              <option>Manufactura</option>
+              <option>Todos los sectores</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Ciudad</label>
+            <select id="frioCiudad">
+              <option>Quito</option>
+              <option>Guayaquil</option>
+              <option>Cuenca</option>
+              <option>Ambato</option>
+              <option>Todo Ecuador</option>
+            </select>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:18px">
+          <label>Empresas a contactar hoy</label>
+          <select id="frioNumero">
+            <option value="5">5 empresas</option>
+            <option value="10" selected>10 empresas</option>
+            <option value="15">15 empresas</option>
+            <option value="20">20 empresas (máximo del plan)</option>
+          </select>
+        </div>
+        <button class="btn-full" onclick="ejecutarCorreosFrio()" style="background:var(--amarillo);color:var(--negro);font-family:'Syne',sans-serif;font-weight:700">
+          Buscar empresas y enviar correos en frío →
+        </button>
+      </div>
+
+      <div class="searching-anim" id="frioSearchAnim">
+        <div class="spin" style="border-top-color:var(--amarillo)"></div>
+        <div style="font-size:13px;color:var(--texto-secundario);margin-bottom:10px">Claude buscando empresas sin vacante publicada...</div>
+        <div id="frioSearchSrcs" style="max-width:400px;margin:0 auto"></div>
+      </div>
+
+      <div id="frioResultados"></div>
+    </div>
+
+    <!-- TAB: RESULTADOS -->
+    <div id="cand-tab-resultados" style="display:none">
+      <div id="candResultados" class="empty-state">
+        <div>🔍</div><p>Realiza una búsqueda para ver oportunidades laborales</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== EMPLEADOR ===== -->
+<div id="page-empleador" class="page">
+  <div class="emp-layout">
+    <div class="emp-header">
+      <div>
+        <div class="dash-welcome" id="empWelcome">Panel de Empleador</div>
+        <div class="dash-sub">Busca candidatos en todo Ecuador con IA</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span id="empPlanPill" class="badge-emp">PLAN PRO</span>
+        <button class="btn-sm-green" onclick="abrirPago('Pro','149')">Renovar</button>
+      </div>
+    </div>
+
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="empTab('buscar')">Buscar candidatos</button>
+      <button class="tab-btn" onclick="empTab('guardados')">Guardados</button>
+      <button class="tab-btn" onclick="empTab('correos')">Correos enviados</button>
+    </div>
+
+    <!-- TAB: BUSCAR -->
+    <div id="emp-tab-buscar">
+      <div class="search-bar-wrap">
+        <input type="text" id="empSearchInput" placeholder="Ej: Contador CPA con 5 años de experiencia en Guayaquil..." onkeydown="if(event.key==='Enter')buscarCandidatos()">
+        <button class="btn-search" onclick="buscarCandidatos()">Buscar con IA →</button>
+      </div>
+
+      <div class="filters-panel">
+        <div class="filters-title">Filtros avanzados</div>
+        <div class="filters-grid">
+          <div class="filter-group">
+            <label>Ciudad</label>
+            <select id="fCiudad">
+              <option value="">Todo Ecuador</option>
+              <option>Quito</option><option>Guayaquil</option><option>Cuenca</option>
+              <option>Ambato</option><option>Manta</option><option>Loja</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Área</label>
+            <select id="fArea">
+              <option value="">Todas</option>
+              <option>Tecnología</option><option>Administración</option><option>Contabilidad</option>
+              <option>Marketing</option><option>Salud</option><option>Ingeniería</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Experiencia mínima</label>
+            <select id="fExp">
+              <option value="">Sin filtro</option>
+              <option>1+ años</option><option>3+ años</option><option>5+ años</option><option>10+ años</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Modalidad</label>
+            <select id="fModalidad">
+              <option value="">Cualquiera</option>
+              <option>Presencial</option><option>Remoto</option><option>Híbrido</option>
+            </select>
+          </div>
+        </div>
+        <div class="chips-row">
+          <span style="font-size:11px;color:var(--texto-secundario);margin-right:4px">Disponibilidad:</span>
+          <span class="chip on" onclick="toggleChip(this)">Inmediata</span>
+          <span class="chip on" onclick="toggleChip(this)">2 semanas</span>
+          <span class="chip" onclick="toggleChip(this)">1 mes</span>
+          <span style="font-size:11px;color:var(--texto-secundario);margin-left:10px;margin-right:4px">Nivel:</span>
+          <span class="chip on" onclick="toggleChip(this)">Junior</span>
+          <span class="chip on" onclick="toggleChip(this)">Senior</span>
+          <span class="chip" onclick="toggleChip(this)">Gerencial</span>
+        </div>
+      </div>
+
+      <div class="sources-bar">
+        <div class="source-pill"><span class="source-dot" style="background:#0077B5"></span>LinkedIn</div>
+        <div class="source-pill"><span class="source-dot" style="background:#E63946"></span>Multitrabajos</div>
+        <div class="source-pill"><span class="source-dot" style="background:#FF6B35"></span>Indeed</div>
+        <div class="source-pill"><span class="source-dot" style="background:#4CAF50"></span>OLX EC</div>
+        <div class="source-pill"><span class="source-dot" style="background:#9B59B6"></span>Computrabajo</div>
+        <div class="source-pill"><span class="source-dot" style="background:#F39C12"></span>Facebook</div>
+        <div class="source-pill"><span class="source-dot" style="background:#3498DB"></span>+30 más</div>
+      </div>
+
+      <div class="searching-anim" id="empSearchAnim">
+        <div class="spin"></div>
+        <div style="font-size:13px;color:var(--texto-secundario);margin-bottom:10px">Claude con web search buscando candidatos...</div>
+        <div id="empSearchSrcs" style="max-width:500px;margin:0 auto"></div>
+      </div>
+
+      <div id="empResultsHeader" style="display:none" class="results-header">
+        <div class="results-count" id="empResultsCount"></div>
+        <select class="sort-select" onchange="sortResults(this.value)">
+          <option value="match">Ordenar: % Match</option>
+          <option value="exp">Ordenar: Experiencia</option>
+          <option value="disp">Ordenar: Disponibilidad</option>
+        </select>
+      </div>
+
+      <div id="empResults">
+        <div class="empty-state"><div>👥</div><p>Escribe el perfil que necesitas y Claude buscará en toda la web ecuatoriana</p></div>
+      </div>
+    </div>
+
+    <!-- TAB: GUARDADOS -->
+    <div id="emp-tab-guardados" style="display:none">
+      <div class="empty-state"><div>🔖</div><p>Guarda candidatos durante la búsqueda para verlos aquí</p></div>
+    </div>
+
+    <!-- TAB: CORREOS -->
+    <div id="emp-tab-correos" style="display:none">
+      <div id="correosList"><div class="empty-state"><div>📧</div><p>Los correos enviados aparecerán aquí</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== AUTH MODAL ===== -->
+<div class="modal-bg" id="authModal">
+  <div class="modal">
+    <h2 id="authTitle">Crear cuenta</h2>
+    <p class="modal-sub" id="authSub">Únete a TalentoEC gratis</p>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuth('register')" id="authTabReg">Registrarse</button>
+      <button class="auth-tab" onclick="switchAuth('login')" id="authTabLog">Iniciar sesión</button>
+    </div>
+
+    <!-- Register -->
+    <div id="authRegister">
+      <div class="tipo-selector" id="tipoSelector">
+        <div class="tipo-card selected" onclick="selectTipo('candidato',this)">
+          <div class="tipo-icon">👤</div>
+          <div class="tipo-label">Candidato</div>
+          <div class="tipo-desc">Busco empleo</div>
+        </div>
+        <div class="tipo-card" onclick="selectTipo('empleador',this)">
+          <div class="tipo-icon">🏢</div>
+          <div class="tipo-label">Empleador</div>
+          <div class="tipo-desc">Busco personal</div>
+        </div>
+      </div>
+      <div class="form-row" style="margin-bottom:14px">
+        <div class="field"><label>Nombre</label><input type="text" id="regNombre" placeholder="Juan Pérez"></div>
+        <div class="field"><label>Email</label><input type="email" id="regEmail" placeholder="juan@gmail.com"></div>
+      </div>
+      <div class="field"><label>Contraseña</label><input type="password" id="regPass" placeholder="Mínimo 6 caracteres"></div>
+      <div class="field" id="empEmpresaField" style="display:none"><label>Empresa</label><input type="text" id="regEmpresa" placeholder="Nombre de tu empresa"></div>
+      <button class="btn-full" onclick="registrar()">Crear cuenta gratis</button>
+      <div class="divider">o</div>
+      <button class="btn-google" onclick="loginGoogle()">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continuar con Google
+      </button>
+    </div>
+
+    <!-- Login -->
+    <div id="authLogin" style="display:none">
+      <div class="field"><label>Email</label><input type="email" id="logEmail" placeholder="tu@email.com"></div>
+      <div class="field"><label>Contraseña</label><input type="password" id="logPass" placeholder="Tu contraseña"></div>
+      <button class="btn-full" onclick="iniciarSesion()">Iniciar sesión</button>
+      <div class="divider">o</div>
+      <button class="btn-google" onclick="loginGoogle()">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continuar con Google
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAYPHONE MODAL ===== -->
+<div class="modal-bg" id="ppModal">
+  <div class="pp-modal">
+    <div id="ppPayView">
+      <div class="pp-header">
+        <h2>Pago seguro con PayPhone</h2>
+        <p>Tu plataforma de pagos ecuatoriana de confianza</p>
+      </div>
+      <div class="pp-body">
+        <div class="pp-plan-summary">
+          <div><div class="pp-plan-name">Plan seleccionado</div><div style="font-size:15px;font-weight:600;margin-top:2px" id="ppPlanName">Pro</div></div>
+          <div><div class="pp-plan-price" id="ppPlanPrice">$149</div><div style="font-size:10px;color:var(--texto-secundario);text-align:right">/mes</div></div>
+        </div>
+        <div class="filters-title" style="margin-bottom:12px">Método de pago</div>
+        <div class="pp-methods">
+          <div class="pp-method selected" onclick="selectPPMethod('tarjeta',this)">
+            <div class="pp-method-icon">💳</div>
+            <div class="pp-method-label">Tarjeta</div>
+            <div class="pp-method-desc">Crédito o débito</div>
+          </div>
+          <div class="pp-method" onclick="selectPPMethod('celular',this)">
+            <div class="pp-method-icon">📱</div>
+            <div class="pp-method-label">PayPhone App</div>
+            <div class="pp-method-desc">Pago por celular</div>
+          </div>
+        </div>
+
+        <!-- Tarjeta form -->
+        <div class="pp-form-section visible" id="ppTarjetaForm">
+          <div class="field"><label>Número de tarjeta</label><input type="text" placeholder="0000 0000 0000 0000" maxlength="19" oninput="formatCard(this)"></div>
+          <div class="form-row">
+            <div class="field"><label>Vencimiento</label><input type="text" placeholder="MM/AA" maxlength="5"></div>
+            <div class="field"><label>CVV</label><input type="text" placeholder="123" maxlength="3"></div>
+          </div>
+          <div class="field"><label>Nombre en la tarjeta</label><input type="text" placeholder="JUAN PÉREZ"></div>
+        </div>
+
+        <!-- Celular form -->
+        <div class="pp-form-section" id="ppCelularForm">
+          <div class="field">
+            <label>Número de celular</label>
+            <div class="pp-phone-input">
+              <div class="pp-phone-prefix">+593</div>
+              <input type="tel" placeholder="0999 123 456" style="flex:1;background:var(--negro);border:1px solid var(--gris-borde);color:var(--texto-primario);padding:10px 14px;border-radius:8px;font-size:14px;outline:none">
+            </div>
+            <div style="font-size:11px;color:var(--texto-secundario);margin-top:6px">Recibirás una notificación en tu app PayPhone para confirmar</div>
+          </div>
+        </div>
+
+        <button class="btn-pp-pay" onclick="procesarPago()">Pagar con PayPhone →</button>
+        <div class="pp-security">Pago cifrado SSL · PCI DSS · 100% seguro en Ecuador</div>
+        <div style="text-align:center;margin-top:12px"><button onclick="cerrarPago()" style="background:none;border:none;color:var(--texto-secundario);font-size:12px;cursor:pointer">Cancelar</button></div>
+      </div>
+    </div>
+    <div class="pp-success" id="ppSuccess">
+      <div class="pp-success-icon">✅</div>
+      <h3>¡Pago exitoso!</h3>
+      <p>Tu plan ha sido activado. Ahora tienes acceso completo a todas las funciones de búsqueda con IA en Ecuador.</p>
+      <button class="btn-full" style="margin-top:20px" onclick="cerrarPagoExito()">Ir a mi dashboard →</button>
+    </div>
+  </div>
+</div>
+
+<!-- EMAIL MODAL -->
+<div class="modal-bg" id="emailModal">
+  <div class="email-modal-inner">
+    <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:4px">Enviar correo automático</h2>
+    <p style="font-size:12px;color:var(--texto-secundario);margin-bottom:18px">Claude redactó este mensaje personalizado</p>
+    <div class="field"><label>Para</label><input type="email" id="modalTo" readonly style="opacity:.6"></div>
+    <div class="field"><label>Asunto</label><input type="text" id="modalSubject"></div>
+    <div class="field"><label>Mensaje</label><textarea id="modalBody" style="min-height:150px"></textarea></div>
+    <div class="ai-note">✦ Generado por Claude con contexto del candidato. Puedes editar antes de enviar.</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cerrarEmail()">Cancelar</button>
+      <button class="btn-send" onclick="enviarEmail()">Enviar correo →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE MENU -->
+<div class="profile-menu" id="profileMenu">
+  <div class="profile-menu-user"><strong id="menuUserName">—</strong><span id="menuUserEmail">—</span></div>
+  <div class="profile-menu-item" onclick="irMiPerfil()">Mi perfil</div>
+  <div class="profile-menu-item" onclick="abrirPago('Pro','149')">Mejorar plan</div>
+  <div class="profile-menu-divider"></div>
+  <div class="profile-menu-item danger" onclick="cerrarSesion()">Cerrar sesión</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ======= CONFIG =======
+const BACKEND_URL = 'https://talentoec-backend-production.up.railway.app';
+
+// ======= STATE =======
+let currentUser = null;
+let userTipo = 'candidato';
+let selectedTipo = 'candidato';
+let cvData = {};
+let candidatosData = [];
+let correosEnviados = [];
+let busquedasCount = 0;
+let correosCount = 0;
+
+// ======= STORAGE =======
+async function saveToStorage(key, val) {
+  try { await window.storage.set(key, JSON.stringify(val)); } catch(e) {}
+}
+async function getFromStorage(key) {
+  try { const r = await window.storage.get(key); return r ? JSON.parse(r.value) : null; } catch(e) { return null; }
+}
+
+// ======= INIT =======
+window.addEventListener('load', async () => {
+  const saved = await getFromStorage('talento_user');
+  if (saved) {
+    currentUser = saved;
+    userTipo = saved.tipo;
+    setLoggedInUI();
+    if (saved.cvData) { cvData = saved.cvData; mostrarCVGuardado(); }
+    if (saved.stats) { busquedasCount = saved.stats.busquedas||0; correosCount = saved.stats.correos||0; updateStats(); }
+  }
+});
+
+// ======= AUTH =======
+function openAuth(mode) { document.getElementById('authModal').classList.add('open'); switchAuth(mode); }
+function closeAuth() { document.getElementById('authModal').classList.remove('open'); }
+function switchAuth(mode) {
+  const isReg = mode === 'register';
+  document.getElementById('authRegister').style.display = isReg ? 'block' : 'none';
+  document.getElementById('authLogin').style.display = isReg ? 'none' : 'block';
+  document.getElementById('authTabReg').classList.toggle('active', isReg);
+  document.getElementById('authTabLog').classList.toggle('active', !isReg);
+  document.getElementById('authTitle').textContent = isReg ? 'Crear cuenta' : 'Bienvenido de vuelta';
+  document.getElementById('authSub').textContent = isReg ? 'Únete a TalentoEC gratis' : 'Ingresa a tu cuenta';
+}
+function selectTipo(tipo, el) {
+  selectedTipo = tipo;
+  document.querySelectorAll('.tipo-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('empEmpresaField').style.display = tipo === 'empleador' ? 'block' : 'none';
+}
+async function registrar() {
+  const nombre = document.getElementById('regNombre').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pass = document.getElementById('regPass').value;
+  if (!nombre || !email || !pass) { showToast('⚠ Completa todos los campos', true); return; }
+  if (pass.length < 6) { showToast('⚠ Contraseña mínimo 6 caracteres', true); return; }
+  currentUser = { nombre, email, tipo: selectedTipo, empresa: document.getElementById('regEmpresa').value, plan: 'free', creado: new Date().toLocaleDateString('es-EC'), stats: { busquedas: 0, correos: 0 } };
+  userTipo = selectedTipo;
+  await saveToStorage('talento_user', currentUser);
+  closeAuth();
+  setLoggedInUI();
+  showToast('✓ Cuenta creada. ¡Bienvenido ' + nombre + '!');
+  setTimeout(() => {
+    showPage(userTipo);
+    // Autocompletar campos con datos de la cuenta recién creada
+    if (document.getElementById('cvNombre')) document.getElementById('cvNombre').value = nombre;
+    if (document.getElementById('cvEmail')) document.getElementById('cvEmail').value = email;
+  }, 600);
+}
+async function iniciarSesion() {
+  const email = document.getElementById('logEmail').value.trim();
+  const pass = document.getElementById('logPass').value;
+  if (!email || !pass) { showToast('⚠ Ingresa email y contraseña', true); return; }
+  const saved = await getFromStorage('talento_user');
+  if (saved && saved.email === email) {
+    currentUser = saved; userTipo = saved.tipo;
+    if (saved.cvData) { cvData = saved.cvData; }
+    if (saved.stats) { busquedasCount = saved.stats.busquedas||0; correosCount = saved.stats.correos||0; }
+    closeAuth(); setLoggedInUI();
+    showToast('✓ Sesión iniciada');
+    setTimeout(() => {
+      showPage(userTipo);
+      if (saved.cvData) mostrarCVGuardado();
+      updateStats(); updateLimitBar();
+      // Autocompletar campos con datos de cuenta
+      if (document.getElementById('cvNombre')) document.getElementById('cvNombre').value = saved.nombre || '';
+      if (document.getElementById('cvEmail')) document.getElementById('cvEmail').value = saved.email || '';
+    }, 600);
+  } else {
+    // Demo: create session anyway
+    currentUser = { nombre: 'Usuario Demo', email, tipo: 'candidato', plan: 'free', stats: { busquedas: 0, correos: 0 } };
+    userTipo = 'candidato';
+    await saveToStorage('talento_user', currentUser);
+    closeAuth(); setLoggedInUI();
+    showToast('✓ Sesión iniciada');
+    setTimeout(() => showPage(userTipo), 600);
+  }
+}
+function loginGoogle() { showToast('Google OAuth requiere backend. Usa registro manual.', true); }
+function setLoggedInUI() {
+  const nr = document.getElementById('navRight');
+  const initials = currentUser.nombre.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  nr.innerHTML = `<div class="user-avatar" onclick="toggleProfileMenu()" id="userAvatarBtn">${initials}</div>`;
+  document.getElementById('menuUserName').textContent = currentUser.nombre;
+  document.getElementById('menuUserEmail').textContent = currentUser.email;
+  document.getElementById('candWelcome').textContent = 'Hola, ' + currentUser.nombre.split(' ')[0] + ' 👋';
+  document.getElementById('empWelcome').textContent = 'Panel de ' + (currentUser.empresa || currentUser.nombre);
+}
+function toggleProfileMenu() {
+  document.getElementById('profileMenu').classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#profileMenu') && !e.target.closest('#userAvatarBtn'))
+    document.getElementById('profileMenu').classList.remove('open');
+});
+function irMiPerfil() { document.getElementById('profileMenu').classList.remove('open'); }
+async function cerrarSesion() {
+  currentUser = null;
+  document.getElementById('navRight').innerHTML = `<button class="btn-nav-login" onclick="openAuth('login')">Iniciar sesión</button><button class="btn-nav-cta" onclick="openAuth('register')">Registrarse gratis</button>`;
+  showPage('landing');
+  document.getElementById('profileMenu').classList.remove('open');
+  showToast('Sesión cerrada');
+}
+function requireAuth(page) {
+  if (currentUser) { showPage(page); }
+  else { openAuth('register'); }
+}
+function goHome() { showPage('landing'); }
+
+// ======= PAGES =======
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.ntab').forEach(b => b.classList.remove('active'));
+  document.getElementById('ntab-' + page)?.classList.add('active');
+}
+
+// ======= TABS =======
+function candTab(tab) {
+  ['cv','busqueda','resultados','frio'].forEach(t => {
+    document.getElementById('cand-tab-'+t).style.display = t===tab?'block':'none';
+  });
+  document.querySelectorAll('#page-candidato .tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', ['cv','busqueda','resultados','frio'][i]===tab);
+  });
+
+  // Si va a CV tab, autocompletar nombre y email con datos de la cuenta
+  if (tab === 'cv') {
+    const nombreInput = document.getElementById('cvNombre');
+    const emailInput = document.getElementById('cvEmail');
+    if (currentUser) {
+      if (!nombreInput.value && currentUser.nombre) nombreInput.value = currentUser.nombre;
+      if (!emailInput.value && currentUser.email) emailInput.value = currentUser.email;
+    }
+    // Si ya tiene CV guardado, también precargar ciudad y área
+    if (cvData && cvData.ciudad) {
+      document.getElementById('cvCiudad').value = cvData.ciudad;
+    }
+    if (cvData && cvData.area) {
+      document.getElementById('cvArea').value = cvData.area;
+    }
+  }
+
+  // Si va a buscar y tiene CV guardado, autocompletar la búsqueda
+  if (tab === 'busqueda' && cvData && cvData.area) {
+    const queryInput = document.getElementById('busquedaQuery');
+    const ciudadSelect = document.getElementById('busquedaCiudad');
+
+    if (!queryInput.value) {
+      // Construir query automática basada en el CV
+      const area = cvData.area || '';
+      const ciudad = cvData.ciudad || 'Ecuador';
+      const exp = cvData.experiencia || '';
+      const nombre = cvData.nombre || '';
+
+      let query = area;
+      if (exp && exp !== 'Sin experiencia (recién graduado)') {
+        query += ' con ' + exp + ' de experiencia';
+      }
+      queryInput.value = query;
+
+      // Autocompletar ciudad
+      if (cvData.ciudad) {
+        for (let opt of ciudadSelect.options) {
+          if (opt.value === cvData.ciudad) {
+            ciudadSelect.value = cvData.ciudad;
+            break;
+          }
+        }
+      }
+
+      // Mostrar banner
+      document.getElementById('cvDetectadoBanner').style.display = 'block';
+    }
+  }
+}
+function empTab(tab) {
+  ['buscar','guardados','correos'].forEach(t => {
+    document.getElementById('emp-tab-'+t).style.display = t===tab?'block':'none';
+  });
+  document.querySelectorAll('#page-empleador .tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', ['buscar','guardados','correos'][i]===tab);
+  });
+  if (tab==='correos') renderCorreos();
+}
+
+// ======= CV =======
+async function handleFile(input) {
+  const file = input.files[0]; if (!file) return;
+  const nombre = file.name.toLowerCase();
+  showToast('⟳ Leyendo ' + file.name + '...');
+
+  // ── PDF ──────────────────────────────────────────
+  if (nombre.endsWith('.pdf')) {
+    const reader = new FileReader();
+    reader.onload = async e => {
+      try {
+        const typedArray = new Uint8Array(e.target.result);
+        const pdf = await window.pdfjsLib.getDocument({ data: typedArray }).promise;
+        let texto = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          // Reconstruir líneas respetando posición Y
+          let lastY = null;
+          for (const item of content.items) {
+            if (lastY !== null && Math.abs(item.transform[5] - lastY) > 5) {
+              texto += '\n';
+            }
+            texto += item.str + ' ';
+            lastY = item.transform[5];
+          }
+          texto += '\n';
+        }
+        document.getElementById('cvText').value = texto.trim();
+        showToast('✓ PDF cargado correctamente');
+      } catch(err) {
+        showToast('⚠ Error leyendo PDF. Pega el texto manualmente.', true);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+
+  // ── WORD (.docx) ─────────────────────────────────
+  } else if (nombre.endsWith('.docx')) {
+    const reader = new FileReader();
+    reader.onload = async e => {
+      try {
+        const result = await mammoth.extractRawText({ arrayBuffer: e.target.result });
+        const texto = result.value.trim();
+        if (!texto) { showToast('⚠ El archivo Word está vacío', true); return; }
+        document.getElementById('cvText').value = texto;
+        showToast('✓ Word cargado correctamente');
+      } catch(err) {
+        showToast('⚠ Error leyendo Word. Pega el texto manualmente.', true);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+
+  // ── TXT ──────────────────────────────────────────
+  } else if (nombre.endsWith('.txt')) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('cvText').value = e.target.result.trim();
+      showToast('✓ Archivo de texto cargado');
+    };
+    reader.readAsText(file, 'UTF-8');
+
+  // ── Formato no soportado ──────────────────────────
+  } else {
+    showToast('⚠ Formato no soportado. Usa PDF, Word o TXT.', true);
+  }
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0]; if (!file) return;
+  const fakeInput = { files: [file] };
+  handleFile(fakeInput);
+}
+function editarCV() {
+  document.getElementById('cvSavedBanner').style.display = 'none';
+  document.getElementById('uploadSection').style.display = 'block';
+  if (cvData.texto) document.getElementById('cvText').value = cvData.texto;
+  if (cvData.nombre) document.getElementById('cvNombre').value = cvData.nombre;
+  if (cvData.email) document.getElementById('cvEmail').value = cvData.email;
+}
+function mostrarCVGuardado() {
+  document.getElementById('cvSavedBanner').style.display = 'flex';
+  document.getElementById('uploadSection').style.display = 'none';
+  document.getElementById('cvSavedDate').textContent = 'Guardado el ' + (cvData.fecha || 'hoy');
+  if (cvData.analysis) {
+    document.getElementById('cvAnalysis').style.display = 'block';
+    document.getElementById('analysisStatus').textContent = '✓ Análisis completado';
+    document.getElementById('analysisContent').textContent = cvData.analysis;
+  }
+}
+async function guardarYAnalizar() {
+  const texto = document.getElementById('cvText').value.trim();
+  const nombre = document.getElementById('cvNombre').value.trim();
+  const email = document.getElementById('cvEmail').value.trim();
+  const ciudad = document.getElementById('cvCiudad').value;
+  const area = document.getElementById('cvArea').value;
+  if (!texto) { showToast('⚠ Pega o sube tu CV primero', true); return; }
+  cvData = { texto, nombre, email, ciudad, area, fecha: new Date().toLocaleDateString('es-EC') };
+  document.getElementById('cvAnalysis').style.display = 'block';
+  document.getElementById('analysisStatus').textContent = 'Claude analizando tu CV...';
+  document.getElementById('analysisContent').innerHTML = '<div style="color:var(--verde)">⟳ Procesando...</div>';
+
+  let analysis = '';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:1000,
+        messages:[{role:'user',content:`Analiza este CV para el mercado laboral de Ecuador. Responde en español con emojis:\n\n1. 📋 RESUMEN DEL PERFIL (2-3 líneas)\n2. 💼 HABILIDADES CLAVE (6-8 habilidades)\n3. ⭐ PUNTOS FUERTES (3 fortalezas)\n4. 📈 ÁREAS DE MEJORA (2-3 sugerencias)\n5. 🇪🇨 COMPATIBILIDAD MERCADO ECUADOR (puntuación /10 para ${area})\n6. 🔍 PALABRAS CLAVE para búsqueda\n7. 🎯 EMPRESAS ECUATORIANAS ideales\n\nCV:\n${texto}`}]
+      })
+    });
+    const data = await res.json();
+    analysis = data.content?.[0]?.text || '';
+  } catch(e) {}
+
+  // Si no hay análisis real, usar modo demo
+  if (!analysis) {
+    analysis = `📋 RESUMEN DEL PERFIL
+Profesional con experiencia en ${area}, con base en ${ciudad}. Perfil con alta empleabilidad en el mercado ecuatoriano y orientado a resultados concretos.
+
+💼 HABILIDADES CLAVE
+• Dominio técnico en ${area}
+• Trabajo en equipo y liderazgo de proyectos
+• Adaptabilidad a entornos dinámicos
+• Comunicación efectiva oral y escrita
+• Manejo de herramientas digitales avanzadas
+• Orientación al cliente y resultados medibles
+• Resolución de problemas complejos
+
+⭐ PUNTOS FUERTES
+1. Experiencia práctica demostrable en empresas ecuatorianas
+2. Perfil bien alineado con la demanda del mercado en ${ciudad}
+3. Capacidad de adaptación rápida a nuevos entornos y tecnologías
+
+📈 ÁREAS DE MEJORA
+1. Fortalecer certificaciones internacionales reconocidas en tu sector
+2. Ampliar red de contactos profesionales en LinkedIn Ecuador
+3. Incluir métricas y logros cuantificables en el CV
+
+🇪🇨 COMPATIBILIDAD MERCADO ECUADOR
+Puntuación: 8.5/10 para ${area} en Ecuador
+El perfil tiene muy buena compatibilidad con el mercado ecuatoriano actual. Hay demanda creciente para este perfil especialmente en Quito y Guayaquil.
+
+🔍 PALABRAS CLAVE PARA BÚSQUEDA
+${area}, Ecuador, ${ciudad}, profesional, experiencia, tiempo completo, empresas ecuatorianas
+
+🎯 EMPRESAS ECUATORIANAS IDEALES
+• Corporaciones líderes del sector en Quito y Guayaquil
+• Empresas medianas en proceso de crecimiento
+• Startups tecnológicas ecuatorianas con inversión
+• Multinacionales con operaciones establecidas en Ecuador
+
+⚡ Análisis en modo demo — conecta tu API key de Anthropic para análisis personalizado real`;
+    showToast('✓ CV guardado — modo demo activo');
+  } else {
+    showToast('✓ CV guardado en tu cuenta');
+  }
+
+  cvData.analysis = analysis;
+  document.getElementById('analysisContent').textContent = analysis;
+  document.getElementById('analysisStatus').textContent = '✓ Análisis completado';
+  if (currentUser) {
+    currentUser.cvData = cvData;
+    await saveToStorage('talento_user', currentUser);
+  }
+  mostrarCVGuardado();
+}
+
+
+async function buscarEmpleo() {
+  if (!currentUser) { openAuth('register'); return; }
+  const query = document.getElementById('busquedaQuery').value.trim();
+  if (!query) { showToast('⚠ Describe qué trabajo buscas', true); return; }
+  const ciudad = document.getElementById('busquedaCiudad').value;
+  const modalidad = document.getElementById('busquedaModalidad').value;
+  const fuentes = [...document.querySelectorAll('#fuentesChips .chip.on')].map(c=>c.textContent);
+
+  candTab('resultados');
+  document.getElementById('candResultados').innerHTML = '';
+  const anim = document.getElementById('candSearchAnim'); anim.classList.add('visible');
+  const srcs = document.getElementById('candSearchSrcs'); srcs.innerHTML = '';
+  fuentes.forEach((f,i) => setTimeout(()=>{ const el=document.createElement('div');el.className='src-item';el.textContent=f;srcs.appendChild(el); },i*350));
+
+  await new Promise(r=>setTimeout(r, fuentes.length*350+600));
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:1000,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        messages:[{role:'user',content:`Busca ofertas de trabajo reales en Ecuador para: "${query}". Ciudad preferida: ${ciudad}. Modalidad: ${modalidad}. Fuentes: ${fuentes.join(', ')}.\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa ecuatoriana real","cargo":"título puesto","ciudad":"ciudad Ecuador","salario":"rango USD","fuente":"fuente donde se encontró","match":85,"email":"rrhh@empresa.com.ec","descripcion":"descripción breve","url":"https://..."}]}\n\nGenera 5 trabajos con datos realistas de Ecuador.`}]
+      })
+    });
+    const data = await res.json();
+    const text = (data.content||[]).map(i=>i.text||'').join('');
+    const clean = text.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    anim.classList.remove('visible');
+    busquedasCount++;
+    if (currentUser) { currentUser.stats = currentUser.stats||{}; currentUser.stats.busquedas = busquedasCount; await saveToStorage('talento_user', currentUser); }
+    updateStats(parsed.jobs);
+    renderJobCards(parsed.jobs);
+  } catch(e) {
+    anim.classList.remove('visible');
+    // MODO DEMO trabajos
+    const demoJobs = [
+      {cargo:'Ingeniero de Software Senior', empresa:'Kruger Corp', ciudad:'Quito', salario:'$1,800-2,500', fuente:'LinkedIn', match:94, email:'rrhh@kruger.com.ec', descripcion:'Desarrollador backend con experiencia en Node.js y bases de datos relacionales.', url:'https://linkedin.com'},
+      {cargo:'Desarrollador Full Stack', empresa:'Novatech Ecuador', ciudad:'Quito', salario:'$1,500-2,000', fuente:'Multitrabajos', match:89, email:'talento@novatech.ec', descripcion:'Posición para desarrollo de aplicaciones empresariales con React y Node.js.', url:'https://multitrabajos.com'},
+      {cargo:'Tech Lead', empresa:'Tata Consultancy Ecuador', ciudad:'Guayaquil', salario:'$2,000-3,000', fuente:'Indeed', match:85, email:'careers@tcs.com', descripcion:'Liderar equipo de desarrollo de 6 personas en proyecto bancario.', url:'https://indeed.com'},
+      {cargo:'Desarrollador Backend', empresa:'Banco Pichincha', ciudad:'Quito', salario:'$1,600-2,200', fuente:'Computrabajo', match:82, email:'rrhh@pichincha.com', descripcion:'Desarrollo y mantenimiento de microservicios para plataforma digital del banco.', url:'https://computrabajo.com.ec'},
+      {cargo:'Analista Programador', empresa:'CNT Ecuador', ciudad:'Quito', salario:'$1,400-1,800', fuente:'OLX Ecuador', match:78, email:'empleo@cnt.gob.ec', descripcion:'Desarrollar soluciones tecnológicas para telecomunicaciones.', url:'https://olx.com.ec'}
+    ];
+    busquedasCount++;
+    updateStats(demoJobs);
+    renderJobCards(demoJobs);
+    showToast('Modo demo — conecta API key para búsqueda real');
+  }
+}
+
+function renderJobCards(jobs) {
+  const el = document.getElementById('candResultados');
+  el.innerHTML = `<div style="font-size:12px;color:var(--texto-secundario);margin-bottom:14px">${jobs.length} oportunidades encontradas en Ecuador</div>` +
+    jobs.map((j,i)=>`
+    <div class="job-card" style="animation:fadeIn .4s ease ${i*.08}s forwards;opacity:0">
+      <div class="job-card-top">
+        <div><div class="job-title">${j.cargo}</div><div class="job-company">${j.empresa} · ${j.ciudad}</div></div>
+        <div class="match-badge">${j.match}%</div>
+      </div>
+      <div class="tags-row"><span class="tag">${j.fuente}</span><span class="tag">${j.salario}</span><span class="tag">${j.ciudad}</span></div>
+      <div style="font-size:12px;color:var(--texto-secundario)">${j.descripcion}</div>
+      <div class="card-actions">
+        <button class="btn-sm-green" onclick="abrirEmailModal('${j.email}','${j.empresa}','${j.cargo}','${currentUser?.nombre||'Candidato'}',true)">Enviar correo automático</button>
+        <button class="btn-sm-outline" onclick="window.open('${j.url||'#'}')">Ver oferta →</button>
+      </div>
+    </div>`).join('');
+}
+
+// ======= EMPLEADOR BUSQUEDA =======
+async function buscarCandidatos() {
+  if (!currentUser) { openAuth('register'); return; }
+  const query = document.getElementById('empSearchInput').value.trim();
+  if (!query) { showToast('⚠ Describe el perfil que necesitas', true); return; }
+  const ciudad = document.getElementById('fCiudad').value;
+  const area = document.getElementById('fArea').value;
+  const exp = document.getElementById('fExp').value;
+  const modalidad = document.getElementById('fModalidad').value;
+
+  document.getElementById('empResults').innerHTML='';
+  document.getElementById('empResultsHeader').style.display='none';
+  const anim = document.getElementById('empSearchAnim'); anim.classList.add('visible');
+  const srcs = document.getElementById('empSearchSrcs'); srcs.innerHTML='';
+  ['LinkedIn','Multitrabajos','Indeed EC','OLX','Computrabajo','Facebook','Twitter/X','Universidades'].forEach((f,i)=>
+    setTimeout(()=>{ const el=document.createElement('div');el.className='src-item';el.textContent=f;srcs.appendChild(el); },i*300)
+  );
+
+  await new Promise(r=>setTimeout(r,2800));
+
+  try {
+    const filtros = [ciudad&&`ciudad: ${ciudad}`,area&&`área: ${area}`,exp&&`experiencia mínima: ${exp}`,modalidad&&`modalidad: ${modalidad}`].filter(Boolean).join(', ');
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:1000,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        messages:[{role:'user',content:`Busca candidatos en Ecuador para: "${query}". Filtros: ${filtros||'ninguno'}.\n\nResponde SOLO con JSON válido:\n{"candidatos":[{"nombre":"nombre ecuatoriano","cargo_actual":"título","empresa_actual":"empresa EC","ciudad":"ciudad EC","experiencia":"X años","habilidades":["skill1","skill2","skill3","skill4"],"match":92,"email":"email@ejemplo.com","fuente":"LinkedIn/etc","disponibilidad":"Inmediata/2 semanas/1 mes","salario_esperado":"$X-Y/mes","nivel":"Junior/Senior/Gerencial"}]}\n\nGenera 6 candidatos con nombres y datos ecuatorianos. Varía perfiles y ciudades.`}]
+      })
+    });
+    const data = await res.json();
+    const text = (data.content||[]).map(i=>i.text||'').join('');
+    const clean = text.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    candidatosData = parsed.candidatos;
+    anim.classList.remove('visible');
+    document.getElementById('empResultsHeader').style.display='flex';
+    document.getElementById('empResultsCount').textContent = `${candidatosData.length} candidatos encontrados en Ecuador`;
+    renderCandidatos(candidatosData);
+  } catch(e) {
+    anim.classList.remove('visible');
+    // MODO DEMO candidatos
+    const demoCandidatos = [
+      {nombre:'Carlos Andrade Mora', cargo_actual:'Desarrollador Full Stack', empresa_actual:'Kruger Corp', ciudad:'Quito', experiencia:'5 años', habilidades:['React','Node.js','PostgreSQL','Docker'], match:96, email:'carlos.andrade@gmail.com', fuente:'LinkedIn', disponibilidad:'Inmediata', salario_esperado:'$2,000-2,500/mes', nivel:'Senior'},
+      {nombre:'María Fernández Valle', cargo_actual:'Ingeniería de Software', empresa_actual:'Novatech Ecuador', ciudad:'Guayaquil', experiencia:'4 años', habilidades:['Python','Django','AWS','MongoDB'], match:91, email:'mfernandez@hotmail.com', fuente:'Multitrabajos', disponibilidad:'2 semanas', salario_esperado:'$1,800-2,200/mes', nivel:'Senior'},
+      {nombre:'Diego Salazar Ríos', cargo_actual:'Tech Lead', empresa_actual:'Banco Pichincha', ciudad:'Quito', experiencia:'7 años', habilidades:['Java','Spring Boot','Kubernetes','Azure'], match:88, email:'dsalazar@outlook.com', fuente:'Indeed', disponibilidad:'1 mes', salario_esperado:'$2,500-3,500/mes', nivel:'Gerencial'},
+      {nombre:'Ana Lucía Torres', cargo_actual:'Desarrolladora Frontend', empresa_actual:'CNT Ecuador', ciudad:'Cuenca', experiencia:'3 años', habilidades:['Vue.js','TypeScript','Figma','REST APIs'], match:84, email:'aitorres@gmail.com', fuente:'Computrabajo', disponibilidad:'Inmediata', salario_esperado:'$1,400-1,800/mes', nivel:'Junior'},
+      {nombre:'Roberto Vélez Paz', cargo_actual:'DevOps Engineer', empresa_actual:'Tata Consultancy', ciudad:'Quito', experiencia:'6 años', habilidades:['Docker','Kubernetes','CI/CD','Linux'], match:80, email:'rvelez@gmail.com', fuente:'LinkedIn', disponibilidad:'2 semanas', salario_esperado:'$2,200-3,000/mes', nivel:'Senior'},
+      {nombre:'Sofía Cabrera Luna', cargo_actual:'Data Engineer', empresa_actual:'Telefónica Ecuador', ciudad:'Guayaquil', experiencia:'4 años', habilidades:['Python','Spark','SQL','Power BI'], match:77, email:'scabrera@yahoo.com', fuente:'Facebook', disponibilidad:'1 mes', salario_esperado:'$1,800-2,400/mes', nivel:'Senior'}
+    ];
+    candidatosData = demoCandidatos;
+    document.getElementById('empResultsHeader').style.display='flex';
+    document.getElementById('empResultsCount').textContent = demoCandidatos.length + ' candidatos encontrados (demo)';
+    renderCandidatos(demoCandidatos);
+    showToast('Modo demo — conecta API key para búsqueda real');
+  }
+}
+
+function renderCandidatos(list) {
+  document.getElementById('empResults').innerHTML = list.map((c,i)=>`
+    <div class="candidate-card" style="animation:fadeIn .4s ease ${i*.08}s forwards;opacity:0">
+      <div class="cc-top">
+        <div>
+          <div class="cc-name">${c.nombre}</div>
+          <div class="cc-role">${c.cargo_actual} · ${c.empresa_actual}</div>
+        </div>
+        <div class="cc-badges">
+          <span class="match-badge">${c.match}% match</span>
+          <span class="tag">${c.nivel||'Senior'}</span>
+        </div>
+      </div>
+      <div class="tags-row">${c.habilidades.map(h=>`<span class="tag">${h}</span>`).join('')}<span class="tag">📍 ${c.ciudad}</span></div>
+      <div class="cc-meta">
+        <span>Experiencia: ${c.experiencia}</span>
+        <span>Disponibilidad: ${c.disponibilidad}</span>
+        <span>Salario: ${c.salario_esperado||'A convenir'}</span>
+        <span>Fuente: ${c.fuente}</span>
+      </div>
+      <div class="card-actions">
+        <button class="btn-sm-green" onclick="abrirEmailModal('${c.email}','','${c.cargo_actual}','${c.nombre}',false)">Enviar correo automático</button>
+        <button class="btn-sm-outline" onclick="guardarCandidato('${c.nombre}')">Guardar</button>
+        <button class="btn-sm-outline" onclick="verPerfil('${c.nombre}')">Ver perfil</button>
+      </div>
+    </div>`).join('');
+}
+
+function sortResults(by) {
+  if (!candidatosData.length) return;
+  const sorted = [...candidatosData].sort((a,b)=>{
+    if(by==='match') return b.match - a.match;
+    if(by==='exp') return parseInt(b.experiencia) - parseInt(a.experiencia);
+    if(by==='disp') return a.disponibilidad.localeCompare(b.disponibilidad);
+    return 0;
+  });
+  renderCandidatos(sorted);
+}
+
+function guardarCandidato(nombre) { showToast('✓ ' + nombre + ' guardado'); }
+function verPerfil(nombre) { showToast('Perfil completo próximamente'); }
+
+// ======= EMAIL =======
+async function abrirEmailModal(email, empresa, cargo, nombre, esParaEmpresa) {
+  document.getElementById('modalTo').value = email;
+  document.getElementById('modalSubject').value = 'Oportunidad laboral — ' + cargo;
+  document.getElementById('modalBody').value = '⟳ Generando con Claude...';
+  document.getElementById('emailModal').classList.add('open');
+
+  const prompt = esParaEmpresa
+    ? `Redacta un correo profesional en español para enviar al RRHH de "${empresa}" presentando al candidato "${nombre}" para el puesto de "${cargo}". Formal, 3-4 párrafos, solicita entrevista. Tono profesional ecuatoriano. Sin asunto, solo el cuerpo del correo.`
+    : `Redacta un correo profesional en español para contactar a "${nombre}", actualmente como "${cargo}". Cordial, 3 párrafos, informa que encontramos su perfil y hay una oportunidad interesante. Sin revelar empresa. Tono respetuoso. Sin asunto, solo el cuerpo.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:500, messages:[{role:'user',content:prompt}] })
+    });
+    const data = await res.json();
+    document.getElementById('modalBody').value = data.content?.[0]?.text || '';
+  } catch(e) {
+    // MODO DEMO email
+    const demoEmail = esParaEmpresa
+      ? `Estimado equipo de Recursos Humanos de ${empresa || 'la empresa'},
+
+Me dirijo a ustedes con el fin de presentar mi candidatura para el puesto de ${cargo} que tienen disponible en su organización.
+
+Soy ${nombreRemitente}, profesional con experiencia en el área, y considero que mi perfil se ajusta muy bien a los requerimientos de esta posición. A lo largo de mi carrera he desarrollado competencias clave que me permitirían aportar valor significativo a su equipo.
+
+Adjunto mi currículum vitae para su consideración y quedo a su disposición para una entrevista en el momento que estimen conveniente.
+
+Muchas gracias por su tiempo y atención.
+
+Atentamente,
+${nombreRemitente}`
+      : `Estimado/a ${para},
+
+Me pongo en contacto con usted porque hemos encontrado su perfil profesional y creemos que existe una oportunidad laboral que podría ser de su interés.
+
+Su experiencia como ${cargo} llama mucho nuestra atención. Tenemos una posición disponible en una empresa ecuatoriana que podría encajar perfectamente con sus habilidades y expectativas de carrera.
+
+Si está interesado/a en conocer más detalles sobre esta oportunidad, con gusto podemos coordinar una conversación.
+
+Quedamos atentos a su respuesta.
+
+Saludos cordiales`;
+    document.getElementById('modalBody').value = demoEmail;
+  }
+}
+
+function cerrarEmail() { document.getElementById('emailModal').classList.remove('open'); }
+async function enviarEmail() {
+  if (!puedeEnviarCorreo()) { cerrarEmail(); return; }
+  const to = document.getElementById('modalTo').value;
+  const subject = document.getElementById('modalSubject').value;
+  const body = document.getElementById('modalBody').value;
+  window.open(`mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+  correosCount++;
+  correosEnviados.push({ to, subject, fecha: new Date().toLocaleString('es-EC'), estado: 'Enviado' });
+  if (currentUser) { currentUser.stats = currentUser.stats||{}; currentUser.stats.correos = correosCount; await saveToStorage('talento_user', currentUser); }
+  updateStats();
+  cerrarEmail();
+  showToast('✓ Correo abierto en tu cliente de correo');
+}
+
+async function ejecutarCorreosFrio() {
+  if (!currentUser) { openAuth('register'); return; }
+  const sector = document.getElementById('frioSector').value;
+  const ciudad = document.getElementById('frioCiudad').value;
+  const numero = document.getElementById('frioNumero').value;
+  const nombre = currentUser.nombre;
+  const area = cvData?.area || 'profesional';
+
+  document.getElementById('frioResultados').innerHTML = '';
+  const anim = document.getElementById('frioSearchAnim');
+  anim.classList.add('visible');
+  const srcs = document.getElementById('frioSearchSrcs');
+  srcs.innerHTML = '';
+
+  const fuentes = ['Google Ecuador', 'LinkedIn empresas', 'Páginas amarillas EC', 'Superintendencia Cías', 'Cámara de Comercio', 'Directorio empresarial'];
+  fuentes.forEach((f,i) => setTimeout(() => {
+    const el = document.createElement('div');
+    el.className = 'src-item'; el.textContent = f; srcs.appendChild(el);
+  }, i*400));
+
+  await new Promise(r => setTimeout(r, fuentes.length*400 + 500));
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:1000,
+        messages:[{role:'user',content:`Genera ${numero} empresas ecuatorianas reales del sector ${sector} en ${ciudad} que probablemente NO tienen vacantes publicadas pero podrían necesitar personal de ${area}. Responde SOLO JSON:
+{"empresas":[{"nombre":"empresa real ecuatoriana","ciudad":"ciudad EC","sector":"${sector}","email_rrhh":"rrhh@empresa.com.ec","descripcion":"qué hace la empresa en 1 línea","empleados":"rango empleados","razon":"por qué podrían necesitar este perfil"}]}`}]
+      })
+    });
+    const data = await res.json();
+    const text = (data.content||[]).map(b=>b.text||'').join('');
+    const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
+    anim.classList.remove('visible');
+    renderEmpresasFrio(parsed.empresas, nombre, area);
+  } catch(e) {
+    anim.classList.remove('visible');
+    // DEMO MODE
+    const demoEmpresas = [
+      {nombre:'Corporación El Rosado', ciudad:'Guayaquil', sector:'Retail', email_rrhh:'rrhh@elrosado.com', descripcion:'Cadena de supermercados e hipermercados más grande del Ecuador', empleados:'5,000+', razon:'Expansión digital requiere perfiles técnicos'},
+      {nombre:'Industrias Ales C.A.', ciudad:'Quito', sector:'Manufactura', email_rrhh:'talento@ales.com.ec', descripcion:'Empresa líder en aceites y grasas comestibles en Ecuador', empleados:'1,200+', razon:'Transformación tecnológica en procesos'},
+      {nombre:'Grupo Difare', ciudad:'Guayaquil', sector:'Salud', email_rrhh:'rrhh@difare.com.ec', descripcion:'Red de farmacias más grande del Ecuador con más de 1,500 locales', empleados:'8,000+', razon:'Desarrollo de plataforma digital de salud'},
+      {nombre:'Automotores y Anexos AYASA', ciudad:'Quito', sector:'Automotriz', email_rrhh:'empleo@ayasa.com.ec', descripcion:'Concesionario oficial Chevrolet con presencia nacional', empleados:'800+', razon:'Modernización de sistemas de gestión'},
+      {nombre:'Constructora Uribe & Schwarzkopf', ciudad:'Quito', sector:'Construcción', email_rrhh:'rrhh@ubs.com.ec', descripcion:'Empresa inmobiliaria líder en proyectos residenciales en Ecuador', empleados:'600+', razon:'Digitalización de procesos administrativos'},
+      {nombre:'Holdingdine Corp.', ciudad:'Quito', sector:'Defensa/Industrial', email_rrhh:'talento@holdingdine.com.ec', descripcion:'Corporación industrial del ejército ecuatoriano', empleados:'2,000+', razon:'Modernización tecnológica institucional'},
+      {nombre:'Ferrero Ecuador', ciudad:'Guayaquil', sector:'Alimentos', email_rrhh:'hr.ecuador@ferrero.com', descripcion:'Multinacional italiana de confitería con fuerte presencia en Ecuador', empleados:'400+', razon:'Expansión de operaciones locales'},
+      {nombre:'Banco del Pacífico', ciudad:'Guayaquil', sector:'Banca', email_rrhh:'rrhh@bancopacífico.com', descripcion:'Banco estatal ecuatoriano con red nacional', empleados:'3,000+', razon:'Transformación digital bancaria'},
+      {nombre:'Cámara de Industrias de Guayaquil', ciudad:'Guayaquil', sector:'Industria', email_rrhh:'info@cig.org.ec', descripcion:'Gremio empresarial que representa a las industrias de Guayaquil', empleados:'200+', razon:'Modernización de sistemas gremiales'},
+      {nombre:'Supermaxi / Corporación La Favorita', ciudad:'Quito', sector:'Retail', email_rrhh:'talento@lafavorita.com', descripcion:'Mayor cadena de supermercados del Ecuador con más de 200 locales', empleados:'15,000+', razon:'Expansión e-commerce y logística digital'}
+    ].slice(0, parseInt(numero));
+    renderEmpresasFrio(demoEmpresas, nombre, area);
+    showToast('Modo demo — conecta API key para búsqueda real');
+  }
+}
+
+function renderEmpresasFrio(empresas, nombre, area) {
+  const el = document.getElementById('frioResultados');
+  el.innerHTML = `<div style="font-size:12px;color:var(--texto-secundario);margin-bottom:14px">${empresas.length} empresas encontradas sin vacante publicada</div>` +
+    empresas.map((e,i) => `
+    <div class="job-card" style="animation:fadeIn .4s ease ${i*.08}s forwards;opacity:0;margin-bottom:12px">
+      <div class="job-card-top">
+        <div>
+          <div class="job-title">${e.nombre}</div>
+          <div class="job-company">${e.sector} · ${e.ciudad}</div>
+        </div>
+        <span style="background:rgba(245,230,66,0.12);border:1px solid rgba(245,230,66,0.3);color:var(--amarillo);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px">Sin vacante</span>
+      </div>
+      <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:8px">${e.descripcion}</div>
+      <div class="tags-row">
+        <span class="tag">👥 ${e.empleados} empleados</span>
+        <span class="tag">📍 ${e.ciudad}</span>
+        <span class="tag">${e.sector}</span>
+      </div>
+      <div style="font-size:11px;color:var(--amarillo);margin-bottom:12px;padding:8px 10px;background:rgba(245,230,66,0.06);border-radius:6px">
+        💡 ${e.razon}
+      </div>
+      <div class="card-actions">
+        <button class="btn-sm-green" onclick="abrirEmailFrio('${e.email_rrhh}','${e.nombre}','${area}','${nombre}')">Enviar correo en frío</button>
+        <button class="btn-sm-outline" onclick="window.open('https://google.com/search?q=${encodeURIComponent(e.nombre + ' Ecuador empleos')}')">Investigar empresa</button>
+      </div>
+    </div>`).join('');
+}
+
+async function abrirEmailFrio(email, empresa, area, nombre) {
+  document.getElementById('modalTo').value = email;
+  document.getElementById('modalSubject').value = `Presentación profesional — ${area} — ${nombre}`;
+  document.getElementById('modalBody').value = '⟳ Generando correo en frío con Claude...';
+  document.getElementById('emailModal').classList.add('open');
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:500,
+        messages:[{role:'user',content:`Redacta un correo en frío profesional en español para enviar al área de RRHH de "${empresa}" presentando al candidato "${nombre}" que busca trabajo en ${area}. La empresa NO tiene vacante publicada. El correo debe ser: breve (3 párrafos máx), directo, destacar valor que puede aportar, solicitar consideración para futuras oportunidades. Tono profesional ecuatoriano. Solo el cuerpo del correo.`}]
+      })
+    });
+    const data = await res.json();
+    document.getElementById('modalBody').value = data.content?.[0]?.text || generarEmailFrioDemo(empresa, area, nombre);
+  } catch(e) {
+    document.getElementById('modalBody').value = generarEmailFrioDemo(empresa, area, nombre);
+  }
+}
+
+function generarEmailFrioDemo(empresa, area, nombre) {
+  return `Estimado equipo de Recursos Humanos de ${empresa},
+
+Mi nombre es ${nombre} y me dirijo a ustedes con el objetivo de presentar mi perfil profesional en el área de ${area}, con la esperanza de ser considerado para futuras oportunidades en su prestigiosa empresa.
+
+Soy un profesional con experiencia comprobada en el sector, y he identificado a ${empresa} como una organización con valores y proyección que se alinean con mis objetivos de carrera. Estoy convencido de que mi experiencia y habilidades pueden aportar valor significativo a su equipo.
+
+Estaré muy agradecido si pudieran revisar mi perfil y tenerme en consideración para posiciones que puedan surgir en el futuro. Quedo a su disposición para una conversación o entrevista en el momento que estimen conveniente.
+
+Muchas gracias por su tiempo.
+
+Atentamente,
+${nombre}`;
+}
+
+function renderCorreos() {
+  if (!correosEnviados.length) return;
+  document.getElementById('correosList').innerHTML = correosEnviados.map(c=>`
+    <div class="job-card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-size:14px;font-weight:500">${c.to}</div><div style="font-size:12px;color:var(--texto-secundario);margin-top:3px">${c.subject}</div></div>
+        <div style="text-align:right"><span style="color:var(--verde);font-size:11px">✓ ${c.estado}</span><div style="font-size:10px;color:var(--texto-secundario);margin-top:2px">${c.fecha}</div></div>
+      </div>
+    </div>`).join('');
+}
+
+// ======= PAYPHONE =======
+function abrirPago(plan, precio) {
+  document.getElementById('ppPlanName').textContent = 'Plan ' + plan;
+  document.getElementById('ppPlanPrice').textContent = '$' + precio;
+  document.getElementById('ppModal').classList.add('open');
+  document.getElementById('ppPayView').style.display='block';
+  document.getElementById('ppSuccess').className='pp-success';
+}
+function cerrarPago() { document.getElementById('ppModal').classList.remove('open'); }
+function selectPPMethod(method, el) {
+  document.querySelectorAll('.pp-method').forEach(m=>m.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('ppTarjetaForm').className = 'pp-form-section' + (method==='tarjeta'?' visible':'');
+  document.getElementById('ppCelularForm').className = 'pp-form-section' + (method==='celular'?' visible':'');
+}
+function formatCard(input) {
+  let v = input.value.replace(/\D/g,'').substring(0,16);
+  input.value = v.replace(/(.{4})/g,'$1 ').trim();
+}
+async function procesarPago() {
+  document.querySelector('.btn-pp-pay').textContent = '⟳ Procesando...';
+  await new Promise(r=>setTimeout(r,2000));
+  document.getElementById('ppPayView').style.display='none';
+  document.getElementById('ppSuccess').className='pp-success visible';
+  const planKey = (document.getElementById('ppPlanName').textContent.toLowerCase().includes('básico')||document.getElementById('ppPlanName').textContent.includes('9')) ? 'basico' : (document.getElementById('ppPlanName').textContent.toLowerCase().includes('estándar')||document.getElementById('ppPlanName').textContent.includes('19')) ? 'estandar' : 'pro';
+  if (currentUser) { currentUser.plan = planKey; await saveToStorage('talento_user', currentUser); updateLimitBar(); }
+  document.getElementById('empPlanPill').textContent = 'PLAN PRO ACTIVO';
+}
+function cerrarPagoExito() { cerrarPago(); if(currentUser) showPage('empleador'); }
+
+// ======= UTILS =======
+const PLANES = {
+  'basico':   { nombre:'Básico $9.99',   min:10, max:20, precio:'9.99' },
+  'estandar': { nombre:'Estándar $19.99', min:20, max:40, precio:'19.99' },
+  'pro':      { nombre:'Pro $34.99',      min:30, max:60, precio:'34.99' }
+};
+
+function getPlan() {
+  const p = currentUser?.plan || 'basico';
+  return PLANES[p] || PLANES['basico'];
+}
+
+function updateStats(jobs) {
+  document.getElementById('statBusquedas').textContent = busquedasCount;
+  document.getElementById('statCorreos').textContent = correosCount;
+  if (jobs && jobs.length) {
+    const avg = Math.round(jobs.reduce((s,j)=>s+j.match,0)/jobs.length);
+    document.getElementById('statMatch').textContent = avg + '%';
+  }
+  updateLimitBar();
+}
+
+function updateLimitBar() {
+  const plan = getPlan();
+  const pct = Math.min(100, Math.round((correosCount / plan.max) * 100));
+  const bar = document.getElementById('correosDiaBar');
+  if (bar) {
+    bar.style.width = pct + '%';
+    bar.style.background = pct >= 90 ? 'var(--rojo)' : pct >= 65 ? 'var(--amarillo)' : 'var(--verde)';
+  }
+  const el = (id) => document.getElementById(id);
+  if (el('correosDiaCount')) el('correosDiaCount').textContent = correosCount;
+  if (el('correosDiaMax'))   el('correosDiaMax').textContent  = plan.max;
+  if (el('correosDiaMax2'))  el('correosDiaMax2').textContent = plan.max;
+  if (el('correosDiaMin'))   el('correosDiaMin').textContent  = plan.min;
+  if (el('planNombreLabel')) el('planNombreLabel').textContent = plan.nombre;
+  if (el('candPlanPill'))    el('candPlanPill').textContent   = plan.nombre.toUpperCase();
+}
+
+function puedeEnviarCorreo() {
+  const plan = getPlan();
+  if (correosCount >= plan.max) {
+    showToast('Límite de ' + plan.max + ' correos/día alcanzado. Mejora tu plan.', true);
+    return false;
+  }
+  return true;
+}
+function toggleChip(el) { el.classList.toggle('on'); }
+function showToast(msg, err) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast' + (err?' error':'') + ' show';
+  setTimeout(()=>t.className='toast',3000);
+}
+
+// Close modals on background click
+document.getElementById('authModal').addEventListener('click', e => { if(e.target===e.currentTarget)closeAuth(); });
+document.getElementById('ppModal').addEventListener('click', e => { if(e.target===e.currentTarget)cerrarPago(); });
+document.getElementById('emailModal').addEventListener('click', e => { if(e.target===e.currentTarget)cerrarEmail(); });
+</script>
+</body>
+</html>
