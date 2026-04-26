@@ -552,53 +552,16 @@ if (window.pdfjsLib) {
               <option>Toda la república</option>
             </select>
           </div>
-          <div class="field"><label>Área profesional</label>
-            <select id="cvArea">
-              <option>Tecnología / Sistemas</option>
-              <option>Desarrollo de Software</option>
-              <option>Diseño Web / UX</option>
-              <option>Ciberseguridad</option>
-              <option>Data Science / BI</option>
-              <option>Administración de Empresas</option>
-              <option>Recursos Humanos</option>
-              <option>Contabilidad / Auditoría</option>
-              <option>Finanzas / Banca</option>
-              <option>Economía</option>
-              <option>Marketing Digital</option>
-              <option>Ventas / Comercial</option>
-              <option>Publicidad / Comunicación</option>
-              <option>Atención al Cliente</option>
-              <option>Ingeniería Civil</option>
-              <option>Ingeniería Industrial</option>
-              <option>Ingeniería Eléctrica</option>
-              <option>Ingeniería Mecánica</option>
-              <option>Ingeniería Química</option>
-              <option>Arquitectura</option>
-              <option>Medicina / Salud</option>
-              <option>Enfermería</option>
-              <option>Odontología</option>
-              <option>Farmacia</option>
-              <option>Psicología</option>
-              <option>Educación / Docencia</option>
-              <option>Derecho / Legal</option>
-              <option>Logística / Supply Chain</option>
-              <option>Comercio Exterior</option>
-              <option>Turismo / Hotelería</option>
-              <option>Gastronomía</option>
-              <option>Agronomía / Agropecuario</option>
-              <option>Petróleo / Minería</option>
-              <option>Medio Ambiente</option>
-              <option>Diseño Gráfico</option>
-              <option>Fotografía / Video</option>
-              <option>Periodismo</option>
-              <option>Trabajo Social</option>
-              <option>Seguridad / Vigilancia</option>
-              <option>Construcción / Obras</option>
-              <option>Manufactura / Producción</option>
-              <option>Electricidad / Electrónica</option>
-              <option>Mecánica Automotriz</option>
-              <option>Otro</option>
-            </select>
+                  <div class="field">
+            <label>Área(s) profesional(es)</label>
+            <div style="background:var(--negro);border:1px solid var(--gris-borde);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--texto-secundario);margin-bottom:6px">
+              Claude detectará tus áreas automáticamente al analizar tu CV
+            </div>
+            <div id="areasDetectadas" style="display:none">
+              <div style="font-size:11px;color:var(--texto-secundario);margin-bottom:8px">Selecciona las áreas para buscar trabajo:</div>
+              <div id="areasChips" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+            </div>
+            <input type="hidden" id="cvArea" value="">
           </div>
         </div>
         <button class="btn-full" onclick="guardarYAnalizar()">Guardar y analizar con Claude IA →</button>
@@ -1394,15 +1357,14 @@ function candTab(tab) {
     const ciudadSelect = document.getElementById('busquedaCiudad');
 
     if (!queryInput.value) {
-      // Construir query automática basada en el CV
+      // Construir query automática basada en el CV con cargos específicos
       const area = cvData.area || '';
-      const ciudad = cvData.ciudad || 'Ecuador';
+      const cargos = CARGOS_POR_AREA[area] || area;
       const exp = cvData.experiencia || '';
-      const nombre = cvData.nombre || '';
 
-      let query = area;
+      let query = cargos.split(',')[0].trim(); // Primer cargo específico
       if (exp && exp !== 'Sin experiencia (recién graduado)') {
-        query += ' con ' + exp + ' de experiencia';
+        query += ' ' + exp + ' de experiencia';
       }
       queryInput.value = query;
 
@@ -1535,17 +1497,40 @@ async function guardarYAnalizar() {
   document.getElementById('analysisContent').innerHTML = '<div style="color:var(--verde)">⟳ Procesando...</div>';
 
   let analysis = '';
+  let areasDetectadas = [];
+
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST',
       headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
       body: JSON.stringify({
-        model:'claude-sonnet-4-20250514', max_tokens:1000,
-        messages:[{role:'user',content:`Analiza este CV para el mercado laboral de Ecuador. Responde en español con emojis:\n\n1. 📋 RESUMEN DEL PERFIL (2-3 líneas)\n2. 💼 HABILIDADES CLAVE (6-8 habilidades)\n3. ⭐ PUNTOS FUERTES (3 fortalezas)\n4. 📈 ÁREAS DE MEJORA (2-3 sugerencias)\n5. 🇪🇨 COMPATIBILIDAD MERCADO ECUADOR (puntuación /10 para ${area})\n6. 🔍 PALABRAS CLAVE para búsqueda\n7. 🎯 EMPRESAS ECUATORIANAS ideales\n\nCV:\n${texto}`}]
+        model:'claude-sonnet-4-20250514', max_tokens:1200,
+        messages:[{role:'user',content:`Analiza este CV para el mercado laboral de Ecuador. Responde en español con emojis:
+
+1. 📋 RESUMEN DEL PERFIL (2-3 líneas)
+2. 💼 HABILIDADES CLAVE (6-8 habilidades)
+3. ⭐ PUNTOS FUERTES (3 fortalezas)
+4. 📈 ÁREAS DE MEJORA (2-3 sugerencias)
+5. 🇪🇨 COMPATIBILIDAD MERCADO ECUADOR (puntuación /10)
+6. 🔍 PALABRAS CLAVE para búsqueda
+7. 🎯 EMPRESAS ECUATORIANAS ideales
+8. 💡 ÁREAS PROFESIONALES: Lista las áreas profesionales en las que este candidato tiene experiencia o puede trabajar, separadas por coma. Ejemplo: Contabilidad / Auditoría, Administración de Empresas
+
+CV:
+${texto}`}]
       })
     });
     const data = await res.json();
     analysis = data.content?.[0]?.text || '';
+
+    // Extraer áreas detectadas
+    const areasMatch = analysis.match(/💡 ÁREAS PROFESIONALES[:\s]+([\s\S]+?)(?:
+
+|
+\d|$)/i);
+    if (areasMatch) {
+      areasDetectadas = areasMatch[1].split(',').map(a => a.trim()).filter(Boolean);
+    }
   } catch(e) {}
 
   // Si no hay análisis real, usar modo demo
@@ -1592,9 +1577,26 @@ ${area}, Ecuador, ${ciudad}, profesional, experiencia, tiempo completo, empresas
   }
 
   cvData.analysis = analysis;
+  cvData.areasDetectadas = areasDetectadas;
   document.getElementById('analysisContent').textContent = analysis;
   document.getElementById('analysisStatus').textContent = '✓ Análisis completado';
   document.getElementById('mejorarCVBtn').style.display = 'block';
+
+  // Mostrar chips de áreas detectadas
+  if (areasDetectadas.length > 0) {
+    const areasDiv = document.getElementById('areasDetectadas');
+    const chipsDiv = document.getElementById('areasChips');
+    areasDiv.style.display = 'block';
+    chipsDiv.innerHTML = areasDetectadas.map((a,i) => `
+      <span onclick="toggleAreaChip(this,'${a}')"
+        style="background:rgba(0,196,140,0.12);border:1px solid rgba(0,196,140,0.3);color:var(--verde);
+        padding:6px 14px;border-radius:20px;font-size:12px;cursor:pointer;transition:all .2s;
+        ${i===0?'':'opacity:0.6'}" data-selected="${i===0?'true':'false'}" data-area="${a}">
+        ${i===0?'✓ ':''} ${a}
+      </span>`).join('');
+    // Set first area as default
+    if (areasDetectadas[0]) document.getElementById('cvArea').value = areasDetectadas[0];
+  }
   if (currentUser) {
     currentUser.cvData = cvData;
     await saveToStorage('talento_user', currentUser);
@@ -2067,6 +2069,25 @@ Atentamente,
 ${nombre}`;
 }
 
+function toggleAreaChip(el, area) {
+  const selected = el.dataset.selected === 'true';
+  if (selected) {
+    el.dataset.selected = 'false';
+    el.style.opacity = '0.6';
+    el.style.background = 'rgba(0,196,140,0.06)';
+    el.textContent = area;
+  } else {
+    el.dataset.selected = 'true';
+    el.style.opacity = '1';
+    el.style.background = 'rgba(0,196,140,0.12)';
+    el.textContent = '✓ ' + area;
+  }
+  // Update hidden input with selected areas
+  const selected_areas = [...document.querySelectorAll('#areasChips span[data-selected="true"]')]
+    .map(s => s.dataset.area).join(', ');
+  document.getElementById('cvArea').value = selected_areas;
+}
+
 function renderCorreos() {
   if (!correosEnviados.length) return;
   document.getElementById('correosList').innerHTML = correosEnviados.map(c=>`
@@ -2163,6 +2184,53 @@ function showToast(msg, err) {
 }
 
 // ── Searchable Select ────────────────────────────────────────
+const CARGOS_POR_AREA = {
+  "Tecnología / Sistemas": "desarrollador, programador, ingeniero de software, devops, sysadmin, soporte técnico",
+  "Desarrollo de Software": "desarrollador frontend, backend, fullstack, mobile, React, Node.js, Python, Java",
+  "Diseño Web / UX": "diseñador UX, UI designer, diseñador web, product designer, wireframing",
+  "Ciberseguridad": "analista de seguridad, ethical hacker, pentester, seguridad informática",
+  "Data Science / BI": "analista de datos, data scientist, business intelligence, Power BI, tableau",
+  "Administración de Empresas": "administrador, gerente, jefe administrativo, coordinador, asistente administrativo",
+  "Recursos Humanos": "RRHH, reclutador, talento humano, nómina, bienestar laboral, selección de personal",
+  "Contabilidad / Auditoría": "contador, auditor, CPA, auxiliar contable, tributario, NIIF",
+  "Finanzas / Banca": "analista financiero, banco, crédito, tesorero, inversiones, riesgo financiero",
+  "Economía": "economista, analista económico, investigador económico",
+  "Marketing Digital": "marketing digital, community manager, SEO, SEM, redes sociales, publicidad digital",
+  "Ventas / Comercial": "vendedor, ejecutivo de ventas, asesor comercial, representante de ventas",
+  "Publicidad / Comunicación": "publicista, comunicador, relaciones públicas, prensa, medios",
+  "Atención al Cliente": "atención al cliente, call center, servicio al cliente, recepcionista",
+  "Ingeniería Civil": "ingeniero civil, obras civiles, construcción, estructuras, topógrafo",
+  "Ingeniería Industrial": "ingeniero industrial, producción, procesos, calidad, logística industrial",
+  "Ingeniería Eléctrica": "ingeniero eléctrico, electricista, automatización, PLC, instalaciones eléctricas",
+  "Ingeniería Mecánica": "ingeniero mecánico, mantenimiento mecánico, maquinaria, manufactura",
+  "Ingeniería Química": "ingeniero químico, laboratorista, control de calidad, químico industrial",
+  "Arquitectura": "arquitecto, diseño arquitectónico, proyectos, BIM, urbanismo",
+  "Medicina / Salud": "médico, doctor, médico general, médico especialista, salud ocupacional",
+  "Enfermería": "enfermero, enfermera, auxiliar de enfermería, salud, clínica, hospital",
+  "Odontología": "odontólogo, dentista, auxiliar dental, ortodoncia",
+  "Farmacia": "farmacéutico, químico farmacéutico, regente de farmacia, farmacología",
+  "Psicología": "psicólogo, terapeuta, consejero, salud mental, psicología clínica",
+  "Educación / Docencia": "profesor, docente, maestro, educador, director académico, tutor, coordinador educativo",
+  "Derecho / Legal": "abogado, asesor legal, jurídico, notario, defensor, fiscal",
+  "Logística / Supply Chain": "logístico, cadena de suministro, almacenamiento, bodeguero, compras",
+  "Comercio Exterior": "comercio exterior, importaciones, exportaciones, aduanas, agente de carga",
+  "Turismo / Hotelería": "guía turístico, hotel, recepcionista de hotel, agente de viajes, turismo",
+  "Gastronomía": "chef, cocinero, pastelero, bartender, mesero, administrador de restaurante",
+  "Agronomía / Agropecuario": "agrónomo, veterinario, técnico agrícola, producción agropecuaria",
+  "Petróleo / Minería": "petróleo, minería, perforación, geólogo, ingeniero de petróleo",
+  "Medio Ambiente": "ambiental, ecología, gestión ambiental, consultor ambiental",
+  "Diseño Gráfico": "diseñador gráfico, ilustrador, branding, identidad visual, Adobe",
+  "Fotografía / Video": "fotógrafo, videógrafo, editor de video, producción audiovisual",
+  "Periodismo": "periodista, redactor, comunicador social, editor, locutor",
+  "Trabajo Social": "trabajador social, asistente social, bienestar comunitario",
+  "Seguridad / Vigilancia": "guardia de seguridad, vigilante, oficial de seguridad, supervisor de seguridad",
+  "Construcción / Obras": "maestro de obras, albañil, plomero, carpintero, electricista",
+  "Manufactura / Producción": "operario, técnico de producción, control de calidad, manufactura",
+  "Electricidad / Electrónica": "electricista, técnico electrónico, instalaciones, mantenimiento eléctrico",
+  "Mecánica Automotriz": "mecánico automotriz, técnico automotriz, diagnóstico vehicular",
+  "Otro": "profesional, técnico, asistente, coordinador"
+};
+
 const CIUDADES = ["Quito","Guayaquil","Cuenca","Ambato","Manta","Loja","Ibarra","Riobamba","Esmeraldas","Portoviejo","Santo Domingo","Machala","Durán","Quevedo","Milagro","Latacunga","Babahoyo","Sangolquí","Tulcán","Lago Agrio","Orellana","Tena","Puyo","Macas","Zamora","Guaranda","Azogues","Santa Rosa","Pasaje","Huaquillas","Toda la república"];
 
 const AREAS = ["Tecnología / Sistemas","Desarrollo de Software","Diseño Web / UX","Ciberseguridad","Data Science / BI","Administración de Empresas","Recursos Humanos","Contabilidad / Auditoría","Finanzas / Banca","Economía","Marketing Digital","Ventas / Comercial","Publicidad / Comunicación","Atención al Cliente","Ingeniería Civil","Ingeniería Industrial","Ingeniería Eléctrica","Ingeniería Mecánica","Ingeniería Química","Arquitectura","Medicina / Salud","Enfermería","Odontología","Farmacia","Psicología","Educación / Docencia","Derecho / Legal","Logística / Supply Chain","Comercio Exterior","Turismo / Hotelería","Gastronomía","Agronomía / Agropecuario","Petróleo / Minería","Medio Ambiente","Diseño Gráfico","Fotografía / Video","Periodismo","Trabajo Social","Seguridad / Vigilancia","Construcción / Obras","Manufactura / Producción","Electricidad / Electrónica","Mecánica Automotriz","Otro"];
