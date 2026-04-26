@@ -254,6 +254,7 @@ h1.hero-title span{color:var(--verde)}
 .tab-btn.active{background:var(--negro);color:var(--texto-primario);font-weight:500}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script>
 if (window.pdfjsLib) {
@@ -512,6 +513,32 @@ if (window.pdfjsLib) {
       <div class="ai-panel" id="cvAnalysis" style="display:none">
         <div class="ai-panel-header"><div class="ai-dot"></div><span id="analysisStatus">Analizando...</span></div>
         <div class="ai-content" id="analysisContent"></div>
+        <div id="mejorarCVBtn" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--gris-borde)">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+            <div>
+              <div style="font-size:13px;font-weight:500;margin-bottom:3px">¿Quieres que Claude mejore tu CV automáticamente?</div>
+              <div style="font-size:11px;color:var(--texto-secundario)">Claude reescribe tu CV de forma profesional optimizado para Ecuador · Incluido en tu plan</div>
+            </div>
+            <button onclick="mejorarCV()" style="background:var(--verde);color:var(--negro);border:none;padding:10px 20px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap">
+              ✨ Mejorar mi CV con IA
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel CV Mejorado -->
+      <div id="cvMejoradoPanel" style="display:none;margin-top:16px;background:var(--gris-oscuro);border:1px solid var(--verde);border-radius:14px;padding:24px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="ai-dot"></div>
+            <span style="font-family:'Syne',sans-serif;font-size:14px;font-weight:600" id="mejorarStatus">Mejorando tu CV...</span>
+          </div>
+          <div id="descargarBtn" style="display:none;align-items:center;gap:6px">
+            <span style="color:var(--verde);font-size:13px">✓</span>
+            <span style="font-size:12px;color:var(--verde);font-weight:500">CV mejorado guardado — se usará en todos tus correos automáticamente</span>
+          </div>
+        </div>
+        <div id="cvMejoradoContent" style="font-size:13px;color:var(--texto-secundario);line-height:1.8;white-space:pre-wrap;max-height:400px;overflow-y:auto;background:var(--negro);padding:16px;border-radius:8px"></div>
       </div>
     </div>
 
@@ -599,13 +626,8 @@ if (window.pdfjsLib) {
           </div>
         </div>
         <div class="field" style="margin-bottom:18px">
-          <label>Empresas a contactar hoy</label>
-          <select id="frioNumero">
-            <option value="5">5 empresas</option>
-            <option value="10" selected>10 empresas</option>
-            <option value="15">15 empresas</option>
-            <option value="20">20 empresas (máximo del plan)</option>
-          </select>
+          <label>Empresas a contactar hoy <span id="frioLimitLabel" style="color:var(--texto-secundario);font-size:10px;margin-left:4px"></span></label>
+          <select id="frioNumero"></select>
         </div>
         <button class="btn-full" onclick="ejecutarCorreosFrio()" style="background:var(--amarillo);color:var(--negro);font-family:'Syne',sans-serif;font-weight:700">
           Buscar empresas y enviar correos en frío →
@@ -890,8 +912,64 @@ if (window.pdfjsLib) {
 <script>
 // ======= CONFIG =======
 const BACKEND_URL = 'https://talentoec-backend-production.up.railway.app';
+const SUPABASE_URL = 'https://mgxokvsbxzuvscbibmus.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_fo6XXSuS6ujoBIGcWfPa5Q_X4YB_07Hup14kZk1luV1T';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    flowType: 'implicit',
+    detectSessionInUrl: true,
+    persistSession: true
+  }
+});
 
 // ======= STATE =======
+// ── Google OAuth callback handler ──────────────────────────
+async function handleGoogleCallback() {
+  try {
+    // Supabase pone el token en el hash de la URL
+    const hash = window.location.hash;
+    if (hash && hash.includes('access_token')) {
+      const { data: { session }, error } = await supabaseClient.auth.getSession();
+      if (session && session.user) {
+        await loginConSesion(session.user);
+        // Limpiar el hash de la URL
+        history.replaceState(null, '', window.location.pathname);
+        return true;
+      }
+    }
+    return false;
+  } catch(e) {
+    console.log('Callback error:', e);
+    return false;
+  }
+}
+
+async function loginConSesion(u) {
+  currentUser = {
+    nombre: u.user_metadata?.full_name || u.user_metadata?.name || u.email.split('@')[0],
+    email: u.email,
+    tipo: 'candidato',
+    plan: 'basico',
+    stats: { busquedas: 0, correos: 0 },
+    avatar: u.user_metadata?.avatar_url || u.user_metadata?.picture || null
+  };
+  userTipo = 'candidato';
+  await saveToStorage('talento_user', currentUser);
+  setLoggedInUI();
+  showToast('✓ Bienvenido ' + currentUser.nombre.split(' ')[0] + ' 👋');
+  setTimeout(() => {
+    showPage('candidato');
+    if (document.getElementById('cvNombre')) document.getElementById('cvNombre').value = currentUser.nombre;
+    if (document.getElementById('cvEmail')) document.getElementById('cvEmail').value = currentUser.email;
+  }, 300);
+}
+
+// Listen for Supabase auth changes (Google login callback)
+supabaseClient.auth.onAuthStateChange(async (event, session) => {
+  if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session && session.user && !currentUser) {
+    await loginConSesion(session.user);
+  }
+});
 let currentUser = null;
 let userTipo = 'candidato';
 let selectedTipo = 'candidato';
@@ -911,8 +989,19 @@ async function getFromStorage(key) {
 
 // ======= INIT =======
 window.addEventListener('load', async () => {
+  // ── Detectar sesion de Google via Supabase ───────────────
+  try {
+    // Supabase maneja el token automaticamente del hash o codigo
+    const { data: { session }, error } = await supabaseClient.auth.getSession();
+    if (session && session.user) {
+      await loginConSesion(session.user);
+      history.replaceState(null, '', '/');
+      return;
+    }
+  } catch(e) { console.log('session error:', e); }
+
   const saved = await getFromStorage('talento_user');
-  if (saved) {
+  if (saved && saved.email) {
     currentUser = saved;
     userTipo = saved.tipo;
     setLoggedInUI();
@@ -987,11 +1076,27 @@ async function iniciarSesion() {
     setTimeout(() => showPage(userTipo), 600);
   }
 }
-function loginGoogle() { showToast('Google OAuth requiere backend. Usa registro manual.', true); }
+async function loginGoogle() {
+  try {
+    const { data, error } = await supabaseClient.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: 'https://ajart2209.github.io/talentoec-frontend',
+        queryParams: { access_type: 'offline', prompt: 'consent' }
+      }
+    });
+    if (error) throw error;
+  } catch(e) {
+    showToast('⚠ Error al conectar con Google. Intenta de nuevo.', true);
+  }
+}
 function setLoggedInUI() {
   const nr = document.getElementById('navRight');
   const initials = currentUser.nombre.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-  nr.innerHTML = `<div class="user-avatar" onclick="toggleProfileMenu()" id="userAvatarBtn">${initials}</div>`;
+  const avatarContent = currentUser.avatar
+    ? `<img src="${currentUser.avatar}" style="width:32px;height:32px;border-radius:50%;object-fit:cover">`
+    : initials;
+  nr.innerHTML = `<div class="user-avatar" onclick="toggleProfileMenu()" id="userAvatarBtn">${avatarContent}</div>`;
   document.getElementById('menuUserName').textContent = currentUser.nombre;
   document.getElementById('menuUserEmail').textContent = currentUser.email;
   document.getElementById('candWelcome').textContent = 'Hola, ' + currentUser.nombre.split(' ')[0] + ' 👋';
@@ -1034,6 +1139,26 @@ function candTab(tab) {
   document.querySelectorAll('#page-candidato .tab-btn').forEach((b,i) => {
     b.classList.toggle('active', ['cv','busqueda','resultados','frio'][i]===tab);
   });
+
+  // Si va a correos en frio, ajustar límites según plan
+  if (tab === 'frio') {
+    const plan = getPlan();
+    const maxFrio = plan.max_frio || plan.max_dia;
+    const select = document.getElementById('frioNumero');
+    const label = document.getElementById('frioLimitLabel');
+    if (label) label.textContent = '(máx. ' + maxFrio + ' según tu plan)';
+    if (select) {
+      select.innerHTML = '';
+      const opciones = [5, 10, 15, 20, 30, 40].filter(n => n <= maxFrio);
+      opciones.forEach(n => {
+        const opt = document.createElement('option');
+        opt.value = n;
+        opt.textContent = n + ' empresas' + (n === maxFrio ? ' (máximo de tu plan)' : '');
+        if (n === Math.min(10, maxFrio)) opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
+  }
 
   // Si va a CV tab, autocompletar nombre y email con datos de la cuenta
   if (tab === 'cv') {
@@ -1183,6 +1308,7 @@ function mostrarCVGuardado() {
     document.getElementById('cvAnalysis').style.display = 'block';
     document.getElementById('analysisStatus').textContent = '✓ Análisis completado';
     document.getElementById('analysisContent').textContent = cvData.analysis;
+    document.getElementById('mejorarCVBtn').style.display = 'block';
   }
 }
 async function guardarYAnalizar() {
@@ -1257,6 +1383,7 @@ ${area}, Ecuador, ${ciudad}, profesional, experiencia, tiempo completo, empresas
   cvData.analysis = analysis;
   document.getElementById('analysisContent').textContent = analysis;
   document.getElementById('analysisStatus').textContent = '✓ Análisis completado';
+  document.getElementById('mejorarCVBtn').style.display = 'block';
   if (currentUser) {
     currentUser.cvData = cvData;
     await saveToStorage('talento_user', currentUser);
@@ -1497,6 +1624,116 @@ async function enviarEmail() {
   showToast('✓ Correo abierto en tu cliente de correo');
 }
 
+async function mejorarCV() {
+  if (!cvData || !cvData.texto) { showToast('⚠ Primero sube y analiza tu CV', true); return; }
+
+  document.getElementById('cvMejoradoPanel').style.display = 'block';
+  document.getElementById('mejorarStatus').textContent = 'Claude mejorando tu CV...';
+  document.getElementById('cvMejoradoContent').innerHTML = '<div style="color:var(--verde)">⟳ Reescribiendo con IA...</div>';
+  document.getElementById('descargarBtn').style.display = 'none';
+
+  // Scroll al panel
+  document.getElementById('cvMejoradoPanel').scrollIntoView({ behavior: 'smooth' });
+
+  let cvMejorado = '';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:1500,
+        messages:[{role:'user',content:`Eres un experto en recursos humanos de Ecuador. Mejora profesionalmente el siguiente CV para el mercado laboral ecuatoriano. 
+
+INSTRUCCIONES:
+- Mantén todos los datos reales del candidato
+- Mejora la redacción haciéndola más profesional e impactante
+- Agrega verbos de acción al inicio de cada logro
+- Cuantifica logros donde sea posible (porcentajes, números)
+- Optimiza para ATS (sistemas de selección automatizados)
+- Adapta el lenguaje al mercado ecuatoriano
+- Estructura: Datos de contacto, Perfil profesional, Experiencia, Educación, Habilidades, Idiomas, Certificaciones
+- Máximo 1 página equivalente
+
+CV ORIGINAL:
+${cvData.texto}
+
+Responde SOLO con el CV mejorado, sin explicaciones adicionales.`}]
+      })
+    });
+    const data = await res.json();
+    cvMejorado = data.content?.[0]?.text || '';
+  } catch(e) {}
+
+  // Demo mode si no hay API key
+  if (!cvMejorado) {
+    const nombre = cvData.nombre || 'Profesional';
+    const area = cvData.area || 'su área';
+    const ciudad = cvData.ciudad || 'Ecuador';
+    cvMejorado = `${nombre.toUpperCase()}
+${ciudad}, Ecuador | ${cvData.email || 'correo@gmail.com'}
+
+PERFIL PROFESIONAL
+Profesional altamente calificado en ${area} con trayectoria comprobada en empresas ecuatorianas líderes. Orientado a resultados medibles con capacidad demostrada para liderar equipos multidisciplinarios y ejecutar proyectos de alto impacto. Comprometido con la excelencia operacional y la mejora continua.
+
+EXPERIENCIA PROFESIONAL
+[Empresa actual] — ${area} Senior | ${ciudad}, Ecuador
+• Lideré implementación de soluciones que incrementaron la eficiencia operacional en un 35%
+• Gestioné equipo de 5+ profesionales logrando cumplimiento del 98% en objetivos trimestrales
+• Desarrollé e implementé estrategias que generaron ahorro de $50,000+ anuales
+• Coordiné proyectos con presupuesto de $200,000+ cumpliendo plazos y objetivos
+
+[Empresa anterior] — Analista | ${ciudad}, Ecuador  
+• Optimicé procesos clave reduciendo tiempos de ejecución en 40%
+• Implementé mejoras que elevaron la satisfacción del cliente a 95%
+• Colaboré en proyectos multidisciplinarios con impacto directo en resultados corporativos
+
+EDUCACIÓN
+Título Universitario en ${area}
+Universidad ecuatoriana acreditada | Graduado con distinción
+
+COMPETENCIAS TÉCNICAS
+• Dominio avanzado de herramientas especializadas en ${area}
+• Manejo de plataformas digitales y sistemas de gestión empresarial
+• Análisis de datos y generación de reportes ejecutivos
+• Metodologías ágiles: Scrum, Kanban
+
+IDIOMAS
+• Español: Nativo
+• Inglés: Nivel B2 — Upper Intermediate
+
+CERTIFICACIONES Y FORMACIÓN CONTINUA
+• Certificación internacional en ${area} (2023)
+• Programa de liderazgo empresarial (2022)
+
+⚡ CV mejorado en modo demo — conecta API key para mejora 100% personalizada con tus datos reales`;
+    showToast('✓ CV mejorado — modo demo activo');
+  } else {
+    showToast('✓ CV mejorado con IA');
+  }
+
+  cvData.cvMejorado = cvMejorado;
+  document.getElementById('cvMejoradoContent').textContent = cvMejorado;
+  document.getElementById('mejorarStatus').textContent = '✨ CV mejorado listo';
+  document.getElementById('descargarBtn').style.display = 'flex';
+  if (currentUser) {
+    currentUser.cvData = cvData;
+    await saveToStorage('talento_user', currentUser);
+  }
+}
+
+function descargarCVMejorado() {
+  const texto = cvData?.cvMejorado || '';
+  if (!texto) return;
+  const blob = new Blob([texto], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'CV_Mejorado_TalentoEC.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✓ CV descargado y guardado en tu cuenta');
+}
+
 async function ejecutarCorreosFrio() {
   if (!currentUser) { openAuth('register'); return; }
   const sector = document.getElementById('frioSector').value;
@@ -1662,9 +1899,9 @@ function cerrarPagoExito() { cerrarPago(); if(currentUser) showPage('empleador')
 
 // ======= UTILS =======
 const PLANES = {
-  'basico':   { nombre:'Básico $9.99',   min:10, max:20, precio:'9.99' },
-  'estandar': { nombre:'Estándar $19.99', min:20, max:40, precio:'19.99' },
-  'pro':      { nombre:'Pro $34.99',      min:30, max:60, precio:'34.99' }
+  'basico':   { nombre:'Básico $9.99',   min:10, max:20, precio:'9.99',  max_frio:10 },
+  'estandar': { nombre:'Estándar $19.99', min:20, max:40, precio:'19.99', max_frio:30 },
+  'pro':      { nombre:'Pro $34.99',      min:30, max:60, precio:'34.99', max_frio:40 }
 };
 
 function getPlan() {
