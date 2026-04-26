@@ -1587,13 +1587,9 @@ ${area}, Ecuador, ${ciudad}, profesional, experiencia, tiempo completo, empresas
     const areasDiv = document.getElementById('areasDetectadas');
     const chipsDiv = document.getElementById('areasChips');
     areasDiv.style.display = 'block';
-    chipsDiv.innerHTML = areasDetectadas.map((a,i) => `
-      <span onclick="toggleAreaChip(this,'${a}')"
-        style="background:rgba(0,196,140,0.12);border:1px solid rgba(0,196,140,0.3);color:var(--verde);
-        padding:6px 14px;border-radius:20px;font-size:12px;cursor:pointer;transition:all .2s;
-        ${i===0?'':'opacity:0.6'}" data-selected="${i===0?'true':'false'}" data-area="${a}">
-        ${i===0?'✓ ':''} ${a}
-      </span>`).join('');
+    chipsDiv.innerHTML = areasDetectadas.map(function(a) {
+      return '<span style="background:rgba(0,196,140,0.12);border:1px solid rgba(0,196,140,0.3);color:var(--verde);padding:6px 14px;border-radius:20px;font-size:12px;display:inline-block;margin:2px">✓ ' + a + '</span>';
+    }).join('');
     // Set first area as default
     if (areasDetectadas[0]) document.getElementById('cvArea').value = areasDetectadas[0];
   }
