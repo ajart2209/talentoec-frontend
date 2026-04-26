@@ -252,6 +252,31 @@ h1.hero-title span{color:var(--verde)}
 .tab-row{display:flex;gap:4px;margin-bottom:24px;background:var(--gris-oscuro);border-radius:10px;padding:4px;border:1px solid var(--gris-borde)}
 .tab-btn{flex:1;padding:8px;border-radius:7px;border:none;background:transparent;color:var(--texto-secundario);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
 .tab-btn.active{background:var(--negro);color:var(--texto-primario);font-weight:500}
+
+/* Searchable dropdown */
+.search-select-wrap { position:relative; }
+.search-select-input {
+  width:100%; background:var(--negro); border:1px solid var(--gris-borde);
+  color:var(--texto-primario); padding:10px 14px; border-radius:8px;
+  font-family:'DM Sans',sans-serif; font-size:14px; outline:none;
+  cursor:pointer; transition:border-color .2s;
+}
+.search-select-input:focus { border-color:var(--verde); }
+.search-select-dropdown {
+  display:none; position:absolute; top:100%; left:0; right:0; z-index:50;
+  background:var(--gris-oscuro); border:1px solid var(--verde);
+  border-radius:8px; max-height:220px; overflow-y:auto; margin-top:4px;
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
+}
+.search-select-dropdown.open { display:block; }
+.search-select-option {
+  padding:9px 14px; font-size:13px; color:var(--texto-secundario);
+  cursor:pointer; transition:all .15s;
+}
+.search-select-option:hover, .search-select-option.selected {
+  background:rgba(0,196,140,.1); color:var(--verde);
+}
+.search-select-empty { padding:10px 14px; font-size:13px; color:var(--texto-secundario); }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -529,9 +554,50 @@ if (window.pdfjsLib) {
           </div>
           <div class="field"><label>Área profesional</label>
             <select id="cvArea">
-              <option>Tecnología / Sistemas</option><option>Administración</option><option>Contabilidad</option>
-              <option>Marketing / Ventas</option><option>Salud</option><option>Educación</option>
-              <option>Ingeniería</option><option>Derecho</option><option>Diseño</option><option>Otro</option>
+              <option>Tecnología / Sistemas</option>
+              <option>Desarrollo de Software</option>
+              <option>Diseño Web / UX</option>
+              <option>Ciberseguridad</option>
+              <option>Data Science / BI</option>
+              <option>Administración de Empresas</option>
+              <option>Recursos Humanos</option>
+              <option>Contabilidad / Auditoría</option>
+              <option>Finanzas / Banca</option>
+              <option>Economía</option>
+              <option>Marketing Digital</option>
+              <option>Ventas / Comercial</option>
+              <option>Publicidad / Comunicación</option>
+              <option>Atención al Cliente</option>
+              <option>Ingeniería Civil</option>
+              <option>Ingeniería Industrial</option>
+              <option>Ingeniería Eléctrica</option>
+              <option>Ingeniería Mecánica</option>
+              <option>Ingeniería Química</option>
+              <option>Arquitectura</option>
+              <option>Medicina / Salud</option>
+              <option>Enfermería</option>
+              <option>Odontología</option>
+              <option>Farmacia</option>
+              <option>Psicología</option>
+              <option>Educación / Docencia</option>
+              <option>Derecho / Legal</option>
+              <option>Logística / Supply Chain</option>
+              <option>Comercio Exterior</option>
+              <option>Turismo / Hotelería</option>
+              <option>Gastronomía</option>
+              <option>Agronomía / Agropecuario</option>
+              <option>Petróleo / Minería</option>
+              <option>Medio Ambiente</option>
+              <option>Diseño Gráfico</option>
+              <option>Fotografía / Video</option>
+              <option>Periodismo</option>
+              <option>Trabajo Social</option>
+              <option>Seguridad / Vigilancia</option>
+              <option>Construcción / Obras</option>
+              <option>Manufactura / Producción</option>
+              <option>Electricidad / Electrónica</option>
+              <option>Mecánica Automotriz</option>
+              <option>Otro</option>
             </select>
           </div>
         </div>
@@ -805,9 +871,50 @@ if (window.pdfjsLib) {
           <div class="filter-group">
             <label>Área</label>
             <select id="fArea">
-              <option value="">Todas</option>
-              <option>Tecnología</option><option>Administración</option><option>Contabilidad</option>
-              <option>Marketing</option><option>Salud</option><option>Ingeniería</option>
+              <option>Tecnología / Sistemas</option>
+              <option>Desarrollo de Software</option>
+              <option>Diseño Web / UX</option>
+              <option>Ciberseguridad</option>
+              <option>Data Science / BI</option>
+              <option>Administración de Empresas</option>
+              <option>Recursos Humanos</option>
+              <option>Contabilidad / Auditoría</option>
+              <option>Finanzas / Banca</option>
+              <option>Economía</option>
+              <option>Marketing Digital</option>
+              <option>Ventas / Comercial</option>
+              <option>Publicidad / Comunicación</option>
+              <option>Atención al Cliente</option>
+              <option>Ingeniería Civil</option>
+              <option>Ingeniería Industrial</option>
+              <option>Ingeniería Eléctrica</option>
+              <option>Ingeniería Mecánica</option>
+              <option>Ingeniería Química</option>
+              <option>Arquitectura</option>
+              <option>Medicina / Salud</option>
+              <option>Enfermería</option>
+              <option>Odontología</option>
+              <option>Farmacia</option>
+              <option>Psicología</option>
+              <option>Educación / Docencia</option>
+              <option>Derecho / Legal</option>
+              <option>Logística / Supply Chain</option>
+              <option>Comercio Exterior</option>
+              <option>Turismo / Hotelería</option>
+              <option>Gastronomía</option>
+              <option>Agronomía / Agropecuario</option>
+              <option>Petróleo / Minería</option>
+              <option>Medio Ambiente</option>
+              <option>Diseño Gráfico</option>
+              <option>Fotografía / Video</option>
+              <option>Periodismo</option>
+              <option>Trabajo Social</option>
+              <option>Seguridad / Vigilancia</option>
+              <option>Construcción / Obras</option>
+              <option>Manufactura / Producción</option>
+              <option>Electricidad / Electrónica</option>
+              <option>Mecánica Automotriz</option>
+              <option>Otro</option>
             </select>
           </div>
           <div class="filter-group">
@@ -2054,6 +2161,80 @@ function showToast(msg, err) {
   t.textContent = msg; t.className = 'toast' + (err?' error':'') + ' show';
   setTimeout(()=>t.className='toast',3000);
 }
+
+// ── Searchable Select ────────────────────────────────────────
+const CIUDADES = ["Quito","Guayaquil","Cuenca","Ambato","Manta","Loja","Ibarra","Riobamba","Esmeraldas","Portoviejo","Santo Domingo","Machala","Durán","Quevedo","Milagro","Latacunga","Babahoyo","Sangolquí","Tulcán","Lago Agrio","Orellana","Tena","Puyo","Macas","Zamora","Guaranda","Azogues","Santa Rosa","Pasaje","Huaquillas","Toda la república"];
+
+const AREAS = ["Tecnología / Sistemas","Desarrollo de Software","Diseño Web / UX","Ciberseguridad","Data Science / BI","Administración de Empresas","Recursos Humanos","Contabilidad / Auditoría","Finanzas / Banca","Economía","Marketing Digital","Ventas / Comercial","Publicidad / Comunicación","Atención al Cliente","Ingeniería Civil","Ingeniería Industrial","Ingeniería Eléctrica","Ingeniería Mecánica","Ingeniería Química","Arquitectura","Medicina / Salud","Enfermería","Odontología","Farmacia","Psicología","Educación / Docencia","Derecho / Legal","Logística / Supply Chain","Comercio Exterior","Turismo / Hotelería","Gastronomía","Agronomía / Agropecuario","Petróleo / Minería","Medio Ambiente","Diseño Gráfico","Fotografía / Video","Periodismo","Trabajo Social","Seguridad / Vigilancia","Construcción / Obras","Manufactura / Producción","Electricidad / Electrónica","Mecánica Automotriz","Otro"];
+
+function crearSearchSelect(selectEl, opciones) {
+  if (!selectEl) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'search-select-wrap';
+  selectEl.parentNode.insertBefore(wrap, selectEl);
+  wrap.appendChild(selectEl);
+  selectEl.style.display = 'none';
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'search-select-input';
+  input.placeholder = 'Buscar o escribir...';
+  input.value = selectEl.options[0]?.value || '';
+  wrap.appendChild(input);
+
+  const dropdown = document.createElement('div');
+  dropdown.className = 'search-select-dropdown';
+  wrap.appendChild(dropdown);
+
+  function renderOpciones(filtro='') {
+    dropdown.innerHTML = '';
+    const filtradas = opciones.filter(o => o.toLowerCase().includes(filtro.toLowerCase()));
+    if (!filtradas.length) {
+      dropdown.innerHTML = '<div class="search-select-empty">Sin resultados</div>';
+      return;
+    }
+    filtradas.forEach(op => {
+      const div = document.createElement('div');
+      div.className = 'search-select-option';
+      if (op === selectEl.value) div.classList.add('selected');
+      div.textContent = op;
+      div.onclick = () => {
+        selectEl.value = op;
+        input.value = op;
+        dropdown.classList.remove('open');
+      };
+      dropdown.appendChild(div);
+    });
+  }
+
+  input.addEventListener('focus', () => {
+    renderOpciones(input.value);
+    dropdown.classList.add('open');
+  });
+  input.addEventListener('input', () => {
+    renderOpciones(input.value);
+    dropdown.classList.add('open');
+  });
+  document.addEventListener('click', e => {
+    if (!wrap.contains(e.target)) dropdown.classList.remove('open');
+  });
+
+  // Set initial value
+  if (opciones.length) {
+    selectEl.value = opciones[0];
+    input.value = opciones[0];
+  }
+}
+
+// Inicializar todos los selects de ciudad y área
+setTimeout(() => {
+  ['cvCiudad','busquedaCiudad','frioCiudad'].forEach(id => {
+    crearSearchSelect(document.getElementById(id), CIUDADES);
+  });
+  ['cvArea'].forEach(id => {
+    crearSearchSelect(document.getElementById(id), AREAS);
+  });
+}, 100);
 
 // Close modals on background click
 document.getElementById('authModal').addEventListener('click', e => { if(e.target===e.currentTarget)closeAuth(); });
