@@ -1,0 +1,1 @@
+# talentoec-frontend
