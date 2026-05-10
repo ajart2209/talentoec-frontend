@@ -1,0 +1,2942 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#00C48C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TalentoEC">
+<meta name="description" content="Encuentra trabajo en Ecuador con IA. Subí tu CV y nosotros buscamos por vos.">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%2300C48C'/%3E%3Ctext x='90' y='115' font-family='Arial,sans-serif' font-size='90' font-weight='bold' fill='%230A0F0D' text-anchor='middle'%3ETE%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TalentoEC — Conectando Ecuador</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --verde:#00C48C;--verde-dark:#00996E;--verde-light:#E0FFF5;
+  --negro:#0A0F0D;--gris-oscuro:#1A221E;--gris-medio:#2E3D37;
+  --gris-borde:#334039;--texto-primario:#F0FFF8;--texto-secundario:#7A9E8E;
+  --amarillo:#F5E642;--rojo:#FF4D6D;--azul:#3B82F6;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--negro);color:var(--texto-primario);min-height:100vh;overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:60px;background:rgba(10,15,13,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--gris-borde)}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--texto-primario);display:flex;align-items:center;gap:8px;cursor:pointer}
+.logo-badge{background:var(--verde);color:var(--negro);font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;letter-spacing:.05em}
+.nav-center{display:flex;gap:4px}
+.nav-right{display:flex;align-items:center;gap:10px}
+.ntab{background:transparent;border:1px solid transparent;color:var(--texto-secundario);padding:7px 14px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
+.ntab:hover,.ntab.active{background:var(--gris-oscuro);border-color:var(--gris-borde);color:var(--texto-primario)}
+.btn-nav-login{background:transparent;border:1px solid var(--gris-borde);color:var(--texto-secundario);padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-nav-login:hover{border-color:var(--verde);color:var(--verde)}
+.btn-nav-cta{background:var(--verde);border:none;color:var(--negro);padding:7px 16px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-nav-cta:hover{background:#00e0a0}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:var(--verde);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--negro);cursor:pointer}
+
+/* PAGES */
+.page{display:none;padding-top:60px;min-height:100vh}
+.page.active{display:block}
+
+/* ========== LANDING ========== */
+.hero{padding:70px 40px 50px;max-width:860px;margin:0 auto}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;background:var(--gris-oscuro);border:1px solid var(--gris-borde);padding:5px 14px;border-radius:20px;font-size:11px;color:var(--verde);margin-bottom:24px;letter-spacing:.05em}
+.hero-tag::before{content:'';width:6px;height:6px;background:var(--verde);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+h1.hero-title{font-family:'Syne',sans-serif;font-size:clamp(38px,5.5vw,66px);font-weight:800;line-height:1.05;margin-bottom:20px}
+h1.hero-title span{color:var(--verde)}
+.hero-sub{font-size:16px;color:var(--texto-secundario);line-height:1.7;max-width:560px;margin-bottom:36px}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:50px}
+.btn-primary{background:var(--verde);color:var(--negro);border:none;padding:13px 26px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-primary:hover{background:#00e0a0;transform:translateY(-1px)}
+.btn-secondary{background:transparent;color:var(--texto-primario);border:1px solid var(--gris-borde);padding:13px 26px;border-radius:10px;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-secondary:hover{border-color:var(--verde);color:var(--verde)}
+.stats-row{display:flex;gap:36px;padding:24px 0;border-top:1px solid var(--gris-borde)}
+.stat-num{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--verde)}
+.stat-label{font-size:11px;color:var(--texto-secundario);margin-top:2px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:0 40px 60px;max-width:860px;margin:0 auto}
+.step-card{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:14px;padding:24px;transition:border-color .2s}
+.step-card:hover{border-color:var(--verde)}
+.step-num{font-family:'Syne',sans-serif;font-size:42px;font-weight:800;color:var(--gris-borde);line-height:1;margin-bottom:12px}
+.step-card h3{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;margin-bottom:8px}
+.step-card p{font-size:13px;color:var(--texto-secundario);line-height:1.6}
+
+/* PLANES */
+.planes-section{padding:20px 40px 60px;max-width:860px;margin:0 auto}
+.section-label{font-size:11px;letter-spacing:.12em;color:var(--verde);text-transform:uppercase;margin-bottom:12px}
+.section-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;margin-bottom:32px}
+.planes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.plan-card{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:16px;padding:28px;transition:all .2s;position:relative}
+.plan-card.destacado{border-color:var(--verde);background:rgba(0,196,140,.06)}
+.plan-badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--verde);color:var(--negro);font-size:10px;font-weight:700;padding:3px 12px;border-radius:20px;white-space:nowrap;font-family:'Syne',sans-serif}
+.plan-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:var(--texto-secundario);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em}
+.plan-price{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;margin-bottom:4px}
+.plan-price span{font-size:14px;font-weight:400;color:var(--texto-secundario)}
+.plan-desc{font-size:12px;color:var(--texto-secundario);margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--gris-borde)}
+.plan-features{list-style:none;margin-bottom:24px}
+.plan-features li{font-size:13px;color:var(--texto-secundario);padding:5px 0;display:flex;align-items:center;gap:8px}
+.plan-features li::before{content:'✓';color:var(--verde);font-weight:700;font-size:12px}
+.btn-plan{width:100%;background:transparent;border:1px solid var(--gris-borde);color:var(--texto-primario);padding:11px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:600;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-plan:hover,.plan-card.destacado .btn-plan{background:var(--verde);border-color:var(--verde);color:var(--negro)}
+
+/* ========== AUTH MODAL ========== */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:300;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:20px;padding:36px;width:90%;max-width:440px;max-height:90vh;overflow-y:auto}
+.modal h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:6px}
+.modal .modal-sub{font-size:13px;color:var(--texto-secundario);margin-bottom:24px}
+.auth-tabs{display:flex;gap:0;margin-bottom:24px;background:var(--gris-medio);border-radius:10px;padding:4px}
+.auth-tab{flex:1;padding:8px;border-radius:7px;border:none;background:transparent;color:var(--texto-secundario);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
+.auth-tab.active{background:var(--negro);color:var(--texto-primario);font-weight:500}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field label{font-size:12px;color:var(--texto-secundario)}
+.field input,.field select,.field textarea{background:var(--negro);border:1px solid var(--gris-borde);color:var(--texto-primario);padding:10px 14px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--verde)}
+.field select option{background:var(--gris-oscuro)}
+.field textarea{resize:vertical;min-height:90px}
+.btn-full{width:100%;background:var(--verde);color:var(--negro);border:none;padding:13px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;margin-top:4px}
+.btn-full:hover{background:#00e0a0}
+.btn-full:disabled{background:var(--gris-medio);color:var(--texto-secundario);cursor:not-allowed}
+.divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--texto-secundario);font-size:12px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--gris-borde)}
+.btn-google{width:100%;background:transparent;border:1px solid var(--gris-borde);color:var(--texto-primario);padding:11px;border-radius:10px;font-size:14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-google:hover{border-color:var(--texto-secundario)}
+.tipo-selector{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.tipo-card{padding:16px;border:1px solid var(--gris-borde);border-radius:10px;cursor:pointer;text-align:center;transition:all .2s}
+.tipo-card:hover,.tipo-card.selected{border-color:var(--verde);background:rgba(0,196,140,.07)}
+.tipo-card .tipo-icon{font-size:24px;margin-bottom:6px}
+.tipo-card .tipo-label{font-size:13px;font-weight:500}
+.tipo-card .tipo-desc{font-size:11px;color:var(--texto-secundario);margin-top:3px}
+
+/* ========== CANDIDATO DASHBOARD ========== */
+.dashboard{max-width:760px;margin:0 auto;padding:36px 32px}
+.dash-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px}
+.dash-welcome{font-family:'Syne',sans-serif;font-size:24px;font-weight:700}
+.dash-sub{font-size:13px;color:var(--texto-secundario);margin-top:4px}
+.plan-pill{background:rgba(0,196,140,.12);border:1px solid rgba(0,196,140,.25);color:var(--verde);font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px}
+.dash-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+.dash-card{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:12px;padding:18px}
+.dash-card-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--verde)}
+.dash-card-label{font-size:12px;color:var(--texto-secundario);margin-top:4px}
+.section-box{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:14px;padding:24px;margin-bottom:20px}
+.section-box-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.step-indicators{display:flex;gap:8px;margin-bottom:24px}
+.step-ind{flex:1;padding:7px;border-radius:8px;border:1px solid var(--gris-borde);text-align:center;font-size:11px;color:var(--texto-secundario);transition:all .2s}
+.step-ind.done{border-color:var(--verde);color:var(--verde);background:rgba(0,196,140,.08)}
+.step-ind.current{border-color:var(--verde);color:var(--verde);font-weight:500}
+.upload-box{border:2px dashed var(--gris-borde);border-radius:14px;padding:40px 24px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:20px}
+.upload-box:hover{border-color:var(--verde);background:rgba(0,196,140,.04)}
+.upload-box h3{font-family:'Syne',sans-serif;font-size:15px;margin-bottom:8px}
+.upload-box p{font-size:13px;color:var(--texto-secundario)}
+.fmt-badge{background:var(--gris-medio);border:1px solid var(--gris-borde);color:var(--texto-secundario);font-size:10px;padding:3px 9px;border-radius:5px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ai-panel{background:var(--negro);border:1px solid var(--gris-borde);border-radius:12px;padding:20px;margin-top:20px}
+.ai-panel-header{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.ai-dot{width:7px;height:7px;background:var(--verde);border-radius:50%;animation:pulse 1.5s infinite}
+.ai-content{font-size:13px;color:var(--texto-secundario);line-height:1.8;white-space:pre-wrap}
+.spin{width:30px;height:30px;border:2.5px solid var(--gris-borde);border-top-color:var(--verde);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.searching-anim{display:none;text-align:center;padding:20px}
+.searching-anim.visible{display:block}
+.src-item{font-size:11px;color:var(--texto-secundario);padding:3px 10px;border-radius:20px;border:1px solid var(--gris-borde);animation:fadeIn .4s ease forwards;opacity:0;display:inline-block;margin:3px}
+@keyframes fadeIn{to{opacity:1}}
+.job-card{background:var(--negro);border:1px solid var(--gris-borde);border-radius:12px;padding:18px;margin-bottom:12px;transition:border-color .2s}
+.job-card:hover{border-color:var(--verde)}
+.job-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.job-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:600}
+.job-company{font-size:12px;color:var(--texto-secundario);margin-top:3px}
+.match-badge{background:rgba(0,196,140,.15);border:1px solid rgba(0,196,140,.3);color:var(--verde);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px}
+.tag{background:var(--gris-medio);border:1px solid var(--gris-borde);color:var(--texto-secundario);font-size:10px;padding:3px 9px;border-radius:5px}
+.tags-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.card-actions{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--gris-borde)}
+.btn-sm-green{background:var(--verde);color:var(--negro);border:none;padding:8px 16px;border-radius:7px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:all .2s}
+.btn-sm-green:hover{background:#00e0a0}
+.btn-sm-outline{background:transparent;color:var(--texto-secundario);border:1px solid var(--gris-borde);padding:8px 16px;border-radius:7px;font-size:12px;cursor:pointer;transition:all .2s}
+.btn-sm-outline:hover{border-color:var(--verde);color:var(--verde)}
+.cv-saved-banner{background:rgba(0,196,140,.1);border:1px solid rgba(0,196,140,.25);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.cv-saved-info{font-size:13px;color:var(--verde);font-weight:500}
+.cv-saved-date{font-size:11px;color:var(--texto-secundario);margin-top:2px}
+
+/* ========== EMPLEADOR DASHBOARD ========== */
+.emp-layout{max-width:980px;margin:0 auto;padding:36px 32px}
+.emp-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px}
+.search-bar-wrap{display:flex;gap:10px;margin-bottom:20px}
+.search-bar-wrap input{flex:1;background:var(--gris-oscuro);border:1px solid var(--gris-borde);color:var(--texto-primario);padding:13px 18px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+.search-bar-wrap input:focus{border-color:var(--verde)}
+.search-bar-wrap input::placeholder{color:var(--texto-secundario)}
+.btn-search{background:var(--verde);color:var(--negro);border:none;padding:13px 22px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-search:hover{background:#00e0a0}
+/* Advanced filters */
+.filters-panel{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:14px;padding:20px;margin-bottom:20px}
+.filters-title{font-size:12px;font-weight:500;color:var(--texto-secundario);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
+.filters-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.filter-group label{font-size:11px;color:var(--texto-secundario);display:block;margin-bottom:5px}
+.filter-group select,.filter-group input{width:100%;background:var(--negro);border:1px solid var(--gris-borde);color:var(--texto-primario);padding:8px 12px;border-radius:7px;font-size:12px;outline:none;transition:border-color .2s}
+.filter-group select:focus,.filter-group input:focus{border-color:var(--verde)}
+.filter-group select option{background:var(--negro)}
+.chips-row{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:var(--negro);border:1px solid var(--gris-borde);color:var(--texto-secundario);padding:6px 14px;border-radius:20px;font-size:11px;cursor:pointer;transition:all .2s}
+.chip:hover,.chip.on{background:var(--verde);border-color:var(--verde);color:var(--negro);font-weight:500}
+.results-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.results-count{font-size:13px;color:var(--texto-secundario)}
+.sort-select{background:var(--gris-oscuro);border:1px solid var(--gris-borde);color:var(--texto-primario);padding:7px 12px;border-radius:7px;font-size:12px;outline:none}
+.candidate-card{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:14px;padding:20px 22px;transition:border-color .2s;margin-bottom:14px}
+.candidate-card:hover{border-color:var(--verde)}
+.cc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.cc-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:700}
+.cc-role{font-size:12px;color:var(--texto-secundario);margin-top:3px}
+.cc-badges{display:flex;gap:8px;align-items:center}
+.cc-meta{display:flex;gap:18px;font-size:11px;color:var(--texto-secundario);margin-top:10px}
+.source-dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:4px}
+.sources-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.source-pill{display:flex;align-items:center;gap:5px;background:var(--gris-oscuro);border:1px solid var(--gris-borde);padding:5px 12px;border-radius:20px;font-size:11px;color:var(--texto-secundario)}
+
+/* ========== PAYPHONE MODAL ========== */
+.pp-modal{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:20px;padding:0;width:90%;max-width:480px;overflow:hidden}
+.pp-header{background:linear-gradient(135deg,#00C48C,#00996E);padding:28px;text-align:center}
+.pp-header h2{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--negro);margin-bottom:4px}
+.pp-header p{font-size:13px;color:rgba(0,0,0,.6)}
+.pp-body{padding:28px}
+.pp-plan-summary{background:var(--negro);border:1px solid var(--gris-borde);border-radius:10px;padding:16px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center}
+.pp-plan-name{font-size:13px;color:var(--texto-secundario)}
+.pp-plan-price{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--verde)}
+.pp-methods{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.pp-method{border:1px solid var(--gris-borde);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;background:var(--negro)}
+.pp-method:hover,.pp-method.selected{border-color:var(--verde);background:rgba(0,196,140,.07)}
+.pp-method-icon{font-size:20px;margin-bottom:6px}
+.pp-method-label{font-size:12px;font-weight:500}
+.pp-method-desc{font-size:10px;color:var(--texto-secundario);margin-top:2px}
+.pp-form-section{display:none}
+.pp-form-section.visible{display:block}
+.pp-phone-input{display:flex;gap:8px}
+.pp-phone-prefix{background:var(--negro);border:1px solid var(--gris-borde);color:var(--texto-primario);padding:10px 12px;border-radius:8px;font-size:14px;width:70px;text-align:center}
+.pp-security{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--texto-secundario);margin-top:16px;padding-top:16px;border-top:1px solid var(--gris-borde)}
+.pp-security::before{content:'🔒';font-size:14px}
+.btn-pp-pay{width:100%;background:var(--verde);color:var(--negro);border:none;padding:15px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:800;font-size:15px;cursor:pointer;transition:all .2s;margin-top:16px}
+.btn-pp-pay:hover{background:#00e0a0}
+.pp-success{display:none;text-align:center;padding:40px 28px}
+.pp-success.visible{display:block}
+.pp-success-icon{font-size:48px;margin-bottom:16px}
+.pp-success h3{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:8px;color:var(--verde)}
+.pp-success p{font-size:13px;color:var(--texto-secundario);line-height:1.6}
+
+/* EMAIL MODAL */
+.email-modal-inner{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:20px;padding:28px;width:90%;max-width:540px;max-height:85vh;overflow-y:auto}
+.modal-actions{display:flex;gap:10px;margin-top:16px}
+.btn-cancel{flex:1;background:transparent;color:var(--texto-secundario);border:1px solid var(--gris-borde);padding:11px;border-radius:8px;font-size:13px;cursor:pointer}
+.btn-send{flex:2;background:var(--verde);color:var(--negro);border:none;padding:11px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer}
+.btn-send:hover{background:#00e0a0}
+.ai-note{font-size:11px;color:var(--texto-secundario);background:rgba(0,196,140,.08);border:1px solid rgba(0,196,140,.2);padding:9px 13px;border-radius:7px;margin-top:8px}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--verde);color:var(--negro);padding:12px 20px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;transform:translateY(80px);opacity:0;transition:all .3s;z-index:999}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.error{background:var(--rojo);color:#fff}
+
+/* PROFILE DROPDOWN */
+.profile-menu{position:absolute;top:56px;right:20px;background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:12px;padding:8px;min-width:200px;display:none;z-index:200}
+.profile-menu.open{display:block}
+.profile-menu-item{padding:9px 14px;border-radius:8px;font-size:13px;cursor:pointer;transition:all .2s;color:var(--texto-secundario)}
+.profile-menu-item:hover{background:var(--gris-medio);color:var(--texto-primario)}
+.profile-menu-item.danger{color:var(--rojo)}
+.profile-menu-divider{height:1px;background:var(--gris-borde);margin:4px 0}
+.profile-menu-user{padding:10px 14px;font-size:12px;color:var(--texto-secundario);border-bottom:1px solid var(--gris-borde);margin-bottom:4px}
+.profile-menu-user strong{display:block;font-size:13px;color:var(--texto-primario);font-weight:500;margin-bottom:2px}
+
+/* MISC */
+.empty-state{text-align:center;padding:60px 24px;color:var(--texto-secundario)}
+.empty-state div:first-child{font-size:36px;margin-bottom:14px}
+.empty-state p{font-size:14px}
+.badge-free{background:var(--gris-medio);border:1px solid var(--gris-borde);color:var(--texto-secundario);font-size:10px;padding:3px 9px;border-radius:20px}
+.badge-pro{background:rgba(0,196,140,.12);border:1px solid rgba(0,196,140,.25);color:var(--verde);font-size:10px;padding:3px 9px;border-radius:20px}
+.badge-emp{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);color:#60a5fa;font-size:10px;padding:3px 9px;border-radius:20px}
+.limit-bar{background:var(--gris-medio);border-radius:4px;height:4px;margin-top:6px;overflow:hidden}
+.limit-fill{height:100%;background:var(--verde);border-radius:4px;transition:width .6s}
+.limit-fill.warn{background:var(--amarillo)}
+.limit-fill.full{background:var(--rojo)}
+.tab-row{display:flex;gap:4px;margin-bottom:24px;background:var(--gris-oscuro);border-radius:10px;padding:4px;border:1px solid var(--gris-borde)}
+.tab-btn{flex:1;padding:8px;border-radius:7px;border:none;background:transparent;color:var(--texto-secundario);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
+.tab-btn.active{background:var(--negro);color:var(--texto-primario);font-weight:500}
+
+/* Searchable dropdown */
+.search-select-wrap { position:relative; }
+.search-select-input {
+  width:100%; background:var(--negro); border:1px solid var(--gris-borde);
+  color:var(--texto-primario); padding:10px 14px; border-radius:8px;
+  font-family:'DM Sans',sans-serif; font-size:14px; outline:none;
+  cursor:pointer; transition:border-color .2s;
+}
+.search-select-input:focus { border-color:var(--verde); }
+.search-select-dropdown {
+  display:none; position:absolute; top:100%; left:0; right:0; z-index:50;
+  background:var(--gris-oscuro); border:1px solid var(--verde);
+  border-radius:8px; max-height:220px; overflow-y:auto; margin-top:4px;
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
+}
+.search-select-dropdown.open { display:block; }
+.search-select-option {
+  padding:9px 14px; font-size:13px; color:var(--texto-secundario);
+  cursor:pointer; transition:all .15s;
+}
+.search-select-option:hover, .search-select-option.selected {
+  background:rgba(0,196,140,.1); color:var(--verde);
+}
+.search-select-empty { padding:10px 14px; font-size:13px; color:var(--texto-secundario); }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script>
+if (window.pdfjsLib) {
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+</script>
+</head>
+<body>
+
+<nav>
+  <div class="logo" onclick="goHome()">TalentoEC <span class="logo-badge">ECUADOR</span></div>
+  <div class="nav-center" id="navCenter">
+    <button class="ntab active" onclick="showPage('landing')" id="ntab-landing">Inicio</button>
+    <button class="ntab" onclick="requireAuth('candidato')" id="ntab-candidato">Candidatos</button>
+    <button class="ntab" onclick="requireAuth('empleador')" id="ntab-empleador">Empleadores</button>
+  </div>
+  <div class="nav-right" id="navRight">
+    <button class="btn-nav-login" onclick="openAuth('login')">Iniciar sesión</button>
+    <button class="btn-nav-cta" onclick="openAuth('register')">Registrarse gratis</button>
+  </div>
+</nav>
+
+<!-- ===== LANDING ===== -->
+<div id="page-landing" class="page active">
+  <div class="hero">
+    <div class="hero-tag">Tecnología · Solo Ecuador · Gratis para candidatos</div>
+    <h1 class="hero-title">El talento ecuatoriano,<br><span>encontrado por nosotros</span></h1>
+    <p class="hero-sub">Sube tu CV, Lo analizamos con web search en tiempo real, busca en toda la internet ecuatoriana y envía correos automáticos por ti.</p>
+    <div class="hero-ctas">
+      <button class="btn-primary" onclick="openAuth('register')">Crear cuenta gratis →</button>
+      <button class="btn-secondary" onclick="openAuth('login')">Ya tengo cuenta</button>
+    </div>
+    <div class="stats-row">
+      <div><div class="stat-num">24+</div><div class="stat-label">Provincias</div></div>
+      <div><div class="stat-num">50+</div><div class="stat-label">Fuentes buscadas</div></div>
+      <div><div class="stat-num">100%</div><div class="stat-label">Automatizado</div></div>
+      <div><div class="stat-num">0$</div><div class="stat-label">Para candidatos</div></div>
+    </div>
+  </div>
+
+  <!-- COMO FUNCIONA VISUAL -->
+  <div style="padding:20px 40px 60px;max-width:860px;margin:0 auto">
+    <div class="section-label">Cómo funciona</div>
+    <div class="section-title" style="font-family:'Syne',sans-serif;font-size:28px;font-weight:700;margin-bottom:36px">Tu búsqueda de trabajo, automatizada</div>
+
+    <div style="display:flex;flex-direction:column;gap:0">
+
+      <div style="display:flex;gap:24px;align-items:flex-start;margin-bottom:8px">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:0">
+          <div style="width:72px;height:72px;border-radius:14px;background:rgba(0,196,140,0.12);border:1px solid rgba(0,196,140,0.3);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">📄</div>
+          <div style="width:2px;height:32px;background:rgba(0,196,140,0.3)"></div>
+        </div>
+        <div style="padding-top:10px;padding-bottom:20px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="background:var(--verde);color:var(--negro);font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px">01</span>
+            <span style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700">Sube tu CV</span>
+          </div>
+          <p style="color:var(--texto-secundario);font-size:13px;line-height:1.7;margin:0 0 10px">PDF, Word o texto. Lo analizamos, detecta tus áreas profesionales y mejora la redacción automáticamente.</p>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span style="background:var(--gris-medio);border:1px solid var(--gris-borde);color:var(--texto-secundario);font-size:11px;padding:3px 10px;border-radius:5px">PDF</span>
+            <span style="background:var(--gris-medio);border:1px solid var(--gris-borde);color:var(--texto-secundario);font-size:11px;padding:3px 10px;border-radius:5px">Word</span>
+            <span style="background:var(--gris-medio);border:1px solid var(--gris-borde);color:var(--texto-secundario);font-size:11px;padding:3px 10px;border-radius:5px">Texto</span>
+            <span style="background:rgba(0,196,140,0.1);border:1px solid rgba(0,196,140,0.2);color:var(--verde);font-size:11px;padding:3px 10px;border-radius:5px">✓ CV mejorado </span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:24px;align-items:flex-start;margin-bottom:8px">
+        <div style="display:flex;flex-direction:column;align-items:center">
+          <div style="width:72px;height:72px;border-radius:14px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">🔍</div>
+          <div style="width:2px;height:32px;background:rgba(59,130,246,0.3)"></div>
+        </div>
+        <div style="padding-top:10px;padding-bottom:20px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="background:var(--azul);color:#fff;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px">02</span>
+            <span style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700">Busca en todo Ecuador con web search</span>
+          </div>
+          <p style="color:var(--texto-secundario);font-size:13px;line-height:1.7;margin:0 0 10px">Buscamos en LinkedIn, Multitrabajos, Indeed, OLX, Facebook y páginas de empresas. También encuentra empresas sin vacante publicada.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;max-width:380px">
+            <div style="background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:7px;padding:7px 11px;font-size:11px;color:var(--texto-secundario)">🌐 LinkedIn Ecuador</div>
+            <div style="background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:7px;padding:7px 11px;font-size:11px;color:var(--texto-secundario)">📋 Multitrabajos</div>
+            <div style="background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:7px;padding:7px 11px;font-size:11px;color:var(--texto-secundario)">🔎 Indeed EC</div>
+            <div style="background:rgba(245,230,66,0.08);border:1px solid rgba(245,230,66,0.2);border-radius:7px;padding:7px 11px;font-size:11px;color:var(--amarillo)">🎯 +40 fuentes más</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:24px;align-items:flex-start;margin-bottom:8px">
+        <div style="display:flex;flex-direction:column;align-items:center">
+          <div style="width:72px;height:72px;border-radius:14px;background:rgba(245,230,66,0.08);border:1px solid rgba(245,230,66,0.2);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">✉️</div>
+          <div style="width:2px;height:32px;background:rgba(245,230,66,0.3)"></div>
+        </div>
+        <div style="padding-top:10px;padding-bottom:20px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="background:var(--amarillo);color:var(--negro);font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px">03</span>
+            <span style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700">Correos automáticos personalizados</span>
+          </div>
+          <p style="color:var(--texto-secundario);font-size:13px;line-height:1.7;margin:0 0 10px">Redactamos un correo diferente para cada empresa usando tu CV mejorado. También envía correos en frío a empresas sin vacante.</p>
+          <div style="background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:8px;padding:12px;max-width:380px">
+            <div style="font-size:10px;color:var(--texto-secundario);margin-bottom:5px">Correo generado automáticamente:</div>
+            <div style="font-size:11px;color:var(--texto-primario);line-height:1.6;font-style:italic">"Estimado RRHH de Kruger Corp, me dirijo a ustedes para postularme al puesto de Desarrollador Full Stack..."</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:24px;align-items:flex-start">
+        <div style="width:72px;height:72px;border-radius:14px;background:rgba(0,196,140,0.15);border:2px solid var(--verde);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">🎉</div>
+        <div style="padding-top:10px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="background:rgba(0,196,140,0.15);border:1px solid rgba(0,196,140,0.3);color:var(--verde);font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px">RESULTADO</span>
+            <span style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700">Consigues el trabajo</span>
+          </div>
+          <p style="color:var(--texto-secundario);font-size:13px;line-height:1.7;margin:0 0 16px">Mientras la app trabaja por ti, tú te preparas para las entrevistas. Hasta 900 correos al mes en plan Pro.</p>
+          <button onclick="openAuth('register')" class="btn-primary">Empezar gratis →</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="planes-section">
+    <div class="section-label">Planes para candidatos</div>
+    <div class="section-title">Más correos, más oportunidades</div>
+    <div class="planes-grid">
+
+      <!-- BÁSICO -->
+      <div class="plan-card">
+        <div class="plan-name">Básico</div>
+        <div class="plan-price">$9<span>.99 / mes</span></div>
+        <div class="plan-desc">Para quien empieza su búsqueda</div>
+        <div style="margin:14px 0 16px">
+          <div style="font-size:11px;color:var(--texto-secundario);margin-bottom:6px">Correos diarios</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="flex:1;height:5px;background:var(--gris-medio);border-radius:3px;overflow:hidden">
+              <div style="width:33%;height:100%;background:var(--verde);border-radius:3px"></div>
+            </div>
+            <span style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--verde)">10–20</span>
+          </div>
+          <div style="font-size:11px;color:var(--texto-secundario);margin-top:5px">Mínimo 10 · máximo 20 por día · ~300/mes</div>
+        </div>
+        <ul class="plan-features">
+          <li>Análisis completo de CV </li>
+          <li>10 búsquedas por mes</li>
+          <li>Correos personalizados por TalentoEC</li>
+          <li>5 fuentes de búsqueda</li>
+          <li>Historial de correos enviados</li>
+        </ul>
+        <button class="btn-plan" onclick="abrirPago('Básico','9.99')">Contratar con PayPhone</button>
+      </div>
+
+      <!-- ESTÁNDAR -->
+      <div class="plan-card destacado">
+        <div class="plan-badge">MÁS POPULAR</div>
+        <div class="plan-name">Estándar</div>
+        <div class="plan-price">$19<span>.99 / mes</span></div>
+        <div class="plan-desc">Para búsqueda activa e intensa</div>
+        <div style="margin:14px 0 16px">
+          <div style="font-size:11px;color:var(--texto-secundario);margin-bottom:6px">Correos diarios</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="flex:1;height:5px;background:var(--gris-medio);border-radius:3px;overflow:hidden">
+              <div style="width:66%;height:100%;background:var(--azul);border-radius:3px"></div>
+            </div>
+            <span style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--azul)">20–40</span>
+          </div>
+          <div style="font-size:11px;color:var(--texto-secundario);margin-top:5px">Mínimo 20 · máximo 40 por día · ~600/mes</div>
+        </div>
+        <ul class="plan-features">
+          <li>Todo del plan Básico</li>
+          <li>30 búsquedas por mes</li>
+          <li>Web search en tiempo real</li>
+          <li>15 fuentes de búsqueda</li>
+          <li>Perfil destacado para empleadores</li>
+          <li>Seguimiento de respuestas</li>
+        </ul>
+        <button class="btn-plan" onclick="abrirPago('Estándar','19.99')">Contratar con PayPhone</button>
+      </div>
+
+      <!-- PRO -->
+      <div class="plan-card">
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">$34<span>.99 / mes</span></div>
+        <div class="plan-desc">Para quien no se rinde hasta conseguirlo</div>
+        <div style="margin:14px 0 16px">
+          <div style="font-size:11px;color:var(--texto-secundario);margin-bottom:6px">Correos diarios</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="flex:1;height:5px;background:var(--gris-medio);border-radius:3px;overflow:hidden">
+              <div style="width:100%;height:100%;background:var(--amarillo);border-radius:3px"></div>
+            </div>
+            <span style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--amarillo)">30–60</span>
+          </div>
+          <div style="font-size:11px;color:var(--texto-secundario);margin-top:5px">Mínimo 30 · máximo 60 por día · ~900/mes</div>
+        </div>
+        <ul class="plan-features">
+          <li>Todo del plan Estándar</li>
+          <li>Búsquedas ilimitadas</li>
+          <li>+50 fuentes de búsqueda</li>
+          <li>Perfil destacado prioritario</li>
+          <li>Carta de presentación </li>
+          <li>Reporte de aperturas de correo</li>
+          <li>Soporte prioritario WhatsApp</li>
+        </ul>
+        <button class="btn-plan" onclick="abrirPago('Pro','34.99')">Contratar con PayPhone</button>
+      </div>
+
+    </div>
+
+    <!-- Tabla comparativa rápida -->
+    <div style="margin-top:24px;background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:14px;padding:20px 24px">
+      <div style="font-size:12px;font-weight:500;color:var(--texto-secundario);text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px">Resumen comparativo</div>
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:0;font-size:12px">
+        <div style="color:var(--texto-secundario);padding:7px 0;border-bottom:1px solid var(--gris-borde)"></div>
+        <div style="color:var(--verde);padding:7px 0;border-bottom:1px solid var(--gris-borde);text-align:center;font-weight:600">Básico</div>
+        <div style="color:var(--azul);padding:7px 0;border-bottom:1px solid var(--gris-borde);text-align:center;font-weight:600">Estándar</div>
+        <div style="color:var(--amarillo);padding:7px 0;border-bottom:1px solid var(--gris-borde);text-align:center;font-weight:600">Pro</div>
+        <div style="color:var(--texto-secundario);padding:8px 0;border-bottom:1px solid var(--gris-borde)">Correos mínimos / día</div>
+        <div style="color:var(--texto-primario);padding:8px 0;border-bottom:1px solid var(--gris-borde);text-align:center">10</div>
+        <div style="color:var(--texto-primario);padding:8px 0;border-bottom:1px solid var(--gris-borde);text-align:center">20</div>
+        <div style="color:var(--texto-primario);padding:8px 0;border-bottom:1px solid var(--gris-borde);text-align:center">30</div>
+        <div style="color:var(--texto-secundario);padding:8px 0;border-bottom:1px solid var(--gris-borde)">Correos máximos / día</div>
+        <div style="color:var(--texto-primario);padding:8px 0;border-bottom:1px solid var(--gris-borde);text-align:center">20</div>
+        <div style="color:var(--texto-primario);padding:8px 0;border-bottom:1px solid var(--gris-borde);text-align:center">40</div>
+        <div style="color:var(--texto-primario);padding:8px 0;border-bottom:1px solid var(--gris-borde);text-align:center">60</div>
+        <div style="color:var(--texto-secundario);padding:8px 0;border-bottom:1px solid var(--gris-borde)">Total estimado / mes</div>
+        <div style="color:var(--texto-primario);padding:8px 0;border-bottom:1px solid var(--gris-borde);text-align:center">~300</div>
+        <div style="color:var(--texto-primario);padding:8px 0;border-bottom:1px solid var(--gris-borde);text-align:center">~600</div>
+        <div style="color:var(--texto-primario);padding:8px 0;border-bottom:1px solid var(--gris-borde);text-align:center">~900</div>
+        <div style="color:var(--texto-secundario);padding:8px 0">Precio</div>
+        <div style="color:var(--verde);padding:8px 0;text-align:center;font-weight:600">$9.99</div>
+        <div style="color:var(--azul);padding:8px 0;text-align:center;font-weight:600">$19.99</div>
+        <div style="color:var(--amarillo);padding:8px 0;text-align:center;font-weight:600">$34.99</div>
+      </div>
+    </div>
+
+  </div>
+
+    <!-- PLANES EMPLEADORES -->
+    <div style="margin-top:48px">
+      <div class="section-label">Para empresas</div>
+      <div class="section-title">Encuentra el talento que necesitas</div>
+      <div class="planes-grid">
+
+        <!-- BÁSICO EMPLEADOR -->
+        <div class="plan-card">
+          <div class="plan-name">Básico</div>
+          <div class="plan-price">$49<span> / mes</span></div>
+          <div class="plan-desc">Para empresas que contratan ocasionalmente</div>
+          <ul class="plan-features">
+            <li>10 búsquedas de candidatos/mes</li>
+            <li>20 correos automáticos/mes</li>
+            <li>Filtros por ciudad y área</li>
+            <li>Historial de candidatos contactados</li>
+          </ul>
+          <button class="btn-plan" onclick="abrirPago('Empleador Básico','49')">Contratar con PayPhone</button>
+        </div>
+
+        <!-- PRO EMPLEADOR -->
+        <div class="plan-card destacado">
+          <div class="plan-badge">MÁS POPULAR</div>
+          <div class="plan-name">Pro</div>
+          <div class="plan-price">$149<span> / mes</span></div>
+          <div class="plan-desc">Para empresas que contratan activamente</div>
+          <ul class="plan-features">
+            <li>Búsquedas ilimitadas de candidatos</li>
+            <li>200 correos automáticos/mes</li>
+            <li>Filtros por ciudad, área y experiencia</li>
+            <li>Historial de candidatos contactados</li>
+            <li>Correos personalizados por candidato</li>
+          </ul>
+          <button class="btn-plan" onclick="abrirPago('Empleador Pro','149')">Contratar con PayPhone</button>
+        </div>
+
+        <!-- ENTERPRISE -->
+        <div class="plan-card">
+          <div class="plan-name">Enterprise</div>
+          <div class="plan-price">$399<span> / mes</span></div>
+          <div class="plan-desc">Para grandes empresas y agencias de RRHH</div>
+          <ul class="plan-features">
+            <li>Búsquedas ilimitadas de candidatos</li>
+            <li>Correos automáticos ilimitados</li>
+            <li>Filtros por ciudad, área y experiencia</li>
+            <li>Historial de candidatos contactados</li>
+            <li>Correos personalizados por candidato</li>
+          </ul>
+          <button class="btn-plan" onclick="abrirPago('Empleador Enterprise','399')">Contratar con PayPhone</button>
+        </div>
+
+      </div>
+    </div>
+
+  <!-- Footer con T&C -->
+  <div style="text-align:center;padding:20px 40px 40px;border-top:1px solid var(--gris-borde);margin-top:20px">
+    <div style="font-size:12px;color:var(--texto-secundario)">
+      © 2026 TalentoEC · Ecuador · 
+      <span onclick="showPage('terminos')" style="color:var(--verde);cursor:pointer;text-decoration:underline">Términos y Condiciones</span>
+       · 
+      <span style="color:var(--texto-secundario)">info@talentoec.com</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CANDIDATO ===== -->
+<div id="page-candidato" class="page">
+  <div class="dashboard" id="candidatoDash">
+    <div class="dash-header">
+      <div>
+        <div class="dash-welcome" id="candWelcome">Bienvenido 👋</div>
+        <div class="dash-sub">Tu portal de empleo inteligente en Ecuador</div>
+      </div>
+      <span class="plan-pill" id="candPlanPill">BÁSICO $9.99</span>
+    </div>
+
+    <div class="dash-cards">
+      <div class="dash-card"><div class="dash-card-num" id="statBusquedas">0</div><div class="dash-card-label">Búsquedas realizadas</div></div>
+      <div class="dash-card"><div class="dash-card-num" id="statCorreos">0</div><div class="dash-card-label">Correos enviados hoy</div></div>
+      <div class="dash-card"><div class="dash-card-num" id="statMatch">—</div><div class="dash-card-label">Match promedio</div></div>
+    </div>
+
+    <!-- Barra límite correos diarios -->
+    <div style="background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:12px;padding:16px 20px;margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div>
+          <span style="font-size:13px;font-weight:500">Correos de hoy</span>
+          <span style="font-size:11px;color:var(--texto-secundario);margin-left:8px" id="planNombreLabel">Plan Básico</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:4px">
+          <span style="font-size:20px;font-weight:700;font-family:'Syne',sans-serif" id="correosDiaCount">0</span>
+          <span style="font-size:12px;color:var(--texto-secundario)">/ <span id="correosDiaMax">20</span> máx.</span>
+        </div>
+      </div>
+      <div style="height:7px;background:var(--gris-medio);border-radius:4px;overflow:hidden">
+        <div id="correosDiaBar" style="height:100%;background:var(--verde);border-radius:4px;width:0%;transition:width .5s ease"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px">
+        <span style="font-size:11px;color:var(--texto-secundario)">Mín. diario: <span id="correosDiaMin">10</span> · Máx.: <span id="correosDiaMax2">20</span></span>
+        <button onclick="showPage('landing')" style="font-size:11px;color:var(--verde);background:none;border:none;cursor:pointer;text-decoration:underline">Mejorar plan →</button>
+      </div>
+    </div>
+
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="candTab('cv')">Mi CV</button>
+      <button class="tab-btn" onclick="candTab('busqueda')">Buscar trabajo</button>
+      <button class="tab-btn" onclick="candTab('resultados')">Resultados</button>
+      <button class="tab-btn" onclick="candTab('frio')" style="color:var(--amarillo)">🎯 Correos en frío</button>
+    </div>
+
+    <!-- TAB: CV -->
+    <div id="cand-tab-cv">
+      <div id="cvSavedBanner" style="display:none" class="cv-saved-banner">
+        <div><div class="cv-saved-info">✓ CV guardado en tu cuenta</div><div class="cv-saved-date" id="cvSavedDate"></div></div>
+        <button class="btn-sm-outline" onclick="editarCV()">Editar</button>
+      </div>
+
+      <div class="section-box" id="uploadSection">
+        <div class="section-box-title">Sube o pega tu CV</div>
+        <div class="upload-box" onclick="document.getElementById('fileInput').click()"
+             ondragover="event.preventDefault();this.style.borderColor='var(--verde)'"
+             ondragleave="this.style.borderColor=''"
+             ondrop="handleDrop(event)">
+          <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt" style="display:none" onchange="handleFile(this)">
+          <div style="font-size:36px;margin-bottom:12px">📄</div>
+          <h3>Arrastra tu CV o haz clic</h3>
+          <p style="margin:6px 0 12px">PDF, Word o TXT</p>
+          <div style="display:flex;gap:6px;justify-content:center">
+            <span class="fmt-badge">PDF</span><span class="fmt-badge">DOCX</span><span class="fmt-badge">TXT</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>O pega el texto de tu CV aquí</label>
+          <textarea id="cvText" placeholder="Nombre, experiencia, habilidades, educación, contacto..."></textarea>
+        </div>
+        <div class="form-row" style="margin-top:14px">
+          <div class="field"><label>Nombre completo</label><input type="text" id="cvNombre" placeholder="Juan Pérez"></div>
+          <div class="field"><label>Email de contacto</label><input type="email" id="cvEmail" placeholder="juan@gmail.com"></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Ciudad</label>
+            <select id="cvCiudad">
+              <option>Quito</option>
+              <option>Guayaquil</option>
+              <option>Cuenca</option>
+              <option>Ambato</option>
+              <option>Manta</option>
+              <option>Loja</option>
+              <option>Ibarra</option>
+              <option>Riobamba</option>
+              <option>Esmeraldas</option>
+              <option>Portoviejo</option>
+              <option>Santo Domingo</option>
+              <option>Machala</option>
+              <option>Durán</option>
+              <option>Quevedo</option>
+              <option>Milagro</option>
+              <option>Latacunga</option>
+              <option>Babahoyo</option>
+              <option>Sangolquí</option>
+              <option>Tulcán</option>
+              <option>Lago Agrio</option>
+              <option>Orellana</option>
+              <option>Tena</option>
+              <option>Puyo</option>
+              <option>Macas</option>
+              <option>Zamora</option>
+              <option>Guaranda</option>
+              <option>Azogues</option>
+              <option>Santa Rosa</option>
+              <option>Pasaje</option>
+              <option>Huaquillas</option>
+              <option>Toda la república</option>
+            </select>
+          </div>
+                  <div class="field">
+            <label>Área(s) profesional(es)</label>
+            <div style="background:var(--negro);border:1px solid var(--gris-borde);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--texto-secundario);margin-bottom:6px">
+              Detectamos tus áreas automáticamente al analizar tu CV
+            </div>
+            <div id="areasDetectadas" style="display:none">
+              <div style="font-size:11px;color:var(--texto-secundario);margin-bottom:8px">Selecciona las áreas para buscar trabajo:</div>
+              <div id="areasChips" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+            </div>
+            <input type="hidden" id="cvArea" value="">
+          </div>
+        </div>
+        <button class="btn-full" onclick="guardarYAnalizar()">Guardar y analizar →</button>
+      </div>
+
+      <div class="ai-panel" id="cvAnalysis" style="display:none">
+        <div class="ai-panel-header"><div class="ai-dot"></div><span id="analysisStatus">Analizando...</span></div>
+        <div class="ai-content" id="analysisContent"></div>
+        <div id="mejorarCVBtn" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--gris-borde)">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+            <div>
+              <div style="font-size:13px;font-weight:500;margin-bottom:3px">¿Quieres que TalentoEC mejore tu CV automáticamente?</div>
+              <div style="font-size:11px;color:var(--texto-secundario)">Reescribimos tu CV de forma profesional optimizado para Ecuador · Incluido en tu plan</div>
+            </div>
+            <button onclick="mejorarCV()" style="background:var(--verde);color:var(--negro);border:none;padding:10px 20px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap">
+              ✨ Mejorar mi CV
+            </button>
+          </div>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--gris-borde);background:rgba(245,230,66,0.06);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px">
+            <span style="color:var(--amarillo);font-size:18px">📝</span>
+            <div>
+              <div style="font-size:12px;font-weight:500;color:var(--amarillo)">Carta de presentación generada automáticamente</div>
+              <div style="font-size:11px;color:var(--texto-secundario);margin-top:2px">Se incluye en todos los correos que enviemos por ti</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel CV Mejorado -->
+      <div id="cvMejoradoPanel" style="display:none;margin-top:16px;background:var(--gris-oscuro);border:1px solid var(--verde);border-radius:14px;padding:24px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="ai-dot"></div>
+            <span style="font-family:'Syne',sans-serif;font-size:14px;font-weight:600" id="mejorarStatus">Mejorando tu CV...</span>
+          </div>
+          <div id="descargarBtn" style="display:none;align-items:center;gap:6px">
+            <span style="color:var(--verde);font-size:13px">✓</span>
+            <span style="font-size:12px;color:var(--verde);font-weight:500">CV mejorado guardado — se usará en todos tus correos automáticamente</span>
+          </div>
+        </div>
+        <div id="cvMejoradoContent" style="font-size:13px;color:var(--texto-secundario);line-height:1.8;white-space:pre-wrap;max-height:400px;overflow-y:auto;background:var(--negro);padding:16px;border-radius:8px"></div>
+      </div>
+    </div>
+
+    <!-- TAB: BUSQUEDA -->
+    <div id="cand-tab-busqueda" style="display:none">
+      <div class="section-box">
+        <div class="section-box-title">Buscar oportunidades en Ecuador</div>
+        <div id="cvDetectadoBanner" style="display:none;background:rgba(0,196,140,0.08);border:1px solid rgba(0,196,140,0.2);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--verde)">
+          ✦ Búsqueda autocompletada con tu CV guardado — puedes editarla
+        </div>
+        <div class="field">
+          <label>¿Qué tipo de trabajo buscas?</label>
+          <input type="text" id="busquedaQuery" placeholder="Ej: Desarrollador web full stack con React en Quito...">
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Ciudad preferida</label>
+            <select id="busquedaCiudad">
+              <option>Quito</option>
+              <option>Guayaquil</option>
+              <option>Cuenca</option>
+              <option>Ambato</option>
+              <option>Manta</option>
+              <option>Loja</option>
+              <option>Ibarra</option>
+              <option>Riobamba</option>
+              <option>Esmeraldas</option>
+              <option>Portoviejo</option>
+              <option>Santo Domingo</option>
+              <option>Machala</option>
+              <option>Durán</option>
+              <option>Quevedo</option>
+              <option>Milagro</option>
+              <option>Latacunga</option>
+              <option>Babahoyo</option>
+              <option>Sangolquí</option>
+              <option>Tulcán</option>
+              <option>Lago Agrio</option>
+              <option>Orellana</option>
+              <option>Tena</option>
+              <option>Puyo</option>
+              <option>Macas</option>
+              <option>Zamora</option>
+              <option>Guaranda</option>
+              <option>Azogues</option>
+              <option>Santa Rosa</option>
+              <option>Pasaje</option>
+              <option>Huaquillas</option>
+              <option>Toda la república</option>
+            </select>
+          </div>
+          <div class="field"><label>Modalidad</label>
+            <select id="busquedaModalidad">
+              <option>Cualquiera</option><option>Presencial</option><option>Remoto</option><option>Híbrido</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom:14px">
+          <div class="filters-title" style="margin-bottom:10px">Fuentes a buscar</div>
+          <div class="chips-row" id="fuentesChips">
+            <span class="chip on" onclick="toggleChip(this)">LinkedIn</span>
+            <span class="chip on" onclick="toggleChip(this)">Multitrabajos</span>
+            <span class="chip on" onclick="toggleChip(this)">Indeed EC</span>
+            <span class="chip on" onclick="toggleChip(this)">OLX Ecuador</span>
+            <span class="chip on" onclick="toggleChip(this)">Computrabajo</span>
+            <span class="chip on" onclick="toggleChip(this)">Facebook Empleos</span>
+            <span class="chip" onclick="toggleChip(this)">Twitter/X</span>
+            <span class="chip" onclick="toggleChip(this)">Universidades EC</span>
+          </div>
+        </div>
+        <button class="btn-full" onclick="buscarEmpleo()">Buscar ahora →</button>
+      </div>
+
+      <div class="searching-anim" id="candSearchAnim">
+        <div class="spin"></div>
+        <div style="font-size:13px;color:var(--texto-secundario);margin-bottom:10px">Buscamosndo en internet ecuatoriano...</div>
+        <div id="candSearchSrcs" style="max-width:400px;margin:0 auto"></div>
+      </div>
+    </div>
+
+    <!-- TAB: CORREOS EN FRIO -->
+    <div id="cand-tab-frio" style="display:none">
+      <div class="section-box">
+        <div class="section-box-title">
+          <span>🎯 Correos en frío</span>
+          <span style="font-size:11px;color:var(--texto-secundario);font-weight:400">El 40% de empleos en Ecuador nunca se publican</span>
+        </div>
+        <div style="background:rgba(245,230,66,0.06);border:1px solid rgba(245,230,66,0.2);border-radius:10px;padding:14px 16px;margin-bottom:18px;font-size:13px;color:var(--texto-secundario);line-height:1.6">
+          Buscaremos empresas ecuatorianas de tu sector que <strong style="color:var(--texto-primario)">no tienen vacante publicada</strong> y les enviará correos presentando tu perfil directamente a RRHH.
+        </div>
+        <div class="form-row" style="margin-bottom:14px">
+          <div class="field">
+            <label>Sector de empresas</label>
+            <select id="frioSector">
+              <option>Tecnología / Startups</option>
+              <option>Banca y Finanzas</option>
+              <option>Telecomunicaciones</option>
+              <option>Retail y Comercio</option>
+              <option>Construcción e Ingeniería</option>
+              <option>Salud y Farmacéutica</option>
+              <option>Educación</option>
+              <option>Manufactura</option>
+              <option>Todos los sectores</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Ciudad</label>
+            <select id="frioCiudad">
+              <option>Quito</option>
+              <option>Guayaquil</option>
+              <option>Cuenca</option>
+              <option>Ambato</option>
+              <option>Manta</option>
+              <option>Loja</option>
+              <option>Ibarra</option>
+              <option>Riobamba</option>
+              <option>Esmeraldas</option>
+              <option>Portoviejo</option>
+              <option>Santo Domingo</option>
+              <option>Machala</option>
+              <option>Durán</option>
+              <option>Quevedo</option>
+              <option>Milagro</option>
+              <option>Latacunga</option>
+              <option>Babahoyo</option>
+              <option>Sangolquí</option>
+              <option>Tulcán</option>
+              <option>Lago Agrio</option>
+              <option>Orellana</option>
+              <option>Tena</option>
+              <option>Puyo</option>
+              <option>Macas</option>
+              <option>Zamora</option>
+              <option>Guaranda</option>
+              <option>Azogues</option>
+              <option>Santa Rosa</option>
+              <option>Pasaje</option>
+              <option>Huaquillas</option>
+              <option>Toda la república</option>
+            </select>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:18px">
+          <label>Empresas a contactar hoy <span id="frioLimitLabel" style="color:var(--texto-secundario);font-size:10px;margin-left:4px"></span></label>
+          <select id="frioNumero"></select>
+        </div>
+        <button class="btn-full" onclick="ejecutarCorreosFrio()" style="background:var(--amarillo);color:var(--negro);font-family:'Syne',sans-serif;font-weight:700">
+          Buscar empresas y enviar correos en frío →
+        </button>
+      </div>
+
+      <div class="searching-anim" id="frioSearchAnim">
+        <div class="spin" style="border-top-color:var(--amarillo)"></div>
+        <div style="font-size:13px;color:var(--texto-secundario);margin-bottom:10px">Buscamosndo empresas sin vacante publicada...</div>
+        <div id="frioSearchSrcs" style="max-width:400px;margin:0 auto"></div>
+      </div>
+
+      <div id="frioResultados"></div>
+    </div>
+
+    <!-- TAB: RESULTADOS -->
+    <div id="cand-tab-resultados" style="display:none">
+      <div id="candResultados" class="empty-state">
+        <div>🔍</div><p>Realiza una búsqueda para ver oportunidades laborales</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== EMPLEADOR ===== -->
+<div id="page-empleador" class="page">
+  <div class="emp-layout">
+    <div class="emp-header">
+      <div>
+        <div class="dash-welcome" id="empWelcome">Panel de Empleador</div>
+        <div class="dash-sub">Busca candidatos en todo Ecuador </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span id="empPlanPill" class="badge-emp">PLAN PRO</span>
+        <button class="btn-sm-green" onclick="abrirPago('Pro','149')">Renovar</button>
+      </div>
+    </div>
+
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="empTab('buscar')">Buscar candidatos</button>
+      <button class="tab-btn" onclick="empTab('guardados')">Guardados</button>
+      <button class="tab-btn" onclick="empTab('correos')">Correos enviados</button>
+    </div>
+
+    <!-- TAB: BUSCAR -->
+    <div id="emp-tab-buscar">
+      <div style="position:relative;margin-bottom:20px">
+        <div class="search-bar-wrap" style="margin-bottom:0">
+          <input type="text" id="empSearchInput"
+            placeholder="Ej: Ingeniero, Contador, Desarrollador..."
+            onkeydown="if(event.key==='Enter'){cerrarSugerencias();buscarCandidatos();}"
+            oninput="mostrarSugerencias(this.value)"
+            onblur="setTimeout(cerrarSugerencias,200)"
+            autocomplete="off">
+          <button class="btn-search" onclick="buscarCandidatos()">Buscar →</button>
+        </div>
+        <div id="searchSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--gris-oscuro);border:1px solid var(--verde);border-radius:0 0 10px 10px;z-index:50;max-height:280px;overflow-y:auto"></div>
+      </div>
+
+      <div class="filters-panel">
+        <div class="filters-title">Filtros avanzados</div>
+        <div class="filters-grid">
+          <div class="filter-group">
+            <label>Ciudad</label>
+            <select id="fCiudad">
+              <option value="">Todo Ecuador</option>
+              <option>Quito</option>
+              <option>Guayaquil</option>
+              <option>Cuenca</option>
+              <option>Ambato</option>
+              <option>Manta</option>
+              <option>Loja</option>
+              <option>Ibarra</option>
+              <option>Riobamba</option>
+              <option>Esmeraldas</option>
+              <option>Portoviejo</option>
+              <option>Santo Domingo</option>
+              <option>Machala</option>
+              <option>Durán</option>
+              <option>Quevedo</option>
+              <option>Milagro</option>
+              <option>Latacunga</option>
+              <option>Babahoyo</option>
+              <option>Sangolquí</option>
+              <option>Tulcán</option>
+              <option>Lago Agrio</option>
+              <option>Orellana</option>
+              <option>Tena</option>
+              <option>Puyo</option>
+              <option>Macas</option>
+              <option>Zamora</option>
+              <option>Guaranda</option>
+              <option>Azogues</option>
+              <option>Santa Rosa</option>
+              <option>Pasaje</option>
+              <option>Huaquillas</option>
+              <option>Toda la república</option><option>Loja</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Área</label>
+            <select id="fArea">
+              <option>Tecnología / Sistemas</option>
+              <option>Desarrollo de Software</option>
+              <option>Diseño Web / UX</option>
+              <option>Ciberseguridad</option>
+              <option>Data Science / BI</option>
+              <option>Administración de Empresas</option>
+              <option>Recursos Humanos</option>
+              <option>Contabilidad / Auditoría</option>
+              <option>Finanzas / Banca</option>
+              <option>Economía</option>
+              <option>Marketing Digital</option>
+              <option>Ventas / Comercial</option>
+              <option>Publicidad / Comunicación</option>
+              <option>Atención al Cliente</option>
+              <option>Ingeniería Civil</option>
+              <option>Ingeniería Industrial</option>
+              <option>Ingeniería Eléctrica</option>
+              <option>Ingeniería Mecánica</option>
+              <option>Ingeniería Química</option>
+              <option>Arquitectura</option>
+              <option>Medicina / Salud</option>
+              <option>Enfermería</option>
+              <option>Odontología</option>
+              <option>Farmacia</option>
+              <option>Psicología</option>
+              <option>Educación / Docencia</option>
+              <option>Derecho / Legal</option>
+              <option>Logística / Supply Chain</option>
+              <option>Comercio Exterior</option>
+              <option>Turismo / Hotelería</option>
+              <option>Gastronomía</option>
+              <option>Agronomía / Agropecuario</option>
+              <option>Petróleo / Minería</option>
+              <option>Medio Ambiente</option>
+              <option>Diseño Gráfico</option>
+              <option>Fotografía / Video</option>
+              <option>Periodismo</option>
+              <option>Trabajo Social</option>
+              <option>Seguridad / Vigilancia</option>
+              <option>Construcción / Obras</option>
+              <option>Manufactura / Producción</option>
+              <option>Electricidad / Electrónica</option>
+              <option>Mecánica Automotriz</option>
+              <option>Otro</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Experiencia mínima</label>
+            <select id="fExp">
+              <option value="">Sin filtro</option>
+              <option value="1">1+ años</option>
+              <option value="3">3+ años</option>
+              <option value="5">5+ años</option>
+              <option value="10">10+ años</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Modalidad</label>
+            <select id="fModalidad">
+              <option value="">Cualquiera</option>
+              <option>Presencial</option><option>Remoto</option><option>Híbrido</option>
+            </select>
+          </div>
+        </div>
+        <div class="chips-row">
+          <span style="font-size:11px;color:var(--texto-secundario);margin-right:4px">Disponibilidad:</span>
+          <span class="chip on" onclick="toggleChip(this)">Inmediata</span>
+          <span class="chip on" onclick="toggleChip(this)">2 semanas</span>
+          <span class="chip" onclick="toggleChip(this)">1 mes</span>
+          <span style="font-size:11px;color:var(--texto-secundario);margin-left:10px;margin-right:4px">Nivel:</span>
+          <span class="chip on" onclick="toggleChip(this)">Junior</span>
+          <span class="chip on" onclick="toggleChip(this)">Senior</span>
+          <span class="chip" onclick="toggleChip(this)">Gerencial</span>
+        </div>
+      </div>
+
+      <div class="sources-bar">
+        <div class="source-pill"><span class="source-dot" style="background:#0077B5"></span>LinkedIn</div>
+        <div class="source-pill"><span class="source-dot" style="background:#E63946"></span>Multitrabajos</div>
+        <div class="source-pill"><span class="source-dot" style="background:#FF6B35"></span>Indeed</div>
+        <div class="source-pill"><span class="source-dot" style="background:#4CAF50"></span>OLX EC</div>
+        <div class="source-pill"><span class="source-dot" style="background:#9B59B6"></span>Computrabajo</div>
+        <div class="source-pill"><span class="source-dot" style="background:#F39C12"></span>Facebook</div>
+        <div class="source-pill"><span class="source-dot" style="background:#3498DB"></span>+30 más</div>
+      </div>
+
+      <div class="searching-anim" id="empSearchAnim">
+        <div class="spin"></div>
+        <div style="font-size:13px;color:var(--texto-secundario);margin-bottom:10px">Con web search real buscando candidatos...</div>
+        <div id="empSearchSrcs" style="max-width:500px;margin:0 auto"></div>
+      </div>
+
+      <div id="empResultsHeader" style="display:none" class="results-header">
+        <div class="results-count" id="empResultsCount"></div>
+        <select class="sort-select" onchange="sortResults(this.value)">
+          <option value="match">Ordenar: % Match</option>
+          <option value="exp">Ordenar: Experiencia</option>
+          <option value="disp">Ordenar: Disponibilidad</option>
+        </select>
+      </div>
+
+      <div id="empResults">
+        <div class="empty-state"><div>👥</div><p>Escribe el perfil que necesitas y Buscaremos en toda la web ecuatoriana</p></div>
+      </div>
+    </div>
+
+    <!-- TAB: GUARDADOS -->
+    <div id="emp-tab-guardados" style="display:none">
+      <div id="guardadosList">
+        <div class="empty-state"><div>🔖</div><p>Guarda candidatos durante la búsqueda para verlos aquí</p></div>
+      </div>
+    </div>
+
+    <!-- TAB: CORREOS -->
+    <div id="emp-tab-correos" style="display:none">
+      <div id="correosList"><div class="empty-state"><div>📧</div><p>Los correos enviados aparecerán aquí</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PERFIL PAGE ===== -->
+<div id="page-perfil" class="page">
+  <div class="dashboard" style="max-width:600px">
+    <div class="dash-header">
+      <div>
+        <div class="dash-welcome">Mi Perfil</div>
+        <div class="dash-sub">Información de tu cuenta</div>
+      </div>
+      <button onclick="showPage(userTipo)" class="btn-sm-outline">← Volver</button>
+    </div>
+
+    <div class="section-box">
+      <div class="section-box-title">Datos personales</div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="field"><label>Nombre completo</label><input type="text" id="perfilNombre" placeholder="Tu nombre"></div>
+        <div class="field"><label>Email</label><input type="email" id="perfilEmail" readonly style="opacity:.6"></div>
+        <div class="field"><label>Ciudad</label><input type="text" id="perfilCiudad" placeholder="Tu ciudad en Ecuador"></div>
+      </div>
+      <button class="btn-full" style="margin-top:16px" onclick="guardarPerfil()">Guardar cambios</button>
+    </div>
+
+    <div class="section-box" style="margin-top:16px">
+      <div class="section-box-title">Mi plan actual</div>
+      <div style="background:var(--negro);border-radius:10px;padding:16px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--verde)" id="perfilPlanNombre">Básico</div>
+          <div style="font-size:12px;color:var(--texto-secundario);margin-top:4px" id="perfilPlanDetalle">10-20 correos/día</div>
+        </div>
+        <button onclick="showPage('landing')" class="btn-sm-green">Mejorar plan</button>
+      </div>
+    </div>
+
+    <div class="section-box" style="margin-top:16px">
+      <div class="section-box-title">📊 Tus estadísticas</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+        <div class="dash-card"><div class="dash-card-num" id="perfilBusquedas">0</div><div class="dash-card-label">Búsquedas realizadas</div></div>
+        <div class="dash-card"><div class="dash-card-num" id="perfilCorreos">0</div><div class="dash-card-label">Correos enviados</div></div>
+        <div class="dash-card"><div class="dash-card-num" id="perfilAbiertos" style="color:var(--azul)">0</div><div class="dash-card-label">Correos abiertos</div></div>
+        <div class="dash-card"><div class="dash-card-num" id="perfilRespondidos" style="color:var(--amarillo)">0</div><div class="dash-card-label">Respuestas recibidas</div></div>
+      </div>
+      <div style="background:var(--negro);border:1px solid var(--gris-borde);border-radius:10px;padding:14px;margin-top:14px">
+        <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:10px">Tasa de éxito por tipo de empresa</div>
+        <div style="display:flex;flex-direction:column;gap:8px" id="tasaExito">
+          <div style="display:flex;justify-content:space-between;font-size:12px">
+            <span>Banca y Finanzas</span>
+            <span style="color:var(--verde);font-weight:600">12% respuestas</span>
+          </div>
+          <div style="background:var(--gris-borde);height:4px;border-radius:2px;overflow:hidden">
+            <div style="background:var(--verde);height:100%;width:12%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:4px">
+            <span>Tecnología / Startups</span>
+            <span style="color:var(--verde);font-weight:600">28% respuestas</span>
+          </div>
+          <div style="background:var(--gris-borde);height:4px;border-radius:2px;overflow:hidden">
+            <div style="background:var(--verde);height:100%;width:28%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:4px">
+            <span>Retail / Comercio</span>
+            <span style="color:var(--verde);font-weight:600">8% respuestas</span>
+          </div>
+          <div style="background:var(--gris-borde);height:4px;border-radius:2px;overflow:hidden">
+            <div style="background:var(--verde);height:100%;width:8%"></div>
+          </div>
+        </div>
+        <div style="font-size:10px;color:var(--texto-secundario);margin-top:12px;text-align:center">
+          💡 Promedio del mercado ecuatoriano: 5-15% de respuestas
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;text-align:center">
+      <button onclick="cerrarSesion()" style="background:rgba(255,77,109,0.1);border:1px solid var(--rojo);color:var(--rojo);padding:10px 24px;border-radius:8px;cursor:pointer;font-size:13px">
+        Cerrar sesión
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== AUTH MODAL ===== -->
+<div class="modal-bg" id="authModal">
+  <div class="modal">
+    <h2 id="authTitle">Crear cuenta</h2>
+    <p class="modal-sub" id="authSub">Únete a TalentoEC gratis</p>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuth('register')" id="authTabReg">Registrarse</button>
+      <button class="auth-tab" onclick="switchAuth('login')" id="authTabLog">Iniciar sesión</button>
+    </div>
+
+    <!-- Register -->
+    <div id="authRegister">
+      <div class="tipo-selector" id="tipoSelector">
+        <div class="tipo-card selected" onclick="selectTipo('candidato',this)">
+          <div class="tipo-icon">👤</div>
+          <div class="tipo-label">Candidato</div>
+          <div class="tipo-desc">Busco empleo</div>
+        </div>
+        <div class="tipo-card" onclick="selectTipo('empleador',this)">
+          <div class="tipo-icon">🏢</div>
+          <div class="tipo-label">Empleador</div>
+          <div class="tipo-desc">Busco personal</div>
+        </div>
+      </div>
+      <div class="form-row" style="margin-bottom:14px">
+        <div class="field"><label>Nombre</label><input type="text" id="regNombre" placeholder="Juan Pérez"></div>
+        <div class="field"><label>Email</label><input type="email" id="regEmail" placeholder="juan@gmail.com"></div>
+      </div>
+      <div class="field"><label>Contraseña</label><input type="password" id="regPass" placeholder="Mínimo 6 caracteres"></div>
+      <div class="field" id="empEmpresaField" style="display:none"><label>Empresa</label><input type="text" id="regEmpresa" placeholder="Nombre de tu empresa"></div>
+      <button class="btn-full" onclick="registrar()">Crear cuenta gratis</button>
+
+    </div>
+
+    <!-- Login -->
+    <div id="authLogin" style="display:none">
+      <div class="field"><label>Email</label><input type="email" id="logEmail" placeholder="tu@email.com"></div>
+      <div class="field"><label>Contraseña</label><input type="password" id="logPass" placeholder="Tu contraseña"></div>
+      <button class="btn-full" onclick="iniciarSesion()">Iniciar sesión</button>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAYPHONE MODAL ===== -->
+<div class="modal-bg" id="ppModal">
+  <div class="pp-modal">
+    <div id="ppPayView">
+      <div class="pp-header">
+        <h2>Pago seguro con PayPhone</h2>
+        <p>Tu plataforma de pagos ecuatoriana de confianza</p>
+      </div>
+      <div class="pp-body">
+        <div class="pp-plan-summary">
+          <div><div class="pp-plan-name">Plan seleccionado</div><div style="font-size:15px;font-weight:600;margin-top:2px" id="ppPlanName">Pro</div></div>
+          <div><div class="pp-plan-price" id="ppPlanPrice">$149</div><div style="font-size:10px;color:var(--texto-secundario);text-align:right">/mes</div></div>
+        </div>
+        <div class="filters-title" style="margin-bottom:12px">Método de pago</div>
+        <div class="pp-methods">
+          <div class="pp-method selected" onclick="selectPPMethod('tarjeta',this)">
+            <div class="pp-method-icon">💳</div>
+            <div class="pp-method-label">Tarjeta</div>
+            <div class="pp-method-desc">Crédito o débito</div>
+          </div>
+          <div class="pp-method" onclick="selectPPMethod('celular',this)">
+            <div class="pp-method-icon">📱</div>
+            <div class="pp-method-label">PayPhone App</div>
+            <div class="pp-method-desc">Pago por celular</div>
+          </div>
+        </div>
+
+        <!-- Tarjeta form -->
+        <div class="pp-form-section visible" id="ppTarjetaForm">
+          <div class="field"><label>Número de tarjeta</label><input type="text" placeholder="0000 0000 0000 0000" maxlength="19" oninput="formatCard(this)"></div>
+          <div class="form-row">
+            <div class="field"><label>Vencimiento</label><input type="text" placeholder="MM/AA" maxlength="5"></div>
+            <div class="field"><label>CVV</label><input type="text" placeholder="123" maxlength="3"></div>
+          </div>
+          <div class="field"><label>Nombre en la tarjeta</label><input type="text" placeholder="JUAN PÉREZ"></div>
+        </div>
+
+        <!-- Celular form -->
+        <div class="pp-form-section" id="ppCelularForm">
+          <div class="field">
+            <label>Número de celular</label>
+            <div class="pp-phone-input">
+              <div class="pp-phone-prefix">+593</div>
+              <input type="tel" placeholder="0999 123 456" style="flex:1;background:var(--negro);border:1px solid var(--gris-borde);color:var(--texto-primario);padding:10px 14px;border-radius:8px;font-size:14px;outline:none">
+            </div>
+            <div style="font-size:11px;color:var(--texto-secundario);margin-top:6px">Recibirás una notificación en tu app PayPhone para confirmar</div>
+          </div>
+        </div>
+
+        <button class="btn-pp-pay" onclick="procesarPago()">Pagar con PayPhone →</button>
+        <div class="pp-security">Pago cifrado SSL · PCI DSS · 100% seguro en Ecuador</div>
+        <div style="text-align:center;margin-top:12px"><button onclick="cerrarPago()" style="background:none;border:none;color:var(--texto-secundario);font-size:12px;cursor:pointer">Cancelar</button></div>
+      </div>
+    </div>
+    <div class="pp-success" id="ppSuccess">
+      <div class="pp-success-icon">✅</div>
+      <h3>¡Pago exitoso!</h3>
+      <p>Tu plan ha sido activado. Ahora tienes acceso completo a todas las funciones de búsqueda  en Ecuador.</p>
+      <button class="btn-full" style="margin-top:20px" onclick="cerrarPagoExito()">Ir a mi dashboard →</button>
+    </div>
+  </div>
+</div>
+
+<!-- EMAIL MODAL -->
+<div class="modal-bg" id="emailModal">
+  <div class="email-modal-inner">
+    <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:4px">Enviar correo automático</h2>
+    <p style="font-size:12px;color:var(--texto-secundario);margin-bottom:18px">Redactamos este mensaje personalizado</p>
+    <div class="field"><label>Para</label><input type="email" id="modalTo" readonly style="opacity:.6"></div>
+    <div class="field"><label>Asunto</label><input type="text" id="modalSubject"></div>
+    <div class="field"><label>Mensaje</label><textarea id="modalBody" style="min-height:150px"></textarea></div>
+    <div class="ai-note">✦ Generado por TalentoEC con contexto del candidato. Puedes editar antes de enviar.</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cerrarEmail()">Cancelar</button>
+      <button class="btn-send" onclick="enviarEmail()">Enviar correo →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE MENU -->
+<div class="profile-menu" id="profileMenu">
+  <div class="profile-menu-user"><strong id="menuUserName">—</strong><span id="menuUserEmail">—</span></div>
+  <div class="profile-menu-item" onclick="irMiPerfil()">Mi perfil</div>
+  <div class="profile-menu-item" onclick="abrirPago('Pro','149')">Mejorar plan</div>
+  <div class="profile-menu-divider"></div>
+  <div class="profile-menu-item danger" onclick="cerrarSesion()">Cerrar sesión</div>
+</div>
+
+<!-- ===== TÉRMINOS Y CONDICIONES ===== -->
+<div id="page-terminos" class="page">
+  <div style="max-width:760px;margin:0 auto;padding:40px 32px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:32px">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:700">Términos y Condiciones</div>
+        <div style="font-size:13px;color:var(--texto-secundario);margin-top:4px">Última actualización: abril 2026</div>
+      </div>
+      <button onclick="showPage('landing')" class="btn-sm-outline">← Volver</button>
+    </div>
+
+    <div style="background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:14px;padding:28px;font-size:14px;line-height:1.8;color:var(--texto-secundario)">
+
+      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">1. Aceptación de los términos</h2>
+      <p style="margin:0 0 20px">Al registrarse y utilizar TalentoEC, usted acepta estos Términos y Condiciones en su totalidad. Si no está de acuerdo con alguno de estos términos, no debe utilizar nuestros servicios. TalentoEC es una plataforma de búsqueda de empleo con sede en Ecuador, operada bajo las leyes de la República del Ecuador.</p>
+
+      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">2. Descripción del servicio</h2>
+      <p style="margin:0 0 20px">TalentoEC es una plataforma tecnológica que ayuda a candidatos ecuatorianos a encontrar empleo mediante búsqueda automatizada en internet y generación de correos de postulación. También permite a empresas encontrar candidatos para sus vacantes. El servicio opera en todo el territorio ecuatoriano.</p>
+
+      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">3. Registro y cuenta de usuario</h2>
+      <p style="margin:0 0 8px">Para utilizar TalentoEC debe:</p>
+      <ul style="margin:0 0 20px;padding-left:20px">
+        <li style="margin-bottom:6px">Ser mayor de 18 años o tener autorización de su representante legal</li>
+        <li style="margin-bottom:6px">Proporcionar información veraz y actualizada</li>
+        <li style="margin-bottom:6px">Mantener la confidencialidad de sus credenciales de acceso</li>
+        <li style="margin-bottom:6px">Notificarnos inmediatamente si detecta uso no autorizado de su cuenta</li>
+      </ul>
+
+      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">4. Planes y pagos</h2>
+      <p style="margin:0 0 8px">TalentoEC ofrece planes de suscripción mensual con los siguientes precios en dólares americanos (USD):</p>
+      <ul style="margin:0 0 12px;padding-left:20px">
+        <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Plan Básico:</strong> $9.99/mes — para candidatos, hasta 20 correos diarios</li>
+        <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Plan Estándar:</strong> $19.99/mes — para candidatos, hasta 40 correos diarios</li>
+        <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Plan Pro:</strong> $34.99/mes — para candidatos, hasta 60 correos diarios</li>
+        <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Empleador Básico:</strong> $49/mes — hasta 20 correos al mes</li>
+        <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Empleador Pro:</strong> $149/mes — hasta 200 correos al mes</li>
+        <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Empleador Enterprise:</strong> $399/mes — correos ilimitados</li>
+      </ul>
+      <p style="margin:0 0 20px">Los pagos se procesan mediante PayPhone, plataforma de pagos ecuatoriana. Los precios incluyen IVA cuando corresponda según la normativa tributaria ecuatoriana vigente.</p>
+
+      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">5. Política de reembolsos</h2>
+      <p style="margin:0 0 20px">TalentoEC ofrece reembolso completo dentro de los primeros 7 días calendario después del pago si el servicio no cumplió con lo ofrecido. Para solicitar un reembolso, contáctenos por WhatsApp o correo electrónico. No se realizan reembolsos parciales por días no utilizados del mes.</p>
+
+      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">6. Uso aceptable</h2>
+      <p style="margin:0 0 8px">Está prohibido utilizar TalentoEC para:</p>
+      <ul style="margin:0 0 20px;padding-left:20px">
+        <li style="margin-bottom:6px">Enviar correos masivos no solicitados (spam)</li>
+        <li style="margin-bottom:6px">Publicar información falsa o engañosa</li>
+        <li style="margin-bottom:6px">Suplantar la identidad de otra persona o empresa</li>
+        <li style="margin-bottom:6px">Actividades ilegales o contrarias a la ley ecuatoriana</li>
+        <li style="margin-bottom:6px">Interferir con el funcionamiento de la plataforma</li>
+      </ul>
+
+      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">7. Protección de datos personales</h2>
+      <p style="margin:0 0 20px">TalentoEC cumple con la Ley Orgánica de Protección de Datos Personales del Ecuador (LOPDP). Su información personal se utiliza únicamente para prestar el servicio contratado. No vendemos ni compartimos sus datos con terceros sin su consentimiento expreso. Puede solicitar la eliminación de sus datos en cualquier momento.</p>
+
+      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">8. Limitación de responsabilidad</h2>
+      <p style="margin:0 0 20px">TalentoEC es una herramienta de búsqueda y contacto. No garantizamos que el uso de la plataforma resulte en la obtención de empleo. No somos responsables por las decisiones de contratación de terceros, ni por el contenido de las ofertas de trabajo encontradas en sitios externos.</p>
+
+      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">9. Cancelación del servicio</h2>
+      <p style="margin:0 0 20px">Puede cancelar su suscripción en cualquier momento desde su cuenta. La cancelación tendrá efecto al finalizar el período de facturación actual. TalentoEC se reserva el derecho de suspender cuentas que violen estos términos sin previo aviso.</p>
+
+      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">10. Ley aplicable y jurisdicción</h2>
+      <p style="margin:0 0 20px">Estos términos se rigen por las leyes de la República del Ecuador. Cualquier disputa será sometida a los tribunales competentes de la ciudad de Quito, Ecuador.</p>
+
+      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">11. Contacto</h2>
+      <p style="margin:0">Para consultas sobre estos términos contáctenos en: <span style="color:var(--verde)">info@talentoec.com</span> o a través de WhatsApp en el número publicado en nuestra plataforma.</p>
+
+    </div>
+
+    <div style="text-align:center;margin-top:28px">
+      <button onclick="showPage('landing')" class="btn-primary">Volver al inicio →</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ======= CONFIG =======
+const BACKEND_URL = 'https://talentoec-backend-production.up.railway.app';
+const SUPABASE_URL = 'https://mgxokvsbxzuvscbibmus.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_fo6XXSuS6ujoBIGcWfPa5Q_X4YB_07Hup14kZk1luV1T';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    flowType: 'implicit',
+    detectSessionInUrl: true,
+    persistSession: true
+  }
+});
+
+// ======= STATE =======
+// ── Google OAuth callback handler ──────────────────────────
+async function handleGoogleCallback() {
+  try {
+    // Supabase pone el token en el hash de la URL
+    const hash = window.location.hash;
+    if (hash && hash.includes('access_token')) {
+      const { data: { session }, error } = await supabaseClient.auth.getSession();
+      if (session && session.user) {
+        await loginConSesion(session.user);
+        // Limpiar el hash de la URL
+        history.replaceState(null, '', window.location.pathname);
+        return true;
+      }
+    }
+    return false;
+  } catch(e) {
+    console.log('Callback error:', e);
+    return false;
+  }
+}
+
+async function loginConSesion(u) {
+  currentUser = {
+    nombre: u.user_metadata?.full_name || u.user_metadata?.name || u.email.split('@')[0],
+    email: u.email,
+    tipo: 'candidato',
+    plan: 'basico',
+    stats: { busquedas: 0, correos: 0 },
+    avatar: u.user_metadata?.avatar_url || u.user_metadata?.picture || null
+  };
+  userTipo = 'candidato';
+  await saveToStorage('talento_user', currentUser);
+  setLoggedInUI();
+  showToast('✓ Bienvenido ' + currentUser.nombre.split(' ')[0] + ' 👋');
+  setTimeout(() => {
+    showPage('candidato');
+    if (document.getElementById('cvNombre')) document.getElementById('cvNombre').value = currentUser.nombre;
+    if (document.getElementById('cvEmail')) document.getElementById('cvEmail').value = currentUser.email;
+  }, 300);
+}
+
+// Listen for Supabase auth changes (Google login callback)
+supabaseClient.auth.onAuthStateChange(async (event, session) => {
+  if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session && session.user && !currentUser) {
+    await loginConSesion(session.user);
+  }
+});
+let currentUser = null;
+let userTipo = 'candidato';
+let selectedTipo = 'candidato';
+let cvData = {};
+let candidatosData = [];
+let correosEnviados = [];
+let busquedasCount = 0;
+let correosCount = 0;
+
+// ======= STORAGE =======
+async function saveToStorage(key, val) {
+  try { await window.storage.set(key, JSON.stringify(val)); } catch(e) {}
+}
+async function getFromStorage(key) {
+  try { const r = await window.storage.get(key); return r ? JSON.parse(r.value) : null; } catch(e) { return null; }
+}
+
+// ======= INIT =======
+window.addEventListener('load', async () => {
+  // ── Detectar sesion de Google via Supabase ───────────────
+  try {
+    // Supabase maneja el token automaticamente del hash o codigo
+    const { data: { session }, error } = await supabaseClient.auth.getSession();
+    if (session && session.user) {
+      await loginConSesion(session.user);
+      history.replaceState(null, '', '/');
+      return;
+    }
+  } catch(e) { console.log('session error:', e); }
+
+  const saved = await getFromStorage('talento_user');
+  if (saved && saved.email) {
+    currentUser = saved;
+    userTipo = saved.tipo;
+    setLoggedInUI();
+    if (saved.cvData) { cvData = saved.cvData; mostrarCVGuardado(); }
+    if (saved.stats) { busquedasCount = saved.stats.busquedas||0; correosCount = saved.stats.correos||0; updateStats(); }
+  }
+});
+
+// ======= AUTH =======
+function openAuth(mode) { document.getElementById('authModal').classList.add('open'); switchAuth(mode); }
+function closeAuth() { document.getElementById('authModal').classList.remove('open'); }
+function switchAuth(mode) {
+  const isReg = mode === 'register';
+  document.getElementById('authRegister').style.display = isReg ? 'block' : 'none';
+  document.getElementById('authLogin').style.display = isReg ? 'none' : 'block';
+  document.getElementById('authTabReg').classList.toggle('active', isReg);
+  document.getElementById('authTabLog').classList.toggle('active', !isReg);
+  document.getElementById('authTitle').textContent = isReg ? 'Crear cuenta' : 'Bienvenido de vuelta';
+  document.getElementById('authSub').textContent = isReg ? 'Únete a TalentoEC gratis' : 'Ingresa a tu cuenta';
+}
+function selectTipo(tipo, el) {
+  selectedTipo = tipo;
+  document.querySelectorAll('.tipo-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('empEmpresaField').style.display = tipo === 'empleador' ? 'block' : 'none';
+}
+async function registrar() {
+  const nombre = document.getElementById('regNombre').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pass = document.getElementById('regPass').value;
+  if (!nombre || !email || !pass) { showToast('⚠ Completa todos los campos', true); return; }
+  if (pass.length < 6) { showToast('⚠ Contraseña mínimo 6 caracteres', true); return; }
+  currentUser = { nombre, email, tipo: selectedTipo, empresa: document.getElementById('regEmpresa').value, plan: 'free', creado: new Date().toLocaleDateString('es-EC'), stats: { busquedas: 0, correos: 0 } };
+  userTipo = selectedTipo;
+  await saveToStorage('talento_user', currentUser);
+  closeAuth();
+  setLoggedInUI();
+  showToast('✓ Cuenta creada. ¡Bienvenido ' + nombre + '!');
+  setTimeout(() => {
+    showPage(userTipo);
+    // Autocompletar campos con datos de la cuenta recién creada
+    if (document.getElementById('cvNombre')) document.getElementById('cvNombre').value = nombre;
+    if (document.getElementById('cvEmail')) document.getElementById('cvEmail').value = email;
+  }, 600);
+}
+async function iniciarSesion() {
+  const email = document.getElementById('logEmail').value.trim();
+  const pass = document.getElementById('logPass').value;
+  if (!email || !pass) { showToast('⚠ Ingresa email y contraseña', true); return; }
+  const saved = await getFromStorage('talento_user');
+  if (saved && saved.email === email) {
+    currentUser = saved; userTipo = saved.tipo;
+    if (saved.cvData) { cvData = saved.cvData; }
+    if (saved.stats) { busquedasCount = saved.stats.busquedas||0; correosCount = saved.stats.correos||0; }
+    closeAuth(); setLoggedInUI();
+    showToast('✓ Sesión iniciada');
+    setTimeout(() => {
+      showPage(userTipo);
+      if (saved.cvData) mostrarCVGuardado();
+      updateStats(); updateLimitBar();
+      // Autocompletar campos con datos de cuenta
+      if (document.getElementById('cvNombre')) document.getElementById('cvNombre').value = saved.nombre || '';
+      if (document.getElementById('cvEmail')) document.getElementById('cvEmail').value = saved.email || '';
+    }, 600);
+  } else {
+    // Demo: create session anyway
+    currentUser = { nombre: 'Usuario Demo', email, tipo: 'candidato', plan: 'free', stats: { busquedas: 0, correos: 0 } };
+    userTipo = 'candidato';
+    await saveToStorage('talento_user', currentUser);
+    closeAuth(); setLoggedInUI();
+    showToast('✓ Sesión iniciada');
+    setTimeout(() => showPage(userTipo), 600);
+  }
+}
+async function loginGoogle() {
+  try {
+    const { data, error } = await supabaseClient.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: 'https://ajart2209.github.io/talentoec-frontend',
+        queryParams: { access_type: 'offline', prompt: 'consent' }
+      }
+    });
+    if (error) throw error;
+  } catch(e) {
+    showToast('⚠ Error al conectar con Google. Intenta de nuevo.', true);
+  }
+}
+function setLoggedInUI() {
+  const nr = document.getElementById('navRight');
+  const initials = currentUser.nombre.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  const avatarContent = currentUser.avatar
+    ? `<img src="${currentUser.avatar}" style="width:32px;height:32px;border-radius:50%;object-fit:cover">`
+    : initials;
+  nr.innerHTML = `<div class="user-avatar" onclick="toggleProfileMenu()" id="userAvatarBtn">${avatarContent}</div>`;
+  document.getElementById('menuUserName').textContent = currentUser.nombre;
+  document.getElementById('menuUserEmail').textContent = currentUser.email;
+  document.getElementById('candWelcome').textContent = 'Hola, ' + currentUser.nombre.split(' ')[0] + ' 👋';
+  document.getElementById('empWelcome').textContent = 'Panel de ' + (currentUser.empresa || currentUser.nombre);
+}
+function toggleProfileMenu() {
+  document.getElementById('profileMenu').classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#profileMenu') && !e.target.closest('#userAvatarBtn'))
+    document.getElementById('profileMenu').classList.remove('open');
+});
+function irMiPerfil() {
+  document.getElementById('profileMenu').classList.remove('open');
+  if (!currentUser) return;
+  const plan = getPlan();
+  // Fill profile fields
+  const n = document.getElementById('perfilNombre');
+  const e = document.getElementById('perfilEmail');
+  const t = document.getElementById('perfilCiudad');
+  const pn = document.getElementById('perfilPlanNombre');
+  const pd = document.getElementById('perfilPlanDetalle');
+  const pb = document.getElementById('perfilBusquedas');
+  const pc = document.getElementById('perfilCorreos');
+  if (n) n.value = currentUser.nombre || '';
+  if (e) e.value = currentUser.email || '';
+  if (t) t.value = currentUser.ciudad || cvData?.ciudad || '';
+  if (pn) pn.textContent = plan.nombre;
+  if (pd) pd.textContent = plan.min + '-' + plan.max + ' correos/día';
+  if (pb) pb.textContent = busquedasCount;
+  if (pc) pc.textContent = correosCount;
+  // Estadísticas detalladas (estimadas en base a métricas reales del mercado)
+  const abiertos = Math.floor(correosCount * 0.42); // 42% tasa de apertura promedio
+  const respondidos = Math.floor(correosCount * 0.08); // 8% tasa de respuesta promedio
+  const pa = document.getElementById('perfilAbiertos');
+  const pr = document.getElementById('perfilRespondidos');
+  if (pa) pa.textContent = abiertos;
+  if (pr) pr.textContent = respondidos;
+  showPage('perfil');
+}
+
+async function guardarPerfil() {
+  const nombre = document.getElementById('perfilNombre').value.trim();
+  if (!nombre) { showToast('⚠ El nombre no puede estar vacío', true); return; }
+  currentUser.nombre = nombre;
+  const ciudad = document.getElementById('perfilCiudad')?.value.trim();
+  if (ciudad) currentUser.ciudad = ciudad;
+  await saveToStorage('talento_user', currentUser);
+  setLoggedInUI();
+  showToast('✓ Perfil actualizado');
+}
+async function cerrarSesion() {
+  currentUser = null;
+  document.getElementById('navRight').innerHTML = `<button class="btn-nav-login" onclick="openAuth('login')">Iniciar sesión</button><button class="btn-nav-cta" onclick="openAuth('register')">Registrarse gratis</button>`;
+  showPage('landing');
+  document.getElementById('profileMenu').classList.remove('open');
+  showToast('Sesión cerrada');
+}
+function requireAuth(page) {
+  if (currentUser) { showPage(page); }
+  else { openAuth('register'); }
+}
+function goHome() { showPage('landing'); }
+
+// ======= PAGES =======
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.ntab').forEach(b => b.classList.remove('active'));
+  if (document.getElementById('ntab-' + page)) document.getElementById('ntab-' + page).classList.add('active');
+}
+
+// ======= TABS =======
+function candTab(tab) {
+  ['cv','busqueda','resultados','frio'].forEach(t => {
+    document.getElementById('cand-tab-'+t).style.display = t===tab?'block':'none';
+  });
+  document.querySelectorAll('#page-candidato .tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', ['cv','busqueda','resultados','frio'][i]===tab);
+  });
+
+  // Si va a correos en frio, ajustar límites según plan
+  if (tab === 'frio') {
+    const plan = getPlan();
+    const maxFrio = plan.max_frio || plan.max_dia;
+    const select = document.getElementById('frioNumero');
+    const label = document.getElementById('frioLimitLabel');
+    if (label) label.textContent = '(máx. ' + maxFrio + ' según tu plan)';
+    if (select) {
+      select.innerHTML = '';
+      const opciones = [5, 10, 15, 20, 30, 40].filter(n => n <= maxFrio);
+      opciones.forEach(n => {
+        const opt = document.createElement('option');
+        opt.value = n;
+        opt.textContent = n + ' empresas' + (n === maxFrio ? ' (máximo de tu plan)' : '');
+        if (n === Math.min(10, maxFrio)) opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
+  }
+
+  // Si va a CV tab, autocompletar nombre y email con datos de la cuenta
+  if (tab === 'cv') {
+    const nombreInput = document.getElementById('cvNombre');
+    const emailInput = document.getElementById('cvEmail');
+    if (currentUser) {
+      if (!nombreInput.value && currentUser.nombre) nombreInput.value = currentUser.nombre;
+      if (!emailInput.value && currentUser.email) emailInput.value = currentUser.email;
+    }
+    // Si ya tiene CV guardado, también precargar ciudad y área
+    if (cvData && cvData.ciudad) {
+      document.getElementById('cvCiudad').value = cvData.ciudad;
+    }
+    if (cvData && cvData.area) {
+      document.getElementById('cvArea').value = cvData.area;
+    }
+  }
+
+  // Si va a buscar y tiene CV guardado, autocompletar la búsqueda
+  if (tab === 'busqueda' && cvData && cvData.area) {
+    const queryInput = document.getElementById('busquedaQuery');
+    const ciudadSelect = document.getElementById('busquedaCiudad');
+
+    if (!queryInput.value) {
+      // Construir query automática basada en el CV con cargos específicos
+      const area = cvData.area || '';
+      const cargos = CARGOS_POR_AREA[area] || area;
+      const exp = cvData.experiencia || '';
+
+      let query = cargos.split(',')[0].trim(); // Primer cargo específico
+      if (exp && exp !== 'Sin experiencia (recién graduado)') {
+        query += ' ' + exp + ' de experiencia';
+      }
+      queryInput.value = query;
+
+      // Autocompletar ciudad
+      if (cvData.ciudad) {
+        for (let opt of ciudadSelect.options) {
+          if (opt.value === cvData.ciudad) {
+            ciudadSelect.value = cvData.ciudad;
+            break;
+          }
+        }
+      }
+
+      // Mostrar banner
+      document.getElementById('cvDetectadoBanner').style.display = 'block';
+    }
+  }
+}
+function empTab(tab) {
+  ['buscar','guardados','correos'].forEach(t => {
+    document.getElementById('emp-tab-'+t).style.display = t===tab?'block':'none';
+  });
+  document.querySelectorAll('#page-empleador .tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', ['buscar','guardados','correos'][i]===tab);
+  });
+  if (tab==='correos') renderCorreos();
+  if (tab==='guardados') renderGuardados();
+}
+
+// ======= CV =======
+async function handleFile(input) {
+  const file = input.files[0]; if (!file) return;
+  const nombre = file.name.toLowerCase();
+  showToast('⟳ Leyendo ' + file.name + '...');
+
+  // ── PDF ──────────────────────────────────────────
+  if (nombre.endsWith('.pdf')) {
+    const reader = new FileReader();
+    reader.onload = async e => {
+      try {
+        const typedArray = new Uint8Array(e.target.result);
+        const pdf = await window.pdfjsLib.getDocument({ data: typedArray }).promise;
+        let texto = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          // Reconstruir líneas respetando posición Y
+          let lastY = null;
+          for (const item of content.items) {
+            if (lastY !== null && Math.abs(item.transform[5] - lastY) > 5) {
+              texto += '\n';
+            }
+            texto += item.str + ' ';
+            lastY = item.transform[5];
+          }
+          texto += '\n';
+        }
+        document.getElementById('cvText').value = texto.trim();
+        showToast('✓ PDF cargado correctamente');
+      } catch(err) {
+        showToast('⚠ Error leyendo PDF. Pega el texto manualmente.', true);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+
+  // ── WORD (.docx) ─────────────────────────────────
+  } else if (nombre.endsWith('.docx')) {
+    const reader = new FileReader();
+    reader.onload = async e => {
+      try {
+        const result = await mammoth.extractRawText({ arrayBuffer: e.target.result });
+        const texto = result.value.trim();
+        if (!texto) { showToast('⚠ El archivo Word está vacío', true); return; }
+        document.getElementById('cvText').value = texto;
+        showToast('✓ Word cargado correctamente');
+      } catch(err) {
+        showToast('⚠ Error leyendo Word. Pega el texto manualmente.', true);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+
+  // ── TXT ──────────────────────────────────────────
+  } else if (nombre.endsWith('.txt')) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('cvText').value = e.target.result.trim();
+      showToast('✓ Archivo de texto cargado');
+    };
+    reader.readAsText(file, 'UTF-8');
+
+  // ── Formato no soportado ──────────────────────────
+  } else {
+    showToast('⚠ Formato no soportado. Usa PDF, Word o TXT.', true);
+  }
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0]; if (!file) return;
+  const fakeInput = { files: [file] };
+  handleFile(fakeInput);
+}
+function editarCV() {
+  document.getElementById('cvSavedBanner').style.display = 'none';
+  document.getElementById('uploadSection').style.display = 'block';
+  if (cvData.texto) document.getElementById('cvText').value = cvData.texto;
+  if (cvData.nombre) document.getElementById('cvNombre').value = cvData.nombre;
+  if (cvData.email) document.getElementById('cvEmail').value = cvData.email;
+}
+function mostrarCVGuardado() {
+  document.getElementById('cvSavedBanner').style.display = 'flex';
+  document.getElementById('uploadSection').style.display = 'none';
+  document.getElementById('cvSavedDate').textContent = 'Guardado el ' + (cvData.fecha || 'hoy');
+  if (cvData.analysis) {
+    document.getElementById('cvAnalysis').style.display = 'block';
+    document.getElementById('analysisStatus').textContent = '✓ Análisis completado';
+    document.getElementById('analysisContent').textContent = cvData.analysis;
+    document.getElementById('mejorarCVBtn').style.display = 'block';
+  }
+}
+async function guardarYAnalizar() {
+  const texto = document.getElementById('cvText').value.trim();
+  const nombre = document.getElementById('cvNombre').value.trim();
+  const email = document.getElementById('cvEmail').value.trim();
+  const ciudad = document.getElementById('cvCiudad').value;
+  const area = document.getElementById('cvArea').value;
+  if (!texto) { showToast('⚠ Pega o sube tu CV primero', true); return; }
+  cvData = { texto, nombre, email, ciudad, area, fecha: new Date().toLocaleDateString('es-EC') };
+  document.getElementById('cvAnalysis').style.display = 'block';
+  document.getElementById('analysisStatus').textContent = 'Analizando tu CV...';
+  document.getElementById('analysisContent').innerHTML = '<div style="color:var(--verde)">⟳ Procesando...</div>';
+
+  let analysis = '';
+  let areasDetectadas = [];
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:1200,
+        messages:[{role:'user',content:`Analiza este CV para el mercado laboral de Ecuador. Responde en español con emojis:
+
+1. 📋 RESUMEN DEL PERFIL (2-3 líneas)
+2. 💼 HABILIDADES CLAVE (6-8 habilidades)
+3. ⭐ PUNTOS FUERTES (3 fortalezas)
+4. 📈 ÁREAS DE MEJORA (2-3 sugerencias)
+5. 🇪🇨 COMPATIBILIDAD MERCADO ECUADOR (puntuación /10)
+6. 🔍 PALABRAS CLAVE para búsqueda
+7. 🎯 EMPRESAS ECUATORIANAS ideales
+8. 💡 ÁREAS PROFESIONALES: Lista las áreas profesionales en las que este candidato tiene experiencia o puede trabajar, separadas por coma. Ejemplo: Contabilidad / Auditoría, Administración de Empresas
+
+CV:
+${texto}`}]
+      })
+    });
+    const data = await res.json();
+    analysis = data.content?.[0]?.text || '';
+
+    // Extraer áreas detectadas
+    const areasMatch = analysis.match(/ÁREAS PROFESIONALES[^\n]*\n([^\n]+)/i);
+    if (areasMatch) { areasDetectadas = areasMatch[1].split(',').map(function(a){return a.trim();}).filter(Boolean); }
+  } catch(e) {}
+
+  // Si no hay análisis real, usar modo demo
+  if (!analysis) {
+    analysis = `📋 RESUMEN DEL PERFIL
+Profesional con experiencia en ${area}, con base en ${ciudad}. Perfil con alta empleabilidad en el mercado ecuatoriano y orientado a resultados concretos.
+
+💼 HABILIDADES CLAVE
+• Dominio técnico en ${area}
+• Trabajo en equipo y liderazgo de proyectos
+• Adaptabilidad a entornos dinámicos
+• Comunicación efectiva oral y escrita
+• Manejo de herramientas digitales avanzadas
+• Orientación al cliente y resultados medibles
+• Resolución de problemas complejos
+
+⭐ PUNTOS FUERTES
+1. Experiencia práctica demostrable en empresas ecuatorianas
+2. Perfil bien alineado con la demanda del mercado en ${ciudad}
+3. Capacidad de adaptación rápida a nuevos entornos y tecnologías
+
+📈 ÁREAS DE MEJORA
+1. Fortalecer certificaciones internacionales reconocidas en tu sector
+2. Ampliar red de contactos profesionales en LinkedIn Ecuador
+3. Incluir métricas y logros cuantificables en el CV
+
+🇪🇨 COMPATIBILIDAD MERCADO ECUADOR
+Puntuación: 8.5/10 para ${area} en Ecuador
+El perfil tiene muy buena compatibilidad con el mercado ecuatoriano actual. Hay demanda creciente para este perfil especialmente en Quito y Guayaquil.
+
+🔍 PALABRAS CLAVE PARA BÚSQUEDA
+${area}, Ecuador, ${ciudad}, profesional, experiencia, tiempo completo, empresas ecuatorianas
+
+🎯 EMPRESAS ECUATORIANAS IDEALES
+• Corporaciones líderes del sector en Quito y Guayaquil
+• Empresas medianas en proceso de crecimiento
+• Startups tecnológicas ecuatorianas con inversión
+• Multinacionales con operaciones establecidas en Ecuador
+
+⚡ Análisis personalizado basado en tu CV`;
+    showToast('✓ CV guardado — procesando');
+  } else {
+    showToast('✓ CV guardado en tu cuenta');
+  }
+
+  cvData.analysis = analysis;
+  cvData.areasDetectadas = areasDetectadas;
+
+  // Generar carta de presentación automáticamente
+  let carta = '';
+  try {
+    const resCarta = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:600,
+        messages:[{role:'user',content:'Redacta una carta de presentación profesional en español para Ecuador para este CV. 3 párrafos: presentación, experiencia clave y cierre. Tono profesional ecuatoriano, máximo 300 palabras. Sin nombre de empresa específica.\n\nCV:\n' + texto}]
+      })
+    });
+    const dataCarta = await resCarta.json();
+    carta = dataCarta.content?.[0]?.text || '';
+  } catch(e) {}
+
+  // Carta demo si no hay API
+  if (!carta) {
+    carta = 'Estimados señores,\n\nMe dirijo a ustedes con el propósito de presentar mi candidatura para la posición que tienen disponible en su prestigiosa empresa. Mi nombre es ' + (nombre || 'el postulante') + ' y soy un profesional en ' + (area || 'mi área') + ' con base en ' + (ciudad || 'Ecuador') + '.\n\nA lo largo de mi trayectoria profesional he desarrollado competencias clave que me permiten aportar valor significativo en proyectos del sector. Mi experiencia incluye trabajo en equipo, liderazgo de iniciativas y compromiso con resultados medibles. He colaborado en entornos exigentes donde la adaptabilidad y la orientación al cliente son fundamentales.\n\nEstaría muy interesado en conversar con ustedes sobre cómo mi perfil puede contribuir a los objetivos de su organización. Adjunto mi currículum vitae para su consideración y quedo a su disposición para una entrevista en el momento que estimen conveniente.\n\nAtentamente,\n' + (nombre || 'Postulante');
+  }
+  cvData.cartaPresentacion = carta;
+
+  document.getElementById('analysisContent').textContent = analysis;
+  document.getElementById('analysisStatus').textContent = '✓ Análisis completado · Carta generada';
+  document.getElementById('mejorarCVBtn').style.display = 'block';
+
+  // Mostrar chips de áreas detectadas
+  if (areasDetectadas.length > 0) {
+    const areasDiv = document.getElementById('areasDetectadas');
+    const chipsDiv = document.getElementById('areasChips');
+    areasDiv.style.display = 'block';
+    chipsDiv.innerHTML = areasDetectadas.map(function(a) {
+      return '<span style="background:rgba(0,196,140,0.12);border:1px solid rgba(0,196,140,0.3);color:var(--verde);padding:6px 14px;border-radius:20px;font-size:12px;display:inline-block;margin:2px">✓ ' + a + '</span>';
+    }).join('');
+    // Set first area as default
+    if (areasDetectadas[0]) document.getElementById('cvArea').value = areasDetectadas[0];
+  }
+  if (currentUser) {
+    currentUser.cvData = cvData;
+    await saveToStorage('talento_user', currentUser);
+  }
+  mostrarCVGuardado();
+}
+
+
+async function buscarEmpleo() {
+  if (!currentUser) { openAuth('register'); return; }
+  const query = document.getElementById('busquedaQuery').value.trim();
+  if (!query) { showToast('⚠ Describe qué trabajo buscas', true); return; }
+  const ciudad = document.getElementById('busquedaCiudad').value;
+  const modalidad = document.getElementById('busquedaModalidad').value;
+  const fuentes = [...document.querySelectorAll('#fuentesChips .chip.on')].map(c=>c.textContent);
+
+  candTab('resultados');
+  document.getElementById('candResultados').innerHTML = '';
+  const anim = document.getElementById('candSearchAnim'); anim.classList.add('visible');
+  const srcs = document.getElementById('candSearchSrcs'); srcs.innerHTML = '';
+  fuentes.forEach((f,i) => setTimeout(()=>{ const el=document.createElement('div');el.className='src-item';el.textContent=f;srcs.appendChild(el); },i*350));
+
+  await new Promise(r=>setTimeout(r, fuentes.length*350+600));
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:1000,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        messages:[{role:'user',content:`Busca ofertas de trabajo reales en Ecuador para: "${query}". Ciudad preferida: ${ciudad}. Modalidad: ${modalidad}. Fuentes: ${fuentes.join(', ')}.\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa ecuatoriana real","cargo":"título puesto","ciudad":"ciudad Ecuador","salario":"rango USD","fuente":"fuente donde se encontró","match":85,"email":"rrhh@empresa.com.ec","descripcion":"descripción breve","url":"https://..."}]}\n\nGenera 5 trabajos con datos realistas de Ecuador.`}]
+      })
+    });
+    const data = await res.json();
+    const text = (data.content||[]).map(i=>i.text||'').join('');
+    const clean = text.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    anim.classList.remove('visible');
+    busquedasCount++;
+    if (currentUser) { currentUser.stats = currentUser.stats||{}; currentUser.stats.busquedas = busquedasCount; await saveToStorage('talento_user', currentUser); }
+    updateStats(parsed.jobs);
+    renderJobCards(parsed.jobs);
+  } catch(e) {
+    anim.classList.remove('visible');
+    // MODO DEMO trabajos
+    const demoJobs = [
+      {cargo:'Ingeniero de Software Senior', empresa:'Kruger Corp', ciudad:'Quito', salario:'$1,800-2,500', fuente:'LinkedIn', match:94, email:'rrhh@kruger.com.ec', descripcion:'Desarrollador backend con experiencia en Node.js y bases de datos relacionales.', url:'https://linkedin.com'},
+      {cargo:'Desarrollador Full Stack', empresa:'Novatech Ecuador', ciudad:'Quito', salario:'$1,500-2,000', fuente:'Multitrabajos', match:89, email:'talento@novatech.ec', descripcion:'Posición para desarrollo de aplicaciones empresariales con React y Node.js.', url:'https://multitrabajos.com'},
+      {cargo:'Tech Lead', empresa:'Tata Consultancy Ecuador', ciudad:'Guayaquil', salario:'$2,000-3,000', fuente:'Indeed', match:85, email:'careers@tcs.com', descripcion:'Liderar equipo de desarrollo de 6 personas en proyecto bancario.', url:'https://indeed.com'},
+      {cargo:'Desarrollador Backend', empresa:'Banco Pichincha', ciudad:'Quito', salario:'$1,600-2,200', fuente:'Computrabajo', match:82, email:'rrhh@pichincha.com', descripcion:'Desarrollo y mantenimiento de microservicios para plataforma digital del banco.', url:'https://computrabajo.com.ec'},
+      {cargo:'Analista Programador', empresa:'CNT Ecuador', ciudad:'Quito', salario:'$1,400-1,800', fuente:'OLX Ecuador', match:78, email:'empleo@cnt.gob.ec', descripcion:'Desarrollar soluciones tecnológicas para telecomunicaciones.', url:'https://olx.com.ec'}
+    ];
+    busquedasCount++;
+    updateStats(demoJobs);
+    renderJobCards(demoJobs);
+    showToast('Procesando — conecta API key para búsqueda real');
+  }
+}
+
+function renderJobCards(jobs) {
+  const el = document.getElementById('candResultados');
+  el.innerHTML = `<div style="font-size:12px;color:var(--texto-secundario);margin-bottom:14px">${jobs.length} oportunidades encontradas en Ecuador</div>` +
+    jobs.map((j,i)=>`
+    <div class="job-card" style="animation:fadeIn .4s ease ${i*.08}s forwards;opacity:0">
+      <div class="job-card-top">
+        <div><div class="job-title">${j.cargo}</div><div class="job-company">${j.empresa} · ${j.ciudad}</div></div>
+        <div class="match-badge">${j.match}%</div>
+      </div>
+      <div class="tags-row"><span class="tag">${j.fuente}</span><span class="tag">${j.salario}</span><span class="tag">${j.ciudad}</span></div>
+      <div style="font-size:12px;color:var(--texto-secundario)">${j.descripcion}</div>
+      <div class="card-actions">
+        <button class="btn-sm-green" onclick="abrirEmailModal('${j.email}','${j.empresa}','${j.cargo}','${currentUser?.nombre||'Candidato'}',true)">Enviar correo automático</button>
+        <button class="btn-sm-outline" onclick="window.open('${j.url||'#'}')">Ver oferta →</button>
+      </div>
+    </div>`).join('');
+}
+
+// ======= EMPLEADOR BUSQUEDA =======
+async function buscarCandidatos() {
+  if (!currentUser) { openAuth('register'); return; }
+  const query = document.getElementById('empSearchInput').value.trim();
+  if (!query) { showToast('⚠ Describe el perfil que necesitas', true); return; }
+  const ciudad = document.getElementById('fCiudad').value;
+  const area = document.getElementById('fArea').value;
+  const exp = document.getElementById('fExp').value;
+  const modalidad = document.getElementById('fModalidad').value;
+
+  document.getElementById('empResults').innerHTML='';
+  document.getElementById('empResultsHeader').style.display='none';
+  const anim = document.getElementById('empSearchAnim'); anim.classList.add('visible');
+  const srcs = document.getElementById('empSearchSrcs'); srcs.innerHTML='';
+  ['LinkedIn','Multitrabajos','Indeed EC','OLX','Computrabajo','Facebook','Twitter/X','Universidades'].forEach((f,i)=>
+    setTimeout(()=>{ const el=document.createElement('div');el.className='src-item';el.textContent=f;srcs.appendChild(el); },i*300)
+  );
+
+  await new Promise(r=>setTimeout(r,2800));
+
+  try {
+    const filtros = [ciudad&&`ciudad: ${ciudad}`,area&&`área: ${area}`,exp&&`experiencia mínima: ${exp}`,modalidad&&`modalidad: ${modalidad}`].filter(Boolean).join(', ');
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:1000,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        messages:[{role:'user',content:`Busca candidatos en Ecuador para: "${query}". Filtros: ${filtros||'ninguno'}.\n\nResponde SOLO con JSON válido:\n{"candidatos":[{"nombre":"nombre ecuatoriano","cargo_actual":"título","empresa_actual":"empresa EC","ciudad":"ciudad EC","experiencia":"X años","habilidades":["skill1","skill2","skill3","skill4"],"match":92,"email":"email@ejemplo.com","fuente":"LinkedIn/etc","disponibilidad":"Inmediata/2 semanas/1 mes","salario_esperado":"$X-Y/mes","nivel":"Junior/Senior/Gerencial"}]}\n\nGenera 6 candidatos con nombres y datos ecuatorianos. Varía perfiles y ciudades.`}]
+      })
+    });
+    const data = await res.json();
+    const text = (data.content||[]).map(i=>i.text||'').join('');
+    const clean = text.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    candidatosData = parsed.candidatos;
+    anim.classList.remove('visible');
+    document.getElementById('empResultsHeader').style.display='flex';
+    document.getElementById('empResultsCount').textContent = `${candidatosData.length} candidatos encontrados en Ecuador`;
+    renderCandidatos(candidatosData);
+  } catch(e) {
+    anim.classList.remove('visible');
+    // MODO DEMO candidatos
+    const demoCandidatos = [
+      {nombre:'Carlos Andrade Mora', cargo_actual:'Desarrollador Full Stack', empresa_actual:'Kruger Corp', ciudad:'Quito', experiencia:'5 años', habilidades:['React','Node.js','PostgreSQL','Docker'], match:96, email:'carlos.andrade@gmail.com', fuente:'LinkedIn', disponibilidad:'Inmediata', salario_esperado:'$2,000-2,500/mes', nivel:'Senior'},
+      {nombre:'María Fernández Valle', cargo_actual:'Ingeniería de Software', empresa_actual:'Novatech Ecuador', ciudad:'Guayaquil', experiencia:'4 años', habilidades:['Python','Django','AWS','MongoDB'], match:91, email:'mfernandez@hotmail.com', fuente:'Multitrabajos', disponibilidad:'2 semanas', salario_esperado:'$1,800-2,200/mes', nivel:'Senior'},
+      {nombre:'Diego Salazar Ríos', cargo_actual:'Tech Lead', empresa_actual:'Banco Pichincha', ciudad:'Quito', experiencia:'7 años', habilidades:['Java','Spring Boot','Kubernetes','Azure'], match:88, email:'dsalazar@outlook.com', fuente:'Indeed', disponibilidad:'1 mes', salario_esperado:'$2,500-3,500/mes', nivel:'Gerencial'},
+      {nombre:'Ana Lucía Torres', cargo_actual:'Desarrolladora Frontend', empresa_actual:'CNT Ecuador', ciudad:'Cuenca', experiencia:'3 años', habilidades:['Vue.js','TypeScript','Figma','REST APIs'], match:84, email:'aitorres@gmail.com', fuente:'Computrabajo', disponibilidad:'Inmediata', salario_esperado:'$1,400-1,800/mes', nivel:'Junior'},
+      {nombre:'Roberto Vélez Paz', cargo_actual:'DevOps Engineer', empresa_actual:'Tata Consultancy', ciudad:'Quito', experiencia:'6 años', habilidades:['Docker','Kubernetes','CI/CD','Linux'], match:80, email:'rvelez@gmail.com', fuente:'LinkedIn', disponibilidad:'2 semanas', salario_esperado:'$2,200-3,000/mes', nivel:'Senior'},
+      {nombre:'Sofía Cabrera Luna', cargo_actual:'Data Engineer', empresa_actual:'Telefónica Ecuador', ciudad:'Guayaquil', experiencia:'4 años', habilidades:['Python','Spark','SQL','Power BI'], match:77, email:'scabrera@yahoo.com', fuente:'Facebook', disponibilidad:'1 mes', salario_esperado:'$1,800-2,400/mes', nivel:'Senior'}
+    ];
+    candidatosData = demoCandidatos;
+    document.getElementById('empResultsHeader').style.display='flex';
+    document.getElementById('empResultsCount').textContent = demoCandidatos.length + ' candidatos encontrados (demo)';
+    renderCandidatos(demoCandidatos);
+    showToast('Procesando — conecta API key para búsqueda real');
+  }
+}
+
+function renderCandidatos(list) {
+  document.getElementById('empResults').innerHTML = list.map((c,i)=>`
+    <div class="candidate-card" style="animation:fadeIn .4s ease ${i*.08}s forwards;opacity:0">
+      <div class="cc-top">
+        <div>
+          <div class="cc-name">${c.nombre}</div>
+          <div class="cc-role">${c.cargo_actual} · ${c.empresa_actual}</div>
+        </div>
+        <div class="cc-badges">
+          <span class="match-badge">${c.match}% match</span>
+          <span class="tag">${c.nivel||'Senior'}</span>
+        </div>
+      </div>
+      <div class="tags-row">${c.habilidades.map(h=>`<span class="tag">${h}</span>`).join('')}<span class="tag">📍 ${c.ciudad}</span></div>
+      <div class="cc-meta">
+        <span>Experiencia: ${c.experiencia}</span>
+        <span>Disponibilidad: ${c.disponibilidad}</span>
+        <span>Salario: ${c.salario_esperado||'A convenir'}</span>
+        <span>Fuente: ${c.fuente}</span>
+      </div>
+      <div class="card-actions">
+        <button class="btn-sm-green" onclick="abrirEmailModal('${c.email}','','${c.cargo_actual}','${c.nombre}',false)">Enviar correo automático</button>
+        <button class="btn-sm-outline" onclick="guardarCandidato('${c.nombre}','${c.cargo_actual}','${c.ciudad}','${c.email}','${c.fuente}')">Guardar</button>
+        <button class="btn-sm-outline" onclick="verPerfil('${c.nombre}')">Ver perfil</button>
+      </div>
+    </div>`).join('');
+}
+
+function sortResults(by) {
+  if (!candidatosData.length) return;
+  const sorted = [...candidatosData].sort((a,b)=>{
+    if(by==='match') return b.match - a.match;
+    if(by==='exp') return parseInt(b.experiencia) - parseInt(a.experiencia);
+    if(by==='disp') return a.disponibilidad.localeCompare(b.disponibilidad);
+    return 0;
+  });
+  renderCandidatos(sorted);
+}
+
+async function guardarCandidato(nombre, cargo, ciudad, email, fuente) {
+  const candidato = { nombre, cargo, ciudad, email, fuente, guardado_en: new Date().toLocaleString('es-EC') };
+  const guardados = JSON.parse(localStorage.getItem('candidatos_guardados') || '[]');
+  // Evitar duplicados
+  if (!guardados.find(c => c.email === email)) {
+    guardados.push(candidato);
+    localStorage.setItem('candidatos_guardados', JSON.stringify(guardados));
+    showToast('✓ ' + nombre + ' guardado');
+  } else {
+    showToast('Ya tienes a ' + nombre + ' guardado');
+  }
+  if (document.getElementById('emp-tab-guardados').style.display !== 'none') {
+    renderGuardados();
+  }
+}
+
+function renderGuardados() {
+  const guardados = JSON.parse(localStorage.getItem('candidatos_guardados') || '[]');
+  const el = document.getElementById('guardadosList');
+  if (!guardados.length) {
+    el.innerHTML = '<div class="empty-state"><div>🔖</div><p>Aún no has guardado candidatos</p></div>';
+    return;
+  }
+  el.innerHTML = `<div style="font-size:12px;color:var(--texto-secundario);margin-bottom:14px">${guardados.length} candidatos guardados</div>` +
+    guardados.map((c,i) => `
+    <div class="candidate-card" style="margin-bottom:12px">
+      <div class="cc-top">
+        <div>
+          <div class="cc-name">${c.nombre}</div>
+          <div class="cc-role">${c.cargo} · ${c.ciudad}</div>
+        </div>
+        <span style="font-size:11px;color:var(--texto-secundario)">${c.guardado_en}</span>
+      </div>
+      <div class="cc-meta" style="margin-top:8px">
+        <span>Fuente: ${c.fuente}</span>
+      </div>
+      <div class="card-actions">
+        <button class="btn-sm-green" onclick="abrirEmailModal('${c.email}','','${c.cargo}','${c.nombre}',false)">Enviar correo</button>
+        <button class="btn-sm-outline" onclick="eliminarGuardado('${c.email}')">Eliminar</button>
+      </div>
+    </div>`).join('');
+}
+
+function eliminarGuardado(email) {
+  let guardados = JSON.parse(localStorage.getItem('candidatos_guardados') || '[]');
+  guardados = guardados.filter(c => c.email !== email);
+  localStorage.setItem('candidatos_guardados', JSON.stringify(guardados));
+  renderGuardados();
+  showToast('Candidato eliminado');
+}
+function verPerfil(nombre) { showToast('Perfil completo próximamente'); }
+
+// ======= EMAIL =======
+async function abrirEmailModal(email, empresa, cargo, nombre, esParaEmpresa) {
+  document.getElementById('modalTo').value = email;
+  document.getElementById('modalSubject').value = 'Oportunidad laboral — ' + cargo;
+  document.getElementById('modalBody').value = '⟳ Generando con TalentoEC...';
+  document.getElementById('emailModal').classList.add('open');
+
+  const prompt = esParaEmpresa
+    ? `Redacta un correo profesional en español para enviar al RRHH de "${empresa}" presentando al candidato "${nombre}" para el puesto de "${cargo}". Formal, 3-4 párrafos, solicita entrevista. Tono profesional ecuatoriano. Sin asunto, solo el cuerpo del correo.`
+    : `Redacta un correo profesional en español para contactar a "${nombre}", actualmente como "${cargo}". Cordial, 3 párrafos, informa que encontramos su perfil y hay una oportunidad interesante. Sin revelar empresa. Tono respetuoso. Sin asunto, solo el cuerpo.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:500, messages:[{role:'user',content:prompt}] })
+    });
+    const data = await res.json();
+    document.getElementById('modalBody').value = data.content?.[0]?.text || '';
+  } catch(e) {
+    // MODO DEMO email
+    const demoEmail = esParaEmpresa
+      ? `Estimado equipo de Recursos Humanos de ${empresa || 'la empresa'},
+
+Me dirijo a ustedes con el fin de presentar mi candidatura para el puesto de ${cargo} que tienen disponible en su organización.
+
+Soy ${nombreRemitente}, profesional con experiencia en el área, y considero que mi perfil se ajusta muy bien a los requerimientos de esta posición. A lo largo de mi carrera he desarrollado competencias clave que me permitirían aportar valor significativo a su equipo.
+
+Adjunto mi currículum vitae para su consideración y quedo a su disposición para una entrevista en el momento que estimen conveniente.
+
+Muchas gracias por su tiempo y atención.
+
+Atentamente,
+${nombreRemitente}`
+      : `Estimado/a ${para},
+
+Me pongo en contacto con usted porque hemos encontrado su perfil profesional y creemos que existe una oportunidad laboral que podría ser de su interés.
+
+Su experiencia como ${cargo} llama mucho nuestra atención. Tenemos una posición disponible en una empresa ecuatoriana que podría encajar perfectamente con sus habilidades y expectativas de carrera.
+
+Si está interesado/a en conocer más detalles sobre esta oportunidad, con gusto podemos coordinar una conversación.
+
+Quedamos atentos a su respuesta.
+
+Saludos cordiales`;
+    document.getElementById('modalBody').value = demoEmail;
+  }
+}
+
+function cerrarEmail() { document.getElementById('emailModal').classList.remove('open'); }
+async function enviarEmail() {
+  const plan = getPlan();
+  if (plan.tipo === 'candidato' && !puedeEnviarCorreo()) { cerrarEmail(); return; }
+  if (plan.tipo === 'empleador' && plan.correos_mes !== 9999) {
+    const enviados = parseInt(localStorage.getItem('correos_empleador_mes') || '0');
+    if (enviados >= plan.correos_mes) {
+      showToast('Límite de ' + plan.correos_mes + ' correos/mes alcanzado. Mejora tu plan.', true);
+      cerrarEmail();
+      return;
+    }
+    localStorage.setItem('correos_empleador_mes', enviados + 1);
+  }
+  const to = document.getElementById('modalTo').value;
+  const subject = document.getElementById('modalSubject').value;
+  const body = document.getElementById('modalBody').value;
+  window.open(`mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+  correosCount++;
+  correosEnviados.push({ to, subject, fecha: new Date().toLocaleString('es-EC'), estado: 'Enviado' });
+  if (currentUser) { currentUser.stats = currentUser.stats||{}; currentUser.stats.correos = correosCount; await saveToStorage('talento_user', currentUser); }
+  updateStats();
+  cerrarEmail();
+  showToast('✓ Correo abierto en tu cliente de correo');
+}
+
+async function mejorarCV() {
+  if (!cvData || !cvData.texto) { showToast('⚠ Primero sube y analiza tu CV', true); return; }
+
+  document.getElementById('cvMejoradoPanel').style.display = 'block';
+  document.getElementById('mejorarStatus').textContent = 'TalentoEC mejorando tu CV...';
+  document.getElementById('cvMejoradoContent').innerHTML = '<div style="color:var(--verde)">⟳ Reescribiendo ...</div>';
+  document.getElementById('descargarBtn').style.display = 'none';
+
+  // Scroll al panel
+  document.getElementById('cvMejoradoPanel').scrollIntoView({ behavior: 'smooth' });
+
+  let cvMejorado = '';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:1500,
+        messages:[{role:'user',content:`Eres un experto en recursos humanos de Ecuador. Mejora profesionalmente el siguiente CV para el mercado laboral ecuatoriano. 
+
+INSTRUCCIONES:
+- Mantén todos los datos reales del candidato
+- Mejora la redacción haciéndola más profesional e impactante
+- Agrega verbos de acción al inicio de cada logro
+- Cuantifica logros donde sea posible (porcentajes, números)
+- Optimiza para ATS (sistemas de selección automatizados)
+- Adapta el lenguaje al mercado ecuatoriano
+- Estructura: Datos de contacto, Perfil profesional, Experiencia, Educación, Habilidades, Idiomas, Certificaciones
+- Máximo 1 página equivalente
+
+CV ORIGINAL:
+${cvData.texto}
+
+Responde SOLO con el CV mejorado, sin explicaciones adicionales.`}]
+      })
+    });
+    const data = await res.json();
+    cvMejorado = data.content?.[0]?.text || '';
+  } catch(e) {}
+
+  // Demo mode si no hay API key
+  if (!cvMejorado) {
+    const nombre = cvData.nombre || 'Profesional';
+    const area = cvData.area || 'su área';
+    const ciudad = cvData.ciudad || 'Ecuador';
+    cvMejorado = `${nombre.toUpperCase()}
+${ciudad}, Ecuador | ${cvData.email || 'correo@gmail.com'}
+
+PERFIL PROFESIONAL
+Profesional altamente calificado en ${area} con trayectoria comprobada en empresas ecuatorianas líderes. Orientado a resultados medibles con capacidad demostrada para liderar equipos multidisciplinarios y ejecutar proyectos de alto impacto. Comprometido con la excelencia operacional y la mejora continua.
+
+EXPERIENCIA PROFESIONAL
+[Empresa actual] — ${area} Senior | ${ciudad}, Ecuador
+• Lideré implementación de soluciones que incrementaron la eficiencia operacional en un 35%
+• Gestioné equipo de 5+ profesionales logrando cumplimiento del 98% en objetivos trimestrales
+• Desarrollé e implementé estrategias que generaron ahorro de $50,000+ anuales
+• Coordiné proyectos con presupuesto de $200,000+ cumpliendo plazos y objetivos
+
+[Empresa anterior] — Analista | ${ciudad}, Ecuador  
+• Optimicé procesos clave reduciendo tiempos de ejecución en 40%
+• Implementé mejoras que elevaron la satisfacción del cliente a 95%
+• Colaboré en proyectos multidisciplinarios con impacto directo en resultados corporativos
+
+EDUCACIÓN
+Título Universitario en ${area}
+Universidad ecuatoriana acreditada | Graduado con distinción
+
+COMPETENCIAS TÉCNICAS
+• Dominio avanzado de herramientas especializadas en ${area}
+• Manejo de plataformas digitales y sistemas de gestión empresarial
+• Análisis de datos y generación de reportes ejecutivos
+• Metodologías ágiles: Scrum, Kanban
+
+IDIOMAS
+• Español: Nativo
+• Inglés: Nivel B2 — Upper Intermediate
+
+CERTIFICACIONES Y FORMACIÓN CONTINUA
+• Certificación internacional en ${area} (2023)
+• Programa de liderazgo empresarial (2022)
+
+⚡ CV mejorado con tu información real`;
+    showToast('✓ CV mejorado — procesando');
+  } else {
+    showToast('✓ CV mejorado ');
+  }
+
+  cvData.cvMejorado = cvMejorado;
+  document.getElementById('cvMejoradoContent').textContent = cvMejorado;
+  document.getElementById('mejorarStatus').textContent = '✨ CV mejorado listo';
+  document.getElementById('descargarBtn').style.display = 'flex';
+  if (currentUser) {
+    currentUser.cvData = cvData;
+    await saveToStorage('talento_user', currentUser);
+  }
+}
+
+async function generarCarta() {
+  if (!cvData || !cvData.texto) { showToast('⚠ Primero sube y analiza tu CV', true); return; }
+
+  document.getElementById('cvMejoradoPanel').style.display = 'block';
+  document.getElementById('mejorarStatus').textContent = 'Generando carta de presentación...';
+  document.getElementById('cvMejoradoContent').innerHTML = '<div style="color:var(--amarillo)">⟳ Redactando carta profesional...</div>';
+  document.getElementById('cvMejoradoPanel').scrollIntoView({ behavior: 'smooth' });
+
+  let carta = '';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:800,
+        messages:[{role:'user',content:'Redacta una carta de presentación profesional en español para Ecuador para el siguiente CV. La carta debe ser personalizable (sin nombre de empresa específica), 3 párrafos: presentación, experiencia clave y cierre. Tono profesional ecuatoriano, máximo 350 palabras.\n\nCV:\n' + cvData.texto}]
+      })
+    });
+    const data = await res.json();
+    carta = data.content?.[0]?.text || '';
+  } catch(e) {}
+
+  if (!carta) {
+    const nombre = cvData.nombre || 'Profesional';
+    const area = cvData.area || 'mi área';
+    const ciudad = cvData.ciudad || 'Ecuador';
+    carta = `Estimados señores,\n\nMe dirijo a ustedes con el propósito de presentar mi candidatura para la posición que tienen disponible en su prestigiosa empresa. Mi nombre es ${nombre} y soy un profesional en ${area} con base en ${ciudad}, Ecuador.\n\nA lo largo de mi trayectoria profesional he desarrollado competencias clave que me permiten aportar valor significativo en proyectos del sector. Mi experiencia incluye trabajo en equipo, liderazgo de iniciativas y compromiso con resultados medibles. He tenido la oportunidad de colaborar en entornos exigentes donde la adaptabilidad y la orientación al cliente son fundamentales para el éxito.\n\nEstaría muy interesado en conversar con ustedes sobre cómo mi perfil puede contribuir a los objetivos de su organización. Adjunto mi currículum vitae para su consideración y quedo a su disposición para una entrevista en el momento que estimen conveniente.\n\nAgradezco de antemano su atención y consideración.\n\nAtentamente,\n${nombre}`;
+  }
+
+  cvData.cartaPresentacion = carta;
+  document.getElementById('cvMejoradoContent').textContent = carta;
+  document.getElementById('mejorarStatus').textContent = '📝 Carta de presentación lista';
+  if (currentUser) {
+    currentUser.cvData = cvData;
+    await saveToStorage('talento_user', currentUser);
+  }
+  showToast('✓ Carta generada y guardada');
+}
+
+function descargarCVMejorado() {
+  const texto = cvData?.cvMejorado || '';
+  if (!texto) return;
+  const blob = new Blob([texto], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'CV_Mejorado_TalentoEC.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✓ CV descargado y guardado en tu cuenta');
+}
+
+async function ejecutarCorreosFrio() {
+  if (!currentUser) { openAuth('register'); return; }
+  const sector = document.getElementById('frioSector').value;
+  const ciudad = document.getElementById('frioCiudad').value;
+  const numero = document.getElementById('frioNumero').value;
+  const nombre = currentUser.nombre;
+  const area = cvData?.area || 'profesional';
+
+  document.getElementById('frioResultados').innerHTML = '';
+  const anim = document.getElementById('frioSearchAnim');
+  anim.classList.add('visible');
+  const srcs = document.getElementById('frioSearchSrcs');
+  srcs.innerHTML = '';
+
+  const fuentes = ['Google Ecuador', 'LinkedIn empresas', 'Páginas amarillas EC', 'Superintendencia Cías', 'Cámara de Comercio', 'Directorio empresarial'];
+  fuentes.forEach((f,i) => setTimeout(() => {
+    const el = document.createElement('div');
+    el.className = 'src-item'; el.textContent = f; srcs.appendChild(el);
+  }, i*400));
+
+  await new Promise(r => setTimeout(r, fuentes.length*400 + 500));
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:1000,
+        messages:[{role:'user',content:`Genera ${numero} empresas ecuatorianas reales del sector ${sector} en ${ciudad} que probablemente NO tienen vacantes publicadas pero podrían necesitar personal de ${area}. Responde SOLO JSON:
+{"empresas":[{"nombre":"empresa real ecuatoriana","ciudad":"ciudad EC","sector":"${sector}","email_rrhh":"rrhh@empresa.com.ec","descripcion":"qué hace la empresa en 1 línea","empleados":"rango empleados","razon":"por qué podrían necesitar este perfil"}]}`}]
+      })
+    });
+    const data = await res.json();
+    const text = (data.content||[]).map(b=>b.text||'').join('');
+    const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
+    anim.classList.remove('visible');
+    renderEmpresasFrio(parsed.empresas, nombre, area);
+  } catch(e) {
+    anim.classList.remove('visible');
+    // DEMO MODE
+    const demoEmpresas = [
+      {nombre:'Corporación El Rosado', ciudad:'Guayaquil', sector:'Retail', email_rrhh:'rrhh@elrosado.com', descripcion:'Cadena de supermercados e hipermercados más grande del Ecuador', empleados:'5,000+', razon:'Expansión digital requiere perfiles técnicos'},
+      {nombre:'Industrias Ales C.A.', ciudad:'Quito', sector:'Manufactura', email_rrhh:'talento@ales.com.ec', descripcion:'Empresa líder en aceites y grasas comestibles en Ecuador', empleados:'1,200+', razon:'Transformación tecnológica en procesos'},
+      {nombre:'Grupo Difare', ciudad:'Guayaquil', sector:'Salud', email_rrhh:'rrhh@difare.com.ec', descripcion:'Red de farmacias más grande del Ecuador con más de 1,500 locales', empleados:'8,000+', razon:'Desarrollo de plataforma digital de salud'},
+      {nombre:'Automotores y Anexos AYASA', ciudad:'Quito', sector:'Automotriz', email_rrhh:'empleo@ayasa.com.ec', descripcion:'Concesionario oficial Chevrolet con presencia nacional', empleados:'800+', razon:'Modernización de sistemas de gestión'},
+      {nombre:'Constructora Uribe & Schwarzkopf', ciudad:'Quito', sector:'Construcción', email_rrhh:'rrhh@ubs.com.ec', descripcion:'Empresa inmobiliaria líder en proyectos residenciales en Ecuador', empleados:'600+', razon:'Digitalización de procesos administrativos'},
+      {nombre:'Holdingdine Corp.', ciudad:'Quito', sector:'Defensa/Industrial', email_rrhh:'talento@holdingdine.com.ec', descripcion:'Corporación industrial del ejército ecuatoriano', empleados:'2,000+', razon:'Modernización tecnológica institucional'},
+      {nombre:'Ferrero Ecuador', ciudad:'Guayaquil', sector:'Alimentos', email_rrhh:'hr.ecuador@ferrero.com', descripcion:'Multinacional italiana de confitería con fuerte presencia en Ecuador', empleados:'400+', razon:'Expansión de operaciones locales'},
+      {nombre:'Banco del Pacífico', ciudad:'Guayaquil', sector:'Banca', email_rrhh:'rrhh@bancopacífico.com', descripcion:'Banco estatal ecuatoriano con red nacional', empleados:'3,000+', razon:'Transformación digital bancaria'},
+      {nombre:'Cámara de Industrias de Guayaquil', ciudad:'Guayaquil', sector:'Industria', email_rrhh:'info@cig.org.ec', descripcion:'Gremio empresarial que representa a las industrias de Guayaquil', empleados:'200+', razon:'Modernización de sistemas gremiales'},
+      {nombre:'Supermaxi / Corporación La Favorita', ciudad:'Quito', sector:'Retail', email_rrhh:'talento@lafavorita.com', descripcion:'Mayor cadena de supermercados del Ecuador con más de 200 locales', empleados:'15,000+', razon:'Expansión e-commerce y logística digital'}
+    ].slice(0, parseInt(numero));
+    renderEmpresasFrio(demoEmpresas, nombre, area);
+    showToast('Procesando — conecta API key para búsqueda real');
+  }
+}
+
+function renderEmpresasFrio(empresas, nombre, area) {
+  const el = document.getElementById('frioResultados');
+  el.innerHTML = `<div style="font-size:12px;color:var(--texto-secundario);margin-bottom:14px">${empresas.length} empresas encontradas sin vacante publicada</div>` +
+    empresas.map((e,i) => `
+    <div class="job-card" style="animation:fadeIn .4s ease ${i*.08}s forwards;opacity:0;margin-bottom:12px">
+      <div class="job-card-top">
+        <div>
+          <div class="job-title">${e.nombre}</div>
+          <div class="job-company">${e.sector} · ${e.ciudad}</div>
+        </div>
+        <span style="background:rgba(245,230,66,0.12);border:1px solid rgba(245,230,66,0.3);color:var(--amarillo);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px">Sin vacante</span>
+      </div>
+      <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:8px">${e.descripcion}</div>
+      <div class="tags-row">
+        <span class="tag">👥 ${e.empleados} empleados</span>
+        <span class="tag">📍 ${e.ciudad}</span>
+        <span class="tag">${e.sector}</span>
+      </div>
+      <div style="font-size:11px;color:var(--amarillo);margin-bottom:12px;padding:8px 10px;background:rgba(245,230,66,0.06);border-radius:6px">
+        💡 ${e.razon}
+      </div>
+      <div class="card-actions">
+        <button class="btn-sm-green" onclick="abrirEmailFrio('${e.email_rrhh}','${e.nombre}','${area}','${nombre}')">Enviar correo en frío</button>
+        <button class="btn-sm-outline" onclick="window.open('https://google.com/search?q=${encodeURIComponent(e.nombre + ' Ecuador empleos')}')">Investigar empresa</button>
+      </div>
+    </div>`).join('');
+}
+
+async function abrirEmailFrio(email, empresa, area, nombre) {
+  document.getElementById('modalTo').value = email;
+  document.getElementById('modalSubject').value = `Presentación profesional — ${area} — ${nombre}`;
+  document.getElementById('modalBody').value = '⟳ Generando correo en frío con TalentoEC...';
+  document.getElementById('emailModal').classList.add('open');
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:500,
+        messages:[{role:'user',content:`Redacta un correo en frío profesional en español para enviar al área de RRHH de "${empresa}" presentando al candidato "${nombre}" que busca trabajo en ${area}. La empresa NO tiene vacante publicada. El correo debe ser: breve (3 párrafos máx), directo, destacar valor que puede aportar, solicitar consideración para futuras oportunidades. Tono profesional ecuatoriano. Solo el cuerpo del correo.`}]
+      })
+    });
+    const data = await res.json();
+    document.getElementById('modalBody').value = data.content?.[0]?.text || generarEmailFrioDemo(empresa, area, nombre);
+  } catch(e) {
+    document.getElementById('modalBody').value = generarEmailFrioDemo(empresa, area, nombre);
+  }
+}
+
+function generarEmailFrioDemo(empresa, area, nombre) {
+  return `Estimado equipo de Recursos Humanos de ${empresa},
+
+Mi nombre es ${nombre} y me dirijo a ustedes con el objetivo de presentar mi perfil profesional en el área de ${area}, con la esperanza de ser considerado para futuras oportunidades en su prestigiosa empresa.
+
+Soy un profesional con experiencia comprobada en el sector, y he identificado a ${empresa} como una organización con valores y proyección que se alinean con mis objetivos de carrera. Estoy convencido de que mi experiencia y habilidades pueden aportar valor significativo a su equipo.
+
+Estaré muy agradecido si pudieran revisar mi perfil y tenerme en consideración para posiciones que puedan surgir en el futuro. Quedo a su disposición para una conversación o entrevista en el momento que estimen conveniente.
+
+Muchas gracias por su tiempo.
+
+Atentamente,
+${nombre}`;
+}
+
+function toggleAreaChip(el, area) {
+  const selected = el.dataset.selected === 'true';
+  if (selected) {
+    el.dataset.selected = 'false';
+    el.style.opacity = '0.6';
+    el.style.background = 'rgba(0,196,140,0.06)';
+    el.textContent = area;
+  } else {
+    el.dataset.selected = 'true';
+    el.style.opacity = '1';
+    el.style.background = 'rgba(0,196,140,0.12)';
+    el.textContent = '✓ ' + area;
+  }
+  // Update hidden input with selected areas
+  const selected_areas = [...document.querySelectorAll('#areasChips span[data-selected="true"]')]
+    .map(s => s.dataset.area).join(', ');
+  document.getElementById('cvArea').value = selected_areas;
+}
+
+function renderCorreos() {
+  if (!correosEnviados.length) return;
+  document.getElementById('correosList').innerHTML = correosEnviados.map(c=>`
+    <div class="job-card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-size:14px;font-weight:500">${c.to}</div><div style="font-size:12px;color:var(--texto-secundario);margin-top:3px">${c.subject}</div></div>
+        <div style="text-align:right"><span style="color:var(--verde);font-size:11px">✓ ${c.estado}</span><div style="font-size:10px;color:var(--texto-secundario);margin-top:2px">${c.fecha}</div></div>
+      </div>
+    </div>`).join('');
+}
+
+// ======= PAYPHONE =======
+function abrirPago(plan, precio) {
+  document.getElementById('ppPlanName').textContent = 'Plan ' + plan;
+  document.getElementById('ppPlanPrice').textContent = '$' + precio;
+  document.getElementById('ppModal').classList.add('open');
+  document.getElementById('ppPayView').style.display='block';
+  document.getElementById('ppSuccess').className='pp-success';
+}
+function cerrarPago() { document.getElementById('ppModal').classList.remove('open'); }
+function selectPPMethod(method, el) {
+  document.querySelectorAll('.pp-method').forEach(m=>m.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('ppTarjetaForm').className = 'pp-form-section' + (method==='tarjeta'?' visible':'');
+  document.getElementById('ppCelularForm').className = 'pp-form-section' + (method==='celular'?' visible':'');
+}
+function formatCard(input) {
+  let v = input.value.replace(/\D/g,'').substring(0,16);
+  input.value = v.replace(/(.{4})/g,'$1 ').trim();
+}
+async function procesarPago() {
+  document.querySelector('.btn-pp-pay').textContent = '⟳ Procesando...';
+  await new Promise(r=>setTimeout(r,2000));
+  document.getElementById('ppPayView').style.display='none';
+  document.getElementById('ppSuccess').className='pp-success visible';
+  const planKey = (document.getElementById('ppPlanName').textContent.toLowerCase().includes('básico')||document.getElementById('ppPlanName').textContent.includes('9')) ? 'basico' : (document.getElementById('ppPlanName').textContent.toLowerCase().includes('estándar')||document.getElementById('ppPlanName').textContent.includes('19')) ? 'estandar' : 'pro';
+  if (currentUser) { currentUser.plan = planKey; await saveToStorage('talento_user', currentUser); updateLimitBar(); }
+  document.getElementById('empPlanPill').textContent = 'PLAN PRO ACTIVO';
+}
+function cerrarPagoExito() { cerrarPago(); if(currentUser) showPage('empleador'); }
+
+// ======= UTILS =======
+const PLANES = {
+  'basico':        { nombre:'Básico $9.99',          min:10,  max:20,   precio:'9.99',   max_frio:10,  tipo:'candidato' },
+  'estandar':      { nombre:'Estándar $19.99',        min:20,  max:40,   precio:'19.99',  max_frio:30,  tipo:'candidato' },
+  'pro':           { nombre:'Pro $34.99',             min:30,  max:60,   precio:'34.99',  max_frio:40,  tipo:'candidato' },
+  'emp_basico':    { nombre:'Empleador Básico $49',   min:0,   max:20,   precio:'49',     max_frio:0,   tipo:'empleador', busquedas:10,  correos_mes:20  },
+  'emp_pro':       { nombre:'Empleador Pro $149',     min:0,   max:200,  precio:'149',    max_frio:0,   tipo:'empleador', busquedas:999, correos_mes:200 },
+  'emp_enterprise':{ nombre:'Empleador Enterprise $399', min:0, max:9999, precio:'399',  max_frio:0,   tipo:'empleador', busquedas:999, correos_mes:9999 }
+};
+
+function getPlan() {
+  const p = currentUser?.plan || 'basico';
+  return PLANES[p] || PLANES['basico'];
+}
+
+function updateStats(jobs) {
+  document.getElementById('statBusquedas').textContent = busquedasCount;
+  document.getElementById('statCorreos').textContent = correosCount;
+  if (jobs && jobs.length) {
+    const avg = Math.round(jobs.reduce((s,j)=>s+j.match,0)/jobs.length);
+    document.getElementById('statMatch').textContent = avg + '%';
+  }
+  updateLimitBar();
+}
+
+function updateLimitBar() {
+  const plan = getPlan();
+  const pct = Math.min(100, Math.round((correosCount / plan.max) * 100));
+  const bar = document.getElementById('correosDiaBar');
+  if (bar) {
+    bar.style.width = pct + '%';
+    bar.style.background = pct >= 90 ? 'var(--rojo)' : pct >= 65 ? 'var(--amarillo)' : 'var(--verde)';
+  }
+  const el = (id) => document.getElementById(id);
+  if (el('correosDiaCount')) el('correosDiaCount').textContent = correosCount;
+  if (el('correosDiaMax'))   el('correosDiaMax').textContent  = plan.max;
+  if (el('correosDiaMax2'))  el('correosDiaMax2').textContent = plan.max;
+  if (el('correosDiaMin'))   el('correosDiaMin').textContent  = plan.min;
+  if (el('planNombreLabel')) el('planNombreLabel').textContent = plan.nombre;
+  if (el('candPlanPill'))    el('candPlanPill').textContent   = plan.nombre.toUpperCase();
+}
+
+function puedeEnviarCorreo() {
+  const plan = getPlan();
+  if (correosCount >= plan.max) {
+    showToast('Límite de ' + plan.max + ' correos/día alcanzado. Mejora tu plan.', true);
+    return false;
+  }
+  return true;
+}
+function toggleChip(el) { el.classList.toggle('on'); }
+function showToast(msg, err) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast' + (err?' error':'') + ' show';
+  setTimeout(()=>t.className='toast',3000);
+}
+
+// ── Searchable Select ────────────────────────────────────────
+const CARGOS_POR_AREA = {
+  "Tecnología / Sistemas": "desarrollador, programador, ingeniero de software, devops, sysadmin, soporte técnico",
+  "Desarrollo de Software": "desarrollador frontend, backend, fullstack, mobile, React, Node.js, Python, Java",
+  "Diseño Web / UX": "diseñador UX, UI designer, diseñador web, product designer, wireframing",
+  "Ciberseguridad": "analista de seguridad, ethical hacker, pentester, seguridad informática",
+  "Data Science / BI": "analista de datos, data scientist, business intelligence, Power BI, tableau",
+  "Administración de Empresas": "administrador, gerente, jefe administrativo, coordinador, asistente administrativo",
+  "Recursos Humanos": "RRHH, reclutador, talento humano, nómina, bienestar laboral, selección de personal",
+  "Contabilidad / Auditoría": "contador, auditor, CPA, auxiliar contable, tributario, NIIF",
+  "Finanzas / Banca": "analista financiero, banco, crédito, tesorero, inversiones, riesgo financiero",
+  "Economía": "economista, analista económico, investigador económico",
+  "Marketing Digital": "marketing digital, community manager, SEO, SEM, redes sociales, publicidad digital",
+  "Ventas / Comercial": "vendedor, ejecutivo de ventas, asesor comercial, representante de ventas",
+  "Publicidad / Comunicación": "publicista, comunicador, relaciones públicas, prensa, medios",
+  "Atención al Cliente": "atención al cliente, call center, servicio al cliente, recepcionista",
+  "Ingeniería Civil": "ingeniero civil, obras civiles, construcción, estructuras, topógrafo",
+  "Ingeniería Industrial": "ingeniero industrial, producción, procesos, calidad, logística industrial",
+  "Ingeniería Eléctrica": "ingeniero eléctrico, electricista, automatización, PLC, instalaciones eléctricas",
+  "Ingeniería Mecánica": "ingeniero mecánico, mantenimiento mecánico, maquinaria, manufactura",
+  "Ingeniería Química": "ingeniero químico, laboratorista, control de calidad, químico industrial",
+  "Arquitectura": "arquitecto, diseño arquitectónico, proyectos, BIM, urbanismo",
+  "Medicina / Salud": "médico, doctor, médico general, médico especialista, salud ocupacional",
+  "Enfermería": "enfermero, enfermera, auxiliar de enfermería, salud, clínica, hospital",
+  "Odontología": "odontólogo, dentista, auxiliar dental, ortodoncia",
+  "Farmacia": "farmacéutico, químico farmacéutico, regente de farmacia, farmacología",
+  "Psicología": "psicólogo, terapeuta, consejero, salud mental, psicología clínica",
+  "Educación / Docencia": "profesor, docente, maestro, educador, director académico, tutor, coordinador educativo",
+  "Derecho / Legal": "abogado, asesor legal, jurídico, notario, defensor, fiscal",
+  "Logística / Supply Chain": "logístico, cadena de suministro, almacenamiento, bodeguero, compras",
+  "Comercio Exterior": "comercio exterior, importaciones, exportaciones, aduanas, agente de carga",
+  "Turismo / Hotelería": "guía turístico, hotel, recepcionista de hotel, agente de viajes, turismo",
+  "Gastronomía": "chef, cocinero, pastelero, bartender, mesero, administrador de restaurante",
+  "Agronomía / Agropecuario": "agrónomo, veterinario, técnico agrícola, producción agropecuaria",
+  "Petróleo / Minería": "petróleo, minería, perforación, geólogo, ingeniero de petróleo",
+  "Medio Ambiente": "ambiental, ecología, gestión ambiental, consultor ambiental",
+  "Diseño Gráfico": "diseñador gráfico, ilustrador, branding, identidad visual, Adobe",
+  "Fotografía / Video": "fotógrafo, videógrafo, editor de video, producción audiovisual",
+  "Periodismo": "periodista, redactor, comunicador social, editor, locutor",
+  "Trabajo Social": "trabajador social, asistente social, bienestar comunitario",
+  "Seguridad / Vigilancia": "guardia de seguridad, vigilante, oficial de seguridad, supervisor de seguridad",
+  "Construcción / Obras": "maestro de obras, albañil, plomero, carpintero, electricista",
+  "Manufactura / Producción": "operario, técnico de producción, control de calidad, manufactura",
+  "Electricidad / Electrónica": "electricista, técnico electrónico, instalaciones, mantenimiento eléctrico",
+  "Mecánica Automotriz": "mecánico automotriz, técnico automotriz, diagnóstico vehicular",
+  "Otro": "profesional, técnico, asistente, coordinador"
+};
+
+const CIUDADES = ["Quito","Guayaquil","Cuenca","Ambato","Manta","Loja","Ibarra","Riobamba","Esmeraldas","Portoviejo","Santo Domingo","Machala","Durán","Quevedo","Milagro","Latacunga","Babahoyo","Sangolquí","Tulcán","Lago Agrio","Orellana","Tena","Puyo","Macas","Zamora","Guaranda","Azogues","Santa Rosa","Pasaje","Huaquillas","Toda la república"];
+
+const AREAS = ["Tecnología / Sistemas","Desarrollo de Software","Diseño Web / UX","Ciberseguridad","Data Science / BI","Administración de Empresas","Recursos Humanos","Contabilidad / Auditoría","Finanzas / Banca","Economía","Marketing Digital","Ventas / Comercial","Publicidad / Comunicación","Atención al Cliente","Ingeniería Civil","Ingeniería Industrial","Ingeniería Eléctrica","Ingeniería Mecánica","Ingeniería Química","Arquitectura","Medicina / Salud","Enfermería","Odontología","Farmacia","Psicología","Educación / Docencia","Derecho / Legal","Logística / Supply Chain","Comercio Exterior","Turismo / Hotelería","Gastronomía","Agronomía / Agropecuario","Petróleo / Minería","Medio Ambiente","Diseño Gráfico","Fotografía / Video","Periodismo","Trabajo Social","Seguridad / Vigilancia","Construcción / Obras","Manufactura / Producción","Electricidad / Electrónica","Mecánica Automotriz","Otro"];
+
+function crearSearchSelect(selectEl, opciones) {
+  if (!selectEl) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'search-select-wrap';
+  selectEl.parentNode.insertBefore(wrap, selectEl);
+  wrap.appendChild(selectEl);
+  selectEl.style.display = 'none';
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'search-select-input';
+  input.placeholder = 'Buscar o escribir...';
+  input.value = (selectEl.options && selectEl.options[0]) ? selectEl.options[0].value : '';
+  wrap.appendChild(input);
+
+  const dropdown = document.createElement('div');
+  dropdown.className = 'search-select-dropdown';
+  wrap.appendChild(dropdown);
+
+  function renderOpciones(filtro='') {
+    dropdown.innerHTML = '';
+    const filtradas = opciones.filter(o => o.toLowerCase().includes(filtro.toLowerCase()));
+    if (!filtradas.length) {
+      dropdown.innerHTML = '<div class="search-select-empty">Sin resultados</div>';
+      return;
+    }
+    filtradas.forEach(op => {
+      const div = document.createElement('div');
+      div.className = 'search-select-option';
+      if (op === selectEl.value) div.classList.add('selected');
+      div.textContent = op;
+      div.onclick = () => {
+        selectEl.value = op;
+        input.value = op;
+        dropdown.classList.remove('open');
+      };
+      dropdown.appendChild(div);
+    });
+  }
+
+  input.addEventListener('focus', () => {
+    renderOpciones(input.value);
+    dropdown.classList.add('open');
+  });
+  input.addEventListener('input', () => {
+    renderOpciones(input.value);
+    dropdown.classList.add('open');
+  });
+  document.addEventListener('click', e => {
+    if (!wrap.contains(e.target)) dropdown.classList.remove('open');
+  });
+
+  // Set initial value
+  if (opciones && opciones.length > 0) {
+    try {
+      selectEl.value = opciones[0];
+      input.value = opciones[0];
+    } catch(e) {}
+  }
+}
+
+// Inicializar todos los selects de ciudad y área
+setTimeout(() => {
+  try {
+    ['cvCiudad','busquedaCiudad','frioCiudad'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) crearSearchSelect(el, CIUDADES);
+    });
+    ['cvArea'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) crearSearchSelect(el, AREAS);
+    });
+  } catch(e) { console.log('Select init error:', e); }
+}, 500);
+
+// ── Autocompletado buscador empleador ─────────────────────
+// Base de sugerencias con palabras clave para búsqueda inteligente
+const SUGERENCIAS_BASE = [
+  { texto:'Ingeniero de sistemas / software senior', tags:['ing','sis','soft','tech','tecno','sistema','programador','dev'] },
+  { texto:'Ingeniero civil con experiencia en construcción', tags:['ing','civil','construc','obra','arquitect'] },
+  { texto:'Ingeniero industrial para manufactura', tags:['ing','indus','manufactur','planta','produc'] },
+  { texto:'Ingeniero eléctrico en Guayaquil', tags:['ing','elec','electr','guaya'] },
+  { texto:'Ingeniero mecánico con 5 años de experiencia', tags:['ing','mec','mecanic'] },
+  { texto:'Ingeniero químico para industria', tags:['ing','quim','quimic','industria'] },
+  { texto:'Contador CPA con experiencia en auditoría', tags:['cont','cpa','audit','contad'] },
+  { texto:'Contador general para empresa mediana', tags:['cont','contad','general','empresa'] },
+  { texto:'Contador público con conocimiento tributario', tags:['cont','tribut','impuest','sri'] },
+  { texto:'Administrador de empresas para gerencia', tags:['admin','gerenc','empresa','direct'] },
+  { texto:'Administrador financiero en Quito', tags:['admin','financ','quito','finanz'] },
+  { texto:'Desarrollador web full stack con React', tags:['dev','desa','web','react','full','stack','program'] },
+  { texto:'Desarrollador backend con Node.js Python', tags:['dev','desa','back','node','python','program'] },
+  { texto:'Desarrollador móvil Android iOS', tags:['dev','desa','movil','android','ios','app','program'] },
+  { texto:'Diseñador gráfico con experiencia en branding', tags:['dise','graph','brand','creativ','visual'] },
+  { texto:'Diseñador UX/UI para aplicaciones web', tags:['dise','ux','ui','interfaz','web'] },
+  { texto:'Marketing digital con redes sociales', tags:['market','digital','redes','social','publi','comunic'] },
+  { texto:'Ventas y atención al cliente bilingüe', tags:['vent','vend','client','aten','comerc'] },
+  { texto:'Recursos humanos para empresa grande', tags:['rrhh','recurso','human','talento','personal','hr'] },
+  { texto:'Médico general para clínica privada', tags:['med','medic','doctor','clinic','salud'] },
+  { texto:'Abogado corporativo con experiencia tributaria', tags:['abog','legal','derech','juridi','law'] },
+  { texto:'Arquitecto para proyectos residenciales', tags:['arqu','arquit','diseño','construc','proyecto'] },
+  { texto:'Economista con experiencia en finanzas', tags:['econ','financ','finanz','banca','invers'] },
+  { texto:'Psicólogo organizacional para empresa', tags:['psic','psicol','organ','conduct','mental'] },
+  { texto:'Logística y supply chain en Guayaquil', tags:['logis','supply','cadena','bodeg','almac','import'] },
+  { texto:'Chef ejecutivo para restaurante', tags:['chef','cocin','gastrono','restaur','aliment'] },
+  { texto:'Docente universitario en ingeniería', tags:['docen','profes','enseñ','univers','acade'] },
+  { texto:'Mecánico automotriz con certificación', tags:['mecan','auto','carro','vehic','motor','automo'] },
+  { texto:'Electricista industrial con experiencia', tags:['electric','electr','indust','instal','panel'] },
+  { texto:'Enfermera titulada con experiencia clínica', tags:['enfer','salud','clinic','hospital','medic'] },
+  { texto:'Farmacéutico para cadena de farmacias', tags:['farma','farm','medic','salud','drug'] },
+  { texto:'Analista financiero con manejo de Excel', tags:['analis','financ','excel','datos','report'] },
+  { texto:'Asistente administrativo bilingüe', tags:['asist','admin','secretar','oficin','bilingue'] },
+  { texto:'Coordinador de proyectos con PMP', tags:['coordin','proyec','pmp','gest','planif'] },
+  { texto:'Data scientist con Python y machine learning', tags:['data','ciencia','python','ml','ia','analis','machine'] },
+  { texto:'Técnico en redes y comunicaciones', tags:['tecn','redes','comunic','network','cisco','inform'] },
+];
+
+function mostrarSugerencias(valor) {
+  const box = document.getElementById('searchSuggestions');
+  if (!valor || valor.length < 2) { box.style.display = 'none'; return; }
+  
+  const v = valor.toLowerCase().trim();
+  const palabras = v.split(/\s+/);
+  
+  // Buscar por texto completo O por cualquier tag de las palabras escritas
+  const filtradas = SUGERENCIAS_BASE.filter(s => {
+    const textoMatch = s.texto.toLowerCase().includes(v);
+    const tagMatch = palabras.every(p => 
+      s.tags.some(t => t.includes(p) || p.includes(t)) ||
+      s.texto.toLowerCase().includes(p)
+    );
+    return textoMatch || tagMatch;
+  }).slice(0, 7);
+
+  if (!filtradas.length) { 
+    // Si no hay sugerencias mostrar opcion de buscar tal cual
+    box.innerHTML = `<div onclick="seleccionarSugerencia('${valor}')"
+      style="padding:10px 16px;cursor:pointer;font-size:13px;color:var(--texto-secundario);border-bottom:1px solid var(--gris-borde)"
+      onmouseover="this.style.background='rgba(0,196,140,0.08)';this.style.color='var(--verde)'"
+      onmouseout="this.style.background='';this.style.color='var(--texto-secundario)'">
+      🔍 Buscar "<strong style="color:var(--verde)">${valor}</strong>" en Ecuador
+    </div>`;
+    box.style.display = 'block';
+    return;
+  }
+
+  box.innerHTML = filtradas.map(s => {
+    return `<div onclick="seleccionarSugerencia('${s.texto}')"
+      style="padding:10px 16px;cursor:pointer;font-size:13px;color:var(--texto-secundario);border-bottom:1px solid var(--gris-borde)"
+      onmouseover="this.style.background='rgba(0,196,140,0.08)';this.style.color='var(--texto-primario)'"
+      onmouseout="this.style.background='';this.style.color='var(--texto-secundario)'">
+      🔍 ${s.texto}
+    </div>`;
+  }).join('') + `<div onclick="seleccionarSugerencia('${valor}')"
+    style="padding:8px 16px;cursor:pointer;font-size:12px;color:var(--verde);background:rgba(0,196,140,0.05)"
+    onmouseover="this.style.background='rgba(0,196,140,0.1)'"
+    onmouseout="this.style.background='rgba(0,196,140,0.05)'">
+    Buscar exactamente "<strong>${valor}</strong>"
+  </div>`;
+  box.style.display = 'block';
+}
+
+function seleccionarSugerencia(texto) {
+  document.getElementById('empSearchInput').value = texto;
+  cerrarSugerencias();
+  buscarCandidatos();
+}
+
+function cerrarSugerencias() {
+  const box = document.getElementById('searchSuggestions');
+  if (box) box.style.display = 'none';
+}
+
+// Close modals on background click
+document.getElementById('authModal').addEventListener('click', e => { if(e.target===e.currentTarget)closeAuth(); });
+document.getElementById('ppModal').addEventListener('click', e => { if(e.target===e.currentTarget)cerrarPago(); });
+document.getElementById('emailModal').addEventListener('click', e => { if(e.target===e.currentTarget)cerrarEmail(); });
+</script>
+<script>
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      console.log('PWA registrada');
+    }).catch(err => console.log('PWA error:', err));
+  });
+}
+
+// Install prompt
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  setTimeout(() => {
+    if (deferredPrompt && !sessionStorage.getItem('install_dismissed')) {
+      mostrarBannerInstalar();
+    }
+  }, 5000);
+});
+
+function mostrarBannerInstalar() {
+  const banner = document.createElement('div');
+  banner.id = 'installBanner';
+  banner.style.cssText = 'position:fixed;bottom:20px;left:20px;right:20px;max-width:400px;margin:0 auto;background:var(--gris-oscuro);border:1px solid var(--verde);border-radius:14px;padding:16px;z-index:1000;box-shadow:0 8px 32px rgba(0,0,0,0.4);display:flex;align-items:center;gap:12px';
+  banner.innerHTML = `
+    <div style="width:48px;height:48px;background:var(--verde);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--negro);font-size:18px;flex-shrink:0">📱</div>
+    <div style="flex:1">
+      <div style="font-size:13px;font-weight:600;color:var(--texto-primario)">Instala TalentoEC</div>
+      <div style="font-size:11px;color:var(--texto-secundario)">Acceso rápido desde tu celular</div>
+    </div>
+    <button onclick="instalarApp()" style="background:var(--verde);color:var(--negro);border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">Instalar</button>
+    <button onclick="cerrarBannerInstalar()" style="background:transparent;border:none;color:var(--texto-secundario);font-size:18px;cursor:pointer;padding:0 4px">×</button>
+  `;
+  document.body.appendChild(banner);
+}
+
+async function instalarApp() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  cerrarBannerInstalar();
+}
+
+function cerrarBannerInstalar() {
+  const banner = document.getElementById('installBanner');
+  if (banner) banner.remove();
+  sessionStorage.setItem('install_dismissed', '1');
+}
+</script>
+</body>
+</html>

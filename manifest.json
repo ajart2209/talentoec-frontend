@@ -1,0 +1,27 @@
+{
+  "name": "TalentoEC - Empleos en Ecuador",
+  "short_name": "TalentoEC",
+  "description": "Encuentra trabajo en Ecuador con IA. Subí tu CV y nosotros buscamos por vos.",
+  "start_url": "/talentoec-frontend/",
+  "scope": "/talentoec-frontend/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A0F0D",
+  "theme_color": "#00C48C",
+  "lang": "es-EC",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%2300C48C'/%3E%3Ctext x='96' y='125' font-family='Arial,sans-serif' font-size='95' font-weight='bold' fill='%230A0F0D' text-anchor='middle'%3ETE%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%2300C48C'/%3E%3Ctext x='256' y='335' font-family='Arial,sans-serif' font-size='250' font-weight='bold' fill='%230A0F0D' text-anchor='middle'%3ETE%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
