@@ -1713,6 +1713,67 @@ async function registrar() {
   }
 }
 
+function setLoggedInUI() {
+  // Ocultar tab Inicio
+  var inicioTab = document.getElementById('ntab-landing');
+  if (inicioTab) inicioTab.style.display = 'none';
+  // Mostrar/ocultar tabs según rol
+  var candTab = document.getElementById('ntab-candidato');
+  var empTab = document.getElementById('ntab-empleador');
+  var adminTab = document.getElementById('ntab-admin');
+  if (currentUser && currentUser.rol === 'admin') {
+    if (candTab) candTab.style.display = '';
+    if (empTab) empTab.style.display = '';
+    if (adminTab) adminTab.style.display = '';
+  } else if (currentUser && currentUser.tipo === 'candidato') {
+    if (empTab) empTab.style.display = 'none';
+    if (candTab) candTab.style.display = '';
+    if (adminTab) adminTab.style.display = 'none';
+  } else if (currentUser && currentUser.tipo === 'empleador') {
+    if (candTab) candTab.style.display = 'none';
+    if (empTab) empTab.style.display = '';
+    if (adminTab) adminTab.style.display = 'none';
+  }
+
+  const nr = document.getElementById('navRight');
+  if (!nr || !currentUser) return;
+  const initials = currentUser.nombre.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  const avatarContent = currentUser.avatar
+    ? `<img src="${currentUser.avatar}" style="width:32px;height:32px;border-radius:50%;object-fit:cover">`
+    : initials;
+  nr.innerHTML = `<div class="user-avatar" onclick="toggleProfileMenu()" id="userAvatarBtn">${avatarContent}</div>`;
+  const mn = document.getElementById('menuUserName');
+  const me = document.getElementById('menuUserEmail');
+  if (mn) mn.textContent = currentUser.nombre;
+  if (me) me.textContent = currentUser.email;
+  const cw = document.getElementById('candWelcome');
+  const ew = document.getElementById('empWelcome');
+  if (cw) cw.textContent = 'Hola, ' + currentUser.nombre.split(' ')[0] + ' 👋';
+  if (ew) ew.textContent = 'Panel de ' + (currentUser.empresa || currentUser.nombre);
+}
+
+function cerrarSesion() {
+  currentUser = null;
+  document.getElementById('navRight').innerHTML = `<button class="btn-nav-login" onclick="openAuth('login')">Iniciar sesión</button><button class="btn-nav-cta" onclick="openAuth('register')">Registrarse gratis</button>`;
+  // Mostrar de nuevo todos los tabs
+  const inicioTab = document.getElementById('ntab-landing');
+  const candTab2 = document.getElementById('ntab-candidato');
+  const empTab2 = document.getElementById('ntab-empleador');
+  const adminTab2 = document.getElementById('ntab-admin');
+  if (inicioTab) inicioTab.style.display = '';
+  if (candTab2) candTab2.style.display = '';
+  if (empTab2) empTab2.style.display = '';
+  if (adminTab2) adminTab2.style.display = 'none';
+  showPage('landing');
+  const pm = document.getElementById('profileMenu');
+  if (pm) pm.classList.remove('open');
+  showToast('Sesión cerrada');
+}
+
+function toggleProfileMenu() {
+  document.getElementById('profileMenu').classList.toggle('open');
+}
+
 async function iniciarSesion() {
   const email = document.getElementById('logEmail').value.trim().toLowerCase();
   const pass = document.getElementById('logPass').value;
