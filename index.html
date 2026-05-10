@@ -1621,98 +1621,98 @@ function selectTipo(tipo, el) {
 }
 async function registrar() {
   try {
-  const nombre = document.getElementById('regNombre').value.trim();
-  const email = document.getElementById('regEmail').value.trim();
-  const pass = document.getElementById('regPass').value;
-  if (!nombre || !email || !pass) { showToast('⚠ Completa todos los campos', true); return; }
-  if (pass.length < 6) { showToast('⚠ Contraseña mínimo 6 caracteres', true); return; }
+    const nombre = document.getElementById('regNombre').value.trim();
+    const email = document.getElementById('regEmail').value.trim().toLowerCase();
+    const pass = document.getElementById('regPass').value;
+    const empresa = document.getElementById('regEmpresa') ? document.getElementById('regEmpresa').value : '';
 
-  // Validar formato de email
-  const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  if (!emailValido) { showToast('⚠ Email inválido', true); return; }
+    if (!nombre || !email || !pass) {
+      showToast('⚠ Completa todos los campos', true);
+      return;
+    }
+    if (pass.length < 6) {
+      showToast('⚠ Contraseña mínimo 6 caracteres', true);
+      return;
+    }
 
-  // Verificar si el email ya está registrado
-  const usuarios = JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}');
-  const emailKey = email.toLowerCase().trim();
-  if (usuarios[emailKey]) {
-    showToast('⚠ Este email ya está registrado. Inicia sesión.', true);
-    setTimeout(() => { document.querySelector('[data-tab="login"]')?.click(); }, 500);
-    return;
-  }
+    // Validar email
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showToast('⚠ Email inválido', true);
+      return;
+    }
 
-  // Hash simple de contraseña (no es producción real, pero mejor que texto plano)
-  const passHash = await hashPassword(pass);
+    // Verificar duplicado
+    const usuarios = JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}');
+    if (usuarios[email]) {
+      showToast('⚠ Este email ya está registrado. Inicia sesión.', true);
+      return;
+    }
 
-  // Generar ID único y token de sesión
-  const userId = 'usr_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-  const sessionToken = 'tok_' + Date.now() + '_' + Math.random().toString(36).substr(2, 16);
+    // Hash de contraseña
+    const passHash = await hashPassword(pass);
+    const userId = 'usr_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    const sessionToken = 'tok_' + Date.now();
 
-  // Guardar usuario en la "base de datos" local
-  usuarios[emailKey] = {
-    id: userId,
-    nombre, email: emailKey, passHash,
-    tipo: selectedTipo,
-    empresa: document.getElementById('regEmpresa').value,
-    plan: 'basico',
-    creado: new Date().toISOString(),
-    stats: { busquedas: 0, correos: 0 },
-    cvData: null,
-    candidatosGuardados: [],
-    busquedasDiarias: { fecha: '', usadas: 0 }
-  };
+    // Determinar rol
+    const ADMINS = ['ajart6420@gmail.com'];
+    const esAdmin = ADMINS.includes(email);
+    const tipo = esAdmin ? 'admin' : (selectedTipo || 'candidato');
+    const rol = esAdmin ? 'admin' : 'usuario';
 
-  // Asignar rol admin automáticamente a emails específicos
-  const ADMINS = ['ajart6420@gmail.com'];
-  if (ADMINS.includes(emailKey)) {
-    usuarios[emailKey].rol = 'admin';
-    usuarios[emailKey].tipo = 'admin';
-  } else {
-    usuarios[emailKey].rol = 'usuario';
-  }
+    // Guardar en BD local
+    usuarios[email] = {
+      id: userId,
+      nombre, email, passHash,
+      tipo, rol,
+      empresa,
+      plan: esAdmin ? 'pro' : 'basico',
+      creado: new Date().toISOString(),
+      stats: { busquedas: 0, correos: 0 }
+    };
+    localStorage.setItem('talento_usuarios_db', JSON.stringify(usuarios));
 
-  localStorage.setItem('talento_usuarios_db', JSON.stringify(usuarios));
+    // Limpiar datos del usuario anterior
+    localStorage.removeItem('busquedas_dia');
+    localStorage.removeItem('busquedas_fecha');
+    localStorage.removeItem('correos_empleador_mes');
+    localStorage.removeItem('candidatos_guardados');
+    busquedasCount = 0;
+    correosCount = 0;
+    cvData = {};
 
-  // Limpiar TODOS los datos del usuario anterior
-  localStorage.removeItem('talento_user');
-  localStorage.removeItem('busquedas_dia');
-  localStorage.removeItem('busquedas_fecha');
-  localStorage.removeItem('correos_empleador_mes');
-  localStorage.removeItem('candidatos_guardados');
-  localStorage.removeItem('talento_google_user');
-  busquedasCount = 0;
-  correosCount = 0;
-  cvData = {};
+    // Setear current user
+    currentUser = {
+      id: userId,
+      nombre, email,
+      tipo, rol,
+      empresa,
+      plan: esAdmin ? 'pro' : 'basico',
+      creado: new Date().toLocaleDateString('es-EC'),
+      stats: { busquedas: 0, correos: 0 },
+      sessionToken
+    };
+    userTipo = tipo;
 
-  const ADMINS_LIST = ['ajart6420@gmail.com'];
-  const esAdmin = ADMINS_LIST.includes(emailKey);
-  currentUser = {
-    id: userId,
-    nombre, email: emailKey,
-    tipo: esAdmin ? 'admin' : selectedTipo,
-    rol: esAdmin ? 'admin' : 'usuario',
-    empresa: document.getElementById('regEmpresa').value,
-    plan: esAdmin ? 'pro' : 'basico',
-    creado: new Date().toLocaleDateString('es-EC'),
-    stats: { busquedas: 0, correos: 0 },
-    sessionToken
-  };
-  userTipo = currentUser.tipo;
-  await saveToStorage('talento_user', currentUser);
-  closeAuth();
-  setLoggedInUI();
-  showToast('✓ Cuenta creada. ¡Bienvenido ' + nombre + '!');
-  setTimeout(() => {
-    // Si es admin, ir al panel admin, sino al dashboard correspondiente
-    const destino = currentUser.rol === 'admin' ? 'admin' : userTipo;
-    showPage(destino);
-    if (document.getElementById('cvNombre')) document.getElementById('cvNombre').value = nombre;
-    if (document.getElementById('cvEmail')) document.getElementById('cvEmail').value = email;
-  }, 600);
+    await saveToStorage('talento_user', currentUser);
+    closeAuth();
+    setLoggedInUI();
+    showToast('✓ Cuenta creada. Bienvenido ' + nombre + '!');
+
+    setTimeout(() => {
+      const destino = (rol === 'admin') ? 'admin' : tipo;
+      showPage(destino);
+      const cvN = document.getElementById('cvNombre');
+      const cvE = document.getElementById('cvEmail');
+      if (cvN) cvN.value = nombre;
+      if (cvE) cvE.value = email;
+    }, 600);
+
   } catch(err) {
-    console.error('Error en registro:', err);
-    showToast('⚠ Error: ' + err.message, true);
+    console.error('Error registro:', err);
+    showToast('⚠ Error: ' + (err.message || 'algo salió mal'), true);
   }
 }
+
 async function iniciarSesion() {
   const email = document.getElementById('logEmail').value.trim().toLowerCase();
   const pass = document.getElementById('logPass').value;
