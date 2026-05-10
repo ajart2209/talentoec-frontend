@@ -306,6 +306,7 @@ if (window.pdfjsLib) {
     <button class="ntab active" onclick="showPage('landing')" id="ntab-landing">Inicio</button>
     <button class="ntab" onclick="requireAuth('candidato')" id="ntab-candidato">Candidatos</button>
     <button class="ntab" onclick="requireAuth('empleador')" id="ntab-empleador">Empleadores</button>
+    <button class="ntab" onclick="requireAuth('admin')" id="ntab-admin" style="display:none;color:var(--amarillo)">⚙ Admin</button>
   </div>
   <div class="nav-right" id="navRight">
     <button class="btn-nav-login" onclick="openAuth('login')">Iniciar sesión</button>
@@ -1331,6 +1332,72 @@ if (window.pdfjsLib) {
   <div class="profile-menu-item danger" onclick="cerrarSesion()">Cerrar sesión</div>
 </div>
 
+<!-- ===== ADMIN PANEL ===== -->
+<div id="page-admin" class="page">
+  <div class="dashboard" style="max-width:1200px">
+    <div class="dash-header">
+      <div>
+        <div class="dash-welcome">⚙ Panel de Administrador</div>
+        <div class="dash-sub">Gestión completa de TalentoEC</div>
+      </div>
+      <span style="background:var(--amarillo);color:var(--negro);font-weight:700;padding:5px 14px;border-radius:20px;font-size:11px">ADMIN</span>
+    </div>
+
+    <!-- Métricas globales -->
+    <div class="dash-cards" style="grid-template-columns:repeat(4,1fr)">
+      <div class="dash-card">
+        <div class="dash-card-num" id="adminTotalUsers">0</div>
+        <div class="dash-card-label">Total usuarios</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-card-num" id="adminCandidatos" style="color:var(--azul)">0</div>
+        <div class="dash-card-label">Candidatos</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-card-num" id="adminEmpleadores" style="color:var(--amarillo)">0</div>
+        <div class="dash-card-label">Empleadores</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-card-num" id="adminIngresos" style="color:var(--verde)">$0</div>
+        <div class="dash-card-label">Ingresos del mes</div>
+      </div>
+    </div>
+
+    <div class="dash-cards" style="grid-template-columns:repeat(3,1fr);margin-top:14px">
+      <div class="dash-card">
+        <div class="dash-card-num" id="adminBusquedas">0</div>
+        <div class="dash-card-label">Búsquedas totales</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-card-num" id="adminCorreos">0</div>
+        <div class="dash-card-label">Correos enviados</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-card-num" id="adminConversion">0%</div>
+        <div class="dash-card-label">Tasa conversión</div>
+      </div>
+    </div>
+
+    <!-- Lista de usuarios -->
+    <div class="section-box" style="margin-top:20px">
+      <div class="section-box-title">
+        <span>👥 Lista de usuarios</span>
+        <input type="text" id="adminFiltro" placeholder="Buscar por email o nombre..." oninput="renderUsersAdmin()" style="background:var(--negro);border:1px solid var(--gris-borde);color:var(--texto-primario);padding:6px 12px;border-radius:6px;font-size:12px;width:240px">
+      </div>
+      <div id="adminUsersList" style="margin-top:14px"></div>
+    </div>
+
+    <!-- Acciones rápidas -->
+    <div class="section-box" style="margin-top:16px">
+      <div class="section-box-title">⚡ Acciones rápidas</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <button onclick="exportarUsuarios()" class="btn-sm-outline" style="padding:10px">📥 Exportar usuarios CSV</button>
+        <button onclick="resetearContadores()" class="btn-sm-outline" style="padding:10px">🔄 Resetear contadores diarios</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ===== TÉRMINOS Y CONDICIONES ===== -->
 <div id="page-terminos" class="page">
   <div style="max-width:760px;margin:0 auto;padding:40px 32px">
@@ -1496,6 +1563,17 @@ let correosCount = 0;
 async function saveToStorage(key, val) {
   try { await window.storage.set(key, JSON.stringify(val)); } catch(e) {}
 }
+// Hash de contraseña con SHA-256 (mejor que texto plano)
+async function hashPassword(pass) {
+  try {
+    const data = new TextEncoder().encode(pass + 'talentoec_salt_2026');
+    const hash = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+  } catch(e) {
+    return 'plain_' + pass; // fallback
+  }
+}
+
 async function getFromStorage(key) {
   try { const r = await window.storage.get(key); return r ? JSON.parse(r.value) : null; } catch(e) { return null; }
 }
@@ -1547,7 +1625,76 @@ async function registrar() {
   const pass = document.getElementById('regPass').value;
   if (!nombre || !email || !pass) { showToast('⚠ Completa todos los campos', true); return; }
   if (pass.length < 6) { showToast('⚠ Contraseña mínimo 6 caracteres', true); return; }
-  currentUser = { nombre, email, tipo: selectedTipo, empresa: document.getElementById('regEmpresa').value, plan: 'free', creado: new Date().toLocaleDateString('es-EC'), stats: { busquedas: 0, correos: 0 } };
+
+  // Validar formato de email
+  const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if (!emailValido) { showToast('⚠ Email inválido', true); return; }
+
+  // Verificar si el email ya está registrado
+  const usuarios = JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}');
+  const emailKey = email.toLowerCase().trim();
+  if (usuarios[emailKey]) {
+    showToast('⚠ Este email ya está registrado. Inicia sesión.', true);
+    setTimeout(() => { document.querySelector('[data-tab="login"]')?.click(); }, 500);
+    return;
+  }
+
+  // Hash simple de contraseña (no es producción real, pero mejor que texto plano)
+  const passHash = await hashPassword(pass);
+
+  // Generar ID único y token de sesión
+  const userId = 'usr_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  const sessionToken = 'tok_' + Date.now() + '_' + Math.random().toString(36).substr(2, 16);
+
+  // Guardar usuario en la "base de datos" local
+  usuarios[emailKey] = {
+    id: userId,
+    nombre, email: emailKey, passHash,
+    tipo: selectedTipo,
+    empresa: document.getElementById('regEmpresa').value,
+    plan: 'basico',
+    creado: new Date().toISOString(),
+    stats: { busquedas: 0, correos: 0 },
+    cvData: null,
+    candidatosGuardados: [],
+    busquedasDiarias: { fecha: '', usadas: 0 }
+  };
+
+  // Asignar rol admin automáticamente a emails específicos
+  const ADMINS = ['ajart6420@gmail.com'];
+  if (ADMINS.includes(emailKey)) {
+    usuarios[emailKey].rol = 'admin';
+    usuarios[emailKey].tipo = 'admin';
+  } else {
+    usuarios[emailKey].rol = 'usuario';
+  }
+
+  localStorage.setItem('talento_usuarios_db', JSON.stringify(usuarios));
+
+  // Limpiar TODOS los datos del usuario anterior
+  localStorage.removeItem('talento_user');
+  localStorage.removeItem('busquedas_dia');
+  localStorage.removeItem('busquedas_fecha');
+  localStorage.removeItem('correos_empleador_mes');
+  localStorage.removeItem('candidatos_guardados');
+  localStorage.removeItem('talento_google_user');
+  busquedasCount = 0;
+  correosCount = 0;
+  cvData = {};
+
+  const ADMINS_LIST = ['ajart6420@gmail.com'];
+  const esAdmin = ADMINS_LIST.includes(emailKey);
+  currentUser = {
+    id: userId,
+    nombre, email: emailKey,
+    tipo: esAdmin ? 'admin' : selectedTipo,
+    rol: esAdmin ? 'admin' : 'usuario',
+    empresa: document.getElementById('regEmpresa').value,
+    plan: esAdmin ? 'pro' : 'basico',
+    creado: new Date().toLocaleDateString('es-EC'),
+    stats: { busquedas: 0, correos: 0 },
+    sessionToken
+  };
   userTipo = selectedTipo;
   await saveToStorage('talento_user', currentUser);
   closeAuth();
@@ -1561,119 +1708,74 @@ async function registrar() {
   }, 600);
 }
 async function iniciarSesion() {
-  const email = document.getElementById('logEmail').value.trim();
+  const email = document.getElementById('logEmail').value.trim().toLowerCase();
   const pass = document.getElementById('logPass').value;
+
   if (!email || !pass) { showToast('⚠ Ingresa email y contraseña', true); return; }
+
+  // Buscar usuario en la base de datos local
+  const usuarios = JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}');
+  const user = usuarios[email];
+
+  if (!user) {
+    showToast('⚠ Este email no está registrado. Crea una cuenta.', true);
+    return;
+  }
+
+  // Verificar contraseña
+  const passHash = await hashPassword(pass);
+  if (user.passHash !== passHash) {
+    showToast('⚠ Contraseña incorrecta', true);
+    return;
+  }
+
+  // Si es otro usuario, limpiar TODO del anterior
   const saved = await getFromStorage('talento_user');
-  if (saved && saved.email === email) {
-    currentUser = saved; userTipo = saved.tipo;
-    if (saved.cvData) { cvData = saved.cvData; }
-    if (saved.stats) { busquedasCount = saved.stats.busquedas||0; correosCount = saved.stats.correos||0; }
-    closeAuth(); setLoggedInUI();
-    showToast('✓ Sesión iniciada');
-    setTimeout(() => {
-      showPage(userTipo);
-      if (saved.cvData) mostrarCVGuardado(); if (typeof updateStats === 'function') updateStats();
-      updateStats(); updateLimitBar();
-      // Autocompletar campos con datos de cuenta
-      if (document.getElementById('cvNombre')) document.getElementById('cvNombre').value = saved.nombre || '';
-      if (document.getElementById('cvEmail')) document.getElementById('cvEmail').value = saved.email || '';
-    }, 600);
-  } else {
-    // Demo: create session anyway
-    currentUser = { nombre: 'Usuario Demo', email, tipo: 'candidato', plan: 'free', stats: { busquedas: 0, correos: 0 } };
-    userTipo = 'candidato';
-    await saveToStorage('talento_user', currentUser);
-    closeAuth(); setLoggedInUI();
-    showToast('✓ Sesión iniciada');
-    setTimeout(() => showPage(userTipo), 600);
+  if (saved && saved.email !== email) {
+    localStorage.removeItem('busquedas_dia');
+    localStorage.removeItem('busquedas_fecha');
+    localStorage.removeItem('correos_empleador_mes');
+    localStorage.removeItem('candidatos_guardados');
+    busquedasCount = 0;
+    correosCount = 0;
+    cvData = {};
   }
-}
-async function loginGoogle() {
-  try {
-    const { data, error } = await supabaseClient.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: 'https://ajart2209.github.io/talentoec-frontend',
-        queryParams: { access_type: 'offline', prompt: 'consent' }
-      }
-    });
-    if (error) throw error;
-  } catch(e) {
-    showToast('⚠ Error al conectar con Google. Intenta de nuevo.', true);
-  }
-}
-function setLoggedInUI() {
-  // Ocultar tab Inicio cuando esta logueado
-  var inicioTab = document.getElementById('ntab-landing');
-  if (inicioTab) inicioTab.style.display = 'none';
-  // Ocultar tab del tipo opuesto al usuario
-  var candTab = document.getElementById('ntab-candidato');
-  var empTab = document.getElementById('ntab-empleador');
-  if (currentUser && currentUser.tipo === 'candidato') {
-    if (empTab) empTab.style.display = 'none';
-    if (candTab) candTab.style.display = '';
-  } else if (currentUser && currentUser.tipo === 'empleador') {
-    if (candTab) candTab.style.display = 'none';
-    if (empTab) empTab.style.display = '';
-  }
-  const nr = document.getElementById('navRight');
-  const initials = currentUser.nombre.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-  const avatarContent = currentUser.avatar
-    ? `<img src="${currentUser.avatar}" style="width:32px;height:32px;border-radius:50%;object-fit:cover">`
-    : initials;
-  nr.innerHTML = `<div class="user-avatar" onclick="toggleProfileMenu()" id="userAvatarBtn">${avatarContent}</div>`;
-  document.getElementById('menuUserName').textContent = currentUser.nombre;
-  document.getElementById('menuUserEmail').textContent = currentUser.email;
-  document.getElementById('candWelcome').textContent = 'Hola, ' + currentUser.nombre.split(' ')[0] + ' 👋';
-  document.getElementById('empWelcome').textContent = 'Panel de ' + (currentUser.empresa || currentUser.nombre);
-}
-function toggleProfileMenu() {
-  document.getElementById('profileMenu').classList.toggle('open');
-}
-document.addEventListener('click', e => {
-  if (!e.target.closest('#profileMenu') && !e.target.closest('#userAvatarBtn'))
-    document.getElementById('profileMenu').classList.remove('open');
-});
-function irMiPerfil() {
-  document.getElementById('profileMenu').classList.remove('open');
-  if (!currentUser) return;
-  const plan = getPlan();
-  // Fill profile fields
-  const n = document.getElementById('perfilNombre');
-  const e = document.getElementById('perfilEmail');
-  const t = document.getElementById('perfilCiudad');
-  const pn = document.getElementById('perfilPlanNombre');
-  const pd = document.getElementById('perfilPlanDetalle');
-  const pb = document.getElementById('perfilBusquedas');
-  const pc = document.getElementById('perfilCorreos');
-  if (n) n.value = currentUser.nombre || '';
-  if (e) e.value = currentUser.email || '';
-  if (t) t.value = currentUser.ciudad || cvData?.ciudad || '';
-  if (pn) pn.textContent = plan.nombre;
-  if (pd) pd.textContent = plan.min + '-' + plan.max + ' correos/día';
-  if (pb) pb.textContent = busquedasCount;
-  if (pc) pc.textContent = correosCount;
-  // Estadísticas detalladas (estimadas en base a métricas reales del mercado)
-  const abiertos = Math.floor(correosCount * 0.42); // 42% tasa de apertura promedio
-  const respondidos = Math.floor(correosCount * 0.08); // 8% tasa de respuesta promedio
-  const pa = document.getElementById('perfilAbiertos');
-  const pr = document.getElementById('perfilRespondidos');
-  if (pa) pa.textContent = abiertos;
-  if (pr) pr.textContent = respondidos;
-  showPage('perfil');
+
+  // Cargar datos del usuario
+  const sessionToken = 'tok_' + Date.now() + '_' + Math.random().toString(36).substr(2, 16);
+  const ADMINS_LIST = ['ajart6420@gmail.com'];
+  const esAdmin = ADMINS_LIST.includes(email);
+
+  currentUser = {
+    id: user.id,
+    nombre: user.nombre,
+    email: email,
+    tipo: esAdmin ? 'admin' : user.tipo,
+    rol: esAdmin ? 'admin' : (user.rol || 'usuario'),
+    empresa: user.empresa || '',
+    plan: user.plan || 'basico',
+    creado: user.creado,
+    stats: user.stats || { busquedas: 0, correos: 0 },
+    sessionToken
+  };
+  userTipo = currentUser.tipo;
+  busquedasCount = currentUser.stats.busquedas || 0;
+  correosCount = currentUser.stats.correos || 0;
+  cvData = user.cvData || {};
+
+  await saveToStorage('talento_user', currentUser);
+  closeAuth();
+  setLoggedInUI();
+  showToast('✓ Sesión iniciada. Bienvenido ' + currentUser.nombre.split(' ')[0]);
+  setTimeout(() => {
+    showPage(userTipo);
+    if (cvData) mostrarCVGuardado();
+    if (typeof updateStats === 'function') updateStats();
+    if (typeof updateLimitBar === 'function') updateLimitBar();
+  }, 600);
 }
 
-async function guardarPerfil() {
-  const nombre = document.getElementById('perfilNombre').value.trim();
-  if (!nombre) { showToast('⚠ El nombre no puede estar vacío', true); return; }
-  currentUser.nombre = nombre;
-  const ciudad = document.getElementById('perfilCiudad')?.value.trim();
-  if (ciudad) currentUser.ciudad = ciudad;
-  await saveToStorage('talento_user', currentUser);
-  setLoggedInUI();
-  showToast('✓ Perfil actualizado');
-}
+
 async function cerrarSesion() {
   currentUser = null;
   document.getElementById('navRight').innerHTML = `<button class="btn-nav-login" onclick="openAuth('login')">Iniciar sesión</button><button class="btn-nav-cta" onclick="openAuth('register')">Registrarse gratis</button>`;
@@ -1697,11 +1799,18 @@ function goHome() { showPage('landing'); }
 // ======= PAGES =======
 function showPage(page) {
   // Protección de páginas - requieren login
-  const paginasProtegidas = ['candidato', 'empleador', 'perfil'];
+  const paginasProtegidas = ['candidato', 'empleador', 'perfil', 'admin'];
   if (paginasProtegidas.includes(page) && !currentUser) {
     openAuth('register');
     return;
   }
+  // Solo admin puede entrar a /admin
+  if (page === 'admin' && currentUser && currentUser.rol !== 'admin') {
+    showToast('⚠ Acceso restringido a administradores', true);
+    return;
+  }
+  // Cargar datos del admin si entra a esa página
+  if (page === 'admin') setTimeout(cargarDatosAdmin, 100);
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
   document.querySelectorAll('.ntab').forEach(b => b.classList.remove('active'));
@@ -2491,6 +2600,124 @@ async function generarCarta() {
     await saveToStorage('talento_user', currentUser);
   }
   showToast('✓ Carta generada y guardada');
+}
+
+// ── Funciones del panel de administrador ─────────
+function cargarDatosAdmin() {
+  const usuarios = JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}');
+  const lista = Object.values(usuarios);
+  document.getElementById('adminTotalUsers').textContent = lista.length;
+  document.getElementById('adminCandidatos').textContent = lista.filter(u => u.tipo === 'candidato').length;
+  document.getElementById('adminEmpleadores').textContent = lista.filter(u => u.tipo === 'empleador').length;
+
+  // Calcular ingresos estimados del mes
+  const precios = { basico: 9.99, estandar: 19.99, pro: 34.99, emp_basico: 49, emp_pro: 149, emp_enterprise: 399 };
+  const ingresos = lista.reduce((sum, u) => sum + (precios[u.plan] || 0), 0);
+  document.getElementById('adminIngresos').textContent = '$' + ingresos.toFixed(2);
+
+  // Stats agregados
+  const totBusq = lista.reduce((s, u) => s + (u.stats?.busquedas || 0), 0);
+  const totCorr = lista.reduce((s, u) => s + (u.stats?.correos || 0), 0);
+  document.getElementById('adminBusquedas').textContent = totBusq;
+  document.getElementById('adminCorreos').textContent = totCorr;
+
+  // Conversion: usuarios con plan pago / total
+  const pagos = lista.filter(u => u.plan && u.plan !== 'free').length;
+  const conv = lista.length ? Math.round((pagos / lista.length) * 100) : 0;
+  document.getElementById('adminConversion').textContent = conv + '%';
+
+  renderUsersAdmin();
+}
+
+function renderUsersAdmin() {
+  const usuarios = JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}');
+  const filtro = document.getElementById('adminFiltro')?.value.toLowerCase() || '';
+  const lista = Object.values(usuarios).filter(u =>
+    u.email.toLowerCase().includes(filtro) || (u.nombre || '').toLowerCase().includes(filtro)
+  );
+
+  const el = document.getElementById('adminUsersList');
+  if (!lista.length) {
+    el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--texto-secundario)">No hay usuarios que coincidan</div>';
+    return;
+  }
+
+  el.innerHTML = `
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead>
+          <tr style="background:var(--negro);color:var(--texto-secundario);font-size:11px;text-transform:uppercase">
+            <th style="padding:10px;text-align:left">Nombre</th>
+            <th style="padding:10px;text-align:left">Email</th>
+            <th style="padding:10px;text-align:left">Tipo</th>
+            <th style="padding:10px;text-align:left">Plan</th>
+            <th style="padding:10px;text-align:left">Búsquedas</th>
+            <th style="padding:10px;text-align:left">Correos</th>
+            <th style="padding:10px;text-align:left">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${lista.map(u => `
+            <tr style="border-bottom:1px solid var(--gris-borde)">
+              <td style="padding:10px">${u.nombre || '-'}</td>
+              <td style="padding:10px;color:var(--texto-secundario);font-size:12px">${u.email}</td>
+              <td style="padding:10px"><span style="background:${u.rol === 'admin' ? 'rgba(245,230,66,0.15);color:var(--amarillo)' : u.tipo === 'candidato' ? 'rgba(59,130,246,0.15);color:var(--azul)' : 'rgba(0,196,140,0.15);color:var(--verde)'};padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">${u.rol === 'admin' ? 'ADMIN' : u.tipo}</span></td>
+              <td style="padding:10px">${u.plan || 'free'}</td>
+              <td style="padding:10px;color:var(--verde)">${u.stats?.busquedas || 0}</td>
+              <td style="padding:10px;color:var(--verde)">${u.stats?.correos || 0}</td>
+              <td style="padding:10px">
+                <button onclick="cambiarPlanUsuario('${u.email}')" style="background:transparent;border:1px solid var(--gris-borde);color:var(--texto-secundario);padding:4px 8px;border-radius:5px;cursor:pointer;font-size:11px;margin-right:4px">Plan</button>
+                <button onclick="eliminarUsuario('${u.email}')" style="background:transparent;border:1px solid var(--rojo);color:var(--rojo);padding:4px 8px;border-radius:5px;cursor:pointer;font-size:11px">Borrar</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function cambiarPlanUsuario(email) {
+  const usuarios = JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}');
+  const planes = ['basico', 'estandar', 'pro', 'emp_basico', 'emp_pro', 'emp_enterprise'];
+  const planActual = usuarios[email]?.plan || 'basico';
+  const nuevo = prompt('Cambiar plan del usuario.\nPlanes: ' + planes.join(', ') + '\nActual: ' + planActual, planActual);
+  if (nuevo && planes.includes(nuevo)) {
+    usuarios[email].plan = nuevo;
+    localStorage.setItem('talento_usuarios_db', JSON.stringify(usuarios));
+    showToast('✓ Plan actualizado a ' + nuevo);
+    cargarDatosAdmin();
+  }
+}
+
+function eliminarUsuario(email) {
+  if (!confirm('¿Eliminar usuario ' + email + '? Esta acción no se puede deshacer.')) return;
+  const usuarios = JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}');
+  delete usuarios[email];
+  localStorage.setItem('talento_usuarios_db', JSON.stringify(usuarios));
+  showToast('✓ Usuario eliminado');
+  cargarDatosAdmin();
+}
+
+function exportarUsuarios() {
+  const usuarios = JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}');
+  const lista = Object.values(usuarios);
+  const csv = 'Nombre,Email,Tipo,Plan,Búsquedas,Correos,Creado\n' +
+    lista.map(u => [u.nombre, u.email, u.tipo, u.plan, u.stats?.busquedas || 0, u.stats?.correos || 0, u.creado].join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'usuarios_talentoec.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✓ CSV exportado');
+}
+
+function resetearContadores() {
+  if (!confirm('¿Resetear contadores diarios de TODOS los usuarios?')) return;
+  localStorage.removeItem('busquedas_dia');
+  localStorage.removeItem('busquedas_fecha');
+  showToast('✓ Contadores reseteados');
 }
 
 function descargarCVMejorado() {
