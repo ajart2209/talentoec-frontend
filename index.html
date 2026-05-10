@@ -1620,6 +1620,7 @@ function selectTipo(tipo, el) {
   document.getElementById('empEmpresaField').style.display = tipo === 'empleador' ? 'block' : 'none';
 }
 async function registrar() {
+  try {
   const nombre = document.getElementById('regNombre').value.trim();
   const email = document.getElementById('regEmail').value.trim();
   const pass = document.getElementById('regPass').value;
@@ -1695,17 +1696,22 @@ async function registrar() {
     stats: { busquedas: 0, correos: 0 },
     sessionToken
   };
-  userTipo = selectedTipo;
+  userTipo = currentUser.tipo;
   await saveToStorage('talento_user', currentUser);
   closeAuth();
   setLoggedInUI();
   showToast('✓ Cuenta creada. ¡Bienvenido ' + nombre + '!');
   setTimeout(() => {
-    showPage(userTipo);
-    // Autocompletar campos con datos de la cuenta recién creada
+    // Si es admin, ir al panel admin, sino al dashboard correspondiente
+    const destino = currentUser.rol === 'admin' ? 'admin' : userTipo;
+    showPage(destino);
     if (document.getElementById('cvNombre')) document.getElementById('cvNombre').value = nombre;
     if (document.getElementById('cvEmail')) document.getElementById('cvEmail').value = email;
   }, 600);
+  } catch(err) {
+    console.error('Error en registro:', err);
+    showToast('⚠ Error: ' + err.message, true);
+  }
 }
 async function iniciarSesion() {
   const email = document.getElementById('logEmail').value.trim().toLowerCase();
