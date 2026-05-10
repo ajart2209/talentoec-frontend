@@ -1646,6 +1646,9 @@ async function guardarPerfil() {
 async function cerrarSesion() {
   currentUser = null;
   document.getElementById('navRight').innerHTML = `<button class="btn-nav-login" onclick="openAuth('login')">Iniciar sesión</button><button class="btn-nav-cta" onclick="openAuth('register')">Registrarse gratis</button>`;
+  // Mostrar de nuevo el tab Inicio al cerrar sesión
+  const inicioTab = document.getElementById('ntab-landing');
+  if (inicioTab) inicioTab.style.display = '';
   showPage('landing');
   document.getElementById('profileMenu').classList.remove('open');
   showToast('Sesión cerrada');
