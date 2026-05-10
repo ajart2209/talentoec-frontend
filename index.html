@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TalentoEC">
-<meta name="description" content="Encuentra trabajo en Ecuador con IA. Subí tu CV y nosotros buscamos por vos.">
+<meta name="description" content="TalentoEC by Proyectart. Encuentra trabajo en Ecuador con tecnología avanzada. Subí tu CV y nosotros buscamos por vos.">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%2300C48C'/%3E%3Ctext x='90' y='115' font-family='Arial,sans-serif' font-size='90' font-weight='bold' fill='%230A0F0D' text-anchor='middle'%3ETE%3C/text%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -298,7 +298,10 @@ if (window.pdfjsLib) {
 <body>
 
 <nav>
-  <div class="logo" onclick="goHome()">TalentoEC <span class="logo-badge">ECUADOR</span></div>
+  <div class="logo" onclick="goHome()" style="flex-direction:column;align-items:flex-start;gap:0">
+    <div style="display:flex;align-items:center;gap:8px">TalentoEC <span class="logo-badge">ECUADOR</span></div>
+    <div style="font-size:9px;color:var(--texto-secundario);font-weight:400;font-family:'DM Sans',sans-serif;letter-spacing:.05em;margin-top:-2px">by Proyectart</div>
+  </div>
   <div class="nav-center" id="navCenter">
     <button class="ntab active" onclick="showPage('landing')" id="ntab-landing">Inicio</button>
     <button class="ntab" onclick="requireAuth('candidato')" id="ntab-candidato">Candidatos</button>
@@ -430,9 +433,9 @@ if (window.pdfjsLib) {
         </div>
         <ul class="plan-features">
           <li>Análisis completo de CV </li>
-          <li>10 búsquedas por mes</li>
+          <li>5 búsquedas por día</li>
           <li>Correos personalizados por TalentoEC</li>
-          <li>5 fuentes de búsqueda</li>
+          <li>Búsqueda en todas las fuentes ecuatorianas</li>
           <li>Historial de correos enviados</li>
         </ul>
         <button class="btn-plan" onclick="abrirPago('Básico','9.99')">Contratar con PayPhone</button>
@@ -456,9 +459,9 @@ if (window.pdfjsLib) {
         </div>
         <ul class="plan-features">
           <li>Todo del plan Básico</li>
-          <li>30 búsquedas por mes</li>
+          <li>10 búsquedas por día</li>
           <li>Web search en tiempo real</li>
-          <li>15 fuentes de búsqueda</li>
+          <li>Búsqueda en todas las fuentes ecuatorianas</li>
           <li>Perfil destacado para empleadores</li>
           <li>Seguimiento de respuestas</li>
         </ul>
@@ -482,8 +485,8 @@ if (window.pdfjsLib) {
         </div>
         <ul class="plan-features">
           <li>Todo del plan Estándar</li>
-          <li>Búsquedas ilimitadas</li>
-          <li>+50 fuentes de búsqueda</li>
+          <li>20 búsquedas por día</li>
+          <li>Búsqueda en todas las fuentes ecuatorianas</li>
           <li>Perfil destacado prioritario</li>
           <li>Carta de presentación </li>
           <li>Reporte de aperturas de correo</li>
@@ -580,7 +583,7 @@ if (window.pdfjsLib) {
   <!-- Footer con T&C -->
   <div style="text-align:center;padding:20px 40px 40px;border-top:1px solid var(--gris-borde);margin-top:20px">
     <div style="font-size:12px;color:var(--texto-secundario)">
-      © 2026 TalentoEC · Ecuador · 
+      © 2026 TalentoEC · Una empresa de Proyectart · Ecuador · 
       <span onclick="showPage('terminos')" style="color:var(--verde);cursor:pointer;text-decoration:underline">Términos y Condiciones</span>
        · 
       <span style="color:var(--texto-secundario)">info@talentoec.com</span>
@@ -600,7 +603,11 @@ if (window.pdfjsLib) {
     </div>
 
     <div class="dash-cards">
-      <div class="dash-card"><div class="dash-card-num" id="statBusquedas">0</div><div class="dash-card-label">Búsquedas realizadas</div></div>
+      <div class="dash-card">
+        <div class="dash-card-num" id="statBusquedas">0</div>
+        <div class="dash-card-label">Búsquedas realizadas</div>
+        <div id="busquedasDia" style="font-size:10px;margin-top:4px;font-weight:600;color:var(--verde)"></div>
+      </div>
       <div class="dash-card"><div class="dash-card-num" id="statCorreos">0</div><div class="dash-card-label">Correos enviados hoy</div></div>
       <div class="dash-card"><div class="dash-card-num" id="statMatch">—</div><div class="dash-card-label">Match promedio</div></div>
     </div>
@@ -654,10 +661,7 @@ if (window.pdfjsLib) {
             <span class="fmt-badge">PDF</span><span class="fmt-badge">DOCX</span><span class="fmt-badge">TXT</span>
           </div>
         </div>
-        <div class="field">
-          <label>O pega el texto de tu CV aquí</label>
-          <textarea id="cvText" placeholder="Nombre, experiencia, habilidades, educación, contacto..."></textarea>
-        </div>
+        <textarea id="cvText" style="display:none"></textarea>
         <div class="form-row" style="margin-top:14px">
           <div class="field"><label>Nombre completo</label><input type="text" id="cvNombre" placeholder="Juan Pérez"></div>
           <div class="field"><label>Email de contacto</label><input type="email" id="cvEmail" placeholder="juan@gmail.com"></div>
@@ -698,13 +702,9 @@ if (window.pdfjsLib) {
               <option>Toda la república</option>
             </select>
           </div>
-                  <div class="field">
-            <label>Área(s) profesional(es)</label>
-            <div style="background:var(--negro);border:1px solid var(--gris-borde);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--texto-secundario);margin-bottom:6px">
-              Detectamos tus áreas automáticamente al analizar tu CV
-            </div>
-            <div id="areasDetectadas" style="display:none">
-              <div style="font-size:11px;color:var(--texto-secundario);margin-bottom:8px">Selecciona las áreas para buscar trabajo:</div>
+                  <div class="field" style="margin-top:0">
+            <div id="areasDetectadas" style="display:none;background:rgba(0,196,140,0.06);border:1px solid rgba(0,196,140,0.2);border-radius:10px;padding:14px 16px">
+              <div style="font-size:12px;color:var(--verde);margin-bottom:10px;font-weight:600">✓ Áreas detectadas en tu CV</div>
               <div id="areasChips" style="display:flex;flex-wrap:wrap;gap:8px"></div>
             </div>
             <input type="hidden" id="cvArea" value="">
@@ -759,9 +759,14 @@ if (window.pdfjsLib) {
         <div id="cvDetectadoBanner" style="display:none;background:rgba(0,196,140,0.08);border:1px solid rgba(0,196,140,0.2);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--verde)">
           ✦ Búsqueda autocompletada con tu CV guardado — puedes editarla
         </div>
-        <div class="field">
+        <div class="field" style="position:relative">
           <label>¿Qué tipo de trabajo buscas?</label>
-          <input type="text" id="busquedaQuery" placeholder="Ej: Desarrollador web full stack con React en Quito...">
+          <input type="text" id="busquedaQuery"
+            placeholder="Ej: Ingeniero, Contador, Desarrollador..."
+            oninput="mostrarSugerenciasCand(this.value)"
+            onblur="setTimeout(cerrarSugerenciasCand,200)"
+            autocomplete="off">
+          <div id="busquedaSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--gris-oscuro);border:1px solid var(--verde);border-radius:0 0 10px 10px;z-index:50;max-height:280px;overflow-y:auto"></div>
         </div>
         <div class="form-row">
           <div class="field"><label>Ciudad preferida</label>
@@ -1340,7 +1345,7 @@ if (window.pdfjsLib) {
     <div style="background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:14px;padding:28px;font-size:14px;line-height:1.8;color:var(--texto-secundario)">
 
       <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">1. Aceptación de los términos</h2>
-      <p style="margin:0 0 20px">Al registrarse y utilizar TalentoEC, usted acepta estos Términos y Condiciones en su totalidad. Si no está de acuerdo con alguno de estos términos, no debe utilizar nuestros servicios. TalentoEC es una plataforma de búsqueda de empleo con sede en Ecuador, operada bajo las leyes de la República del Ecuador.</p>
+      <p style="margin:0 0 20px">Al registrarse y utilizar TalentoEC, usted acepta estos Términos y Condiciones en su totalidad. Si no está de acuerdo con alguno de estos términos, no debe utilizar nuestros servicios. TalentoEC es una plataforma de búsqueda de empleo desarrollada por Proyectart, con sede en Ecuador, operada bajo las leyes de la República del Ecuador.</p>
 
       <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">2. Descripción del servicio</h2>
       <p style="margin:0 0 20px">TalentoEC es una plataforma tecnológica que ayuda a candidatos ecuatorianos a encontrar empleo mediante búsqueda automatizada en internet y generación de correos de postulación. También permite a empresas encontrar candidatos para sus vacantes. El servicio opera en todo el territorio ecuatoriano.</p>
@@ -1401,6 +1406,19 @@ if (window.pdfjsLib) {
     </div>
   </div>
 </div>
+
+<!-- WhatsApp flotante -->
+<a href="https://wa.me/593982238005?text=Hola,%20necesito%20ayuda%20con%20TalentoEC" target="_blank"
+   style="position:fixed;bottom:20px;right:20px;background:#25D366;color:#fff;width:56px;height:56px;border-radius:50%;
+   display:flex;align-items:center;justify-content:center;text-decoration:none;box-shadow:0 4px 16px rgba(37,211,102,0.4);
+   z-index:998;transition:transform .2s;font-size:0"
+   onmouseover="this.style.transform='scale(1.1)'"
+   onmouseout="this.style.transform='scale(1)'"
+   title="Soporte por WhatsApp">
+  <svg viewBox="0 0 24 24" width="28" height="28" fill="white">
+    <path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.978-1.607zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.149-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+  </svg>
+</a>
 
 <div class="toast" id="toast"></div>
 
@@ -1555,7 +1573,7 @@ async function iniciarSesion() {
     showToast('✓ Sesión iniciada');
     setTimeout(() => {
       showPage(userTipo);
-      if (saved.cvData) mostrarCVGuardado();
+      if (saved.cvData) mostrarCVGuardado(); if (typeof updateStats === 'function') updateStats();
       updateStats(); updateLimitBar();
       // Autocompletar campos con datos de cuenta
       if (document.getElementById('cvNombre')) document.getElementById('cvNombre').value = saved.nombre || '';
@@ -1586,6 +1604,19 @@ async function loginGoogle() {
   }
 }
 function setLoggedInUI() {
+  // Ocultar tab Inicio cuando esta logueado
+  var inicioTab = document.getElementById('ntab-landing');
+  if (inicioTab) inicioTab.style.display = 'none';
+  // Ocultar tab del tipo opuesto al usuario
+  var candTab = document.getElementById('ntab-candidato');
+  var empTab = document.getElementById('ntab-empleador');
+  if (currentUser && currentUser.tipo === 'candidato') {
+    if (empTab) empTab.style.display = 'none';
+    if (candTab) candTab.style.display = '';
+  } else if (currentUser && currentUser.tipo === 'empleador') {
+    if (candTab) candTab.style.display = 'none';
+    if (empTab) empTab.style.display = '';
+  }
   const nr = document.getElementById('navRight');
   const initials = currentUser.nombre.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
   const avatarContent = currentUser.avatar
@@ -1646,9 +1677,13 @@ async function guardarPerfil() {
 async function cerrarSesion() {
   currentUser = null;
   document.getElementById('navRight').innerHTML = `<button class="btn-nav-login" onclick="openAuth('login')">Iniciar sesión</button><button class="btn-nav-cta" onclick="openAuth('register')">Registrarse gratis</button>`;
-  // Mostrar de nuevo el tab Inicio al cerrar sesión
+  // Mostrar de nuevo todos los tabs al cerrar sesión
   const inicioTab = document.getElementById('ntab-landing');
+  const candTab2 = document.getElementById('ntab-candidato');
+  const empTab2 = document.getElementById('ntab-empleador');
   if (inicioTab) inicioTab.style.display = '';
+  if (candTab2) candTab2.style.display = '';
+  if (empTab2) empTab2.style.display = '';
   showPage('landing');
   document.getElementById('profileMenu').classList.remove('open');
   showToast('Sesión cerrada');
@@ -1661,6 +1696,12 @@ function goHome() { showPage('landing'); }
 
 // ======= PAGES =======
 function showPage(page) {
+  // Protección de páginas - requieren login
+  const paginasProtegidas = ['candidato', 'empleador', 'perfil'];
+  if (paginasProtegidas.includes(page) && !currentUser) {
+    openAuth('register');
+    return;
+  }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
   document.querySelectorAll('.ntab').forEach(b => b.classList.remove('active'));
@@ -1785,6 +1826,7 @@ async function handleFile(input) {
           texto += '\n';
         }
         document.getElementById('cvText').value = texto.trim();
+        mostrarCVCargado(file.name, texto.length);
         showToast('✓ PDF cargado correctamente');
       } catch(err) {
         showToast('⚠ Error leyendo PDF. Pega el texto manualmente.', true);
@@ -1801,6 +1843,7 @@ async function handleFile(input) {
         const texto = result.value.trim();
         if (!texto) { showToast('⚠ El archivo Word está vacío', true); return; }
         document.getElementById('cvText').value = texto;
+        mostrarCVCargado(file.name, texto.length);
         showToast('✓ Word cargado correctamente');
       } catch(err) {
         showToast('⚠ Error leyendo Word. Pega el texto manualmente.', true);
@@ -1813,6 +1856,7 @@ async function handleFile(input) {
     const reader = new FileReader();
     reader.onload = e => {
       document.getElementById('cvText').value = e.target.result.trim();
+      mostrarCVCargado(file.name, e.target.result.length);
       showToast('✓ Archivo de texto cargado');
     };
     reader.readAsText(file, 'UTF-8');
@@ -1821,6 +1865,25 @@ async function handleFile(input) {
   } else {
     showToast('⚠ Formato no soportado. Usa PDF, Word o TXT.', true);
   }
+}
+
+function mostrarCVCargado(nombre, longitud) {
+  let info = document.getElementById('cvLoadedInfo');
+  if (!info) {
+    info = document.createElement('div');
+    info.id = 'cvLoadedInfo';
+    info.style.cssText = 'background:rgba(0,196,140,0.08);border:1px solid rgba(0,196,140,0.3);border-radius:10px;padding:14px 16px;margin-top:14px;display:flex;align-items:center;gap:12px';
+    const upload = document.querySelector('.upload-zone');
+    if (upload && upload.parentNode) upload.parentNode.insertBefore(info, upload.nextSibling);
+  }
+  const palabras = Math.round(longitud / 6);
+  info.innerHTML = `
+    <span style="background:var(--verde);color:var(--negro);width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">✓</span>
+    <div style="flex:1">
+      <div style="font-size:13px;font-weight:600;color:var(--verde)">${nombre}</div>
+      <div style="font-size:11px;color:var(--texto-secundario);margin-top:2px">~${palabras} palabras detectadas · Listo para analizar</div>
+    </div>
+  `;
 }
 
 function handleDrop(e) {
@@ -1983,6 +2046,24 @@ ${area}, Ecuador, ${ciudad}, profesional, experiencia, tiempo completo, empresas
 
 async function buscarEmpleo() {
   if (!currentUser) { openAuth('register'); return; }
+
+  // Verificar limite diario de busquedas
+  const limites = { basico: 5, estandar: 10, pro: 20, emp_basico: 999, emp_pro: 999, emp_enterprise: 999 };
+  const planUser = (currentUser && currentUser.plan) || 'basico';
+  const maxDiario = limites[planUser] || 5;
+  const hoy = new Date().toDateString();
+  if (localStorage.getItem('busquedas_fecha') !== hoy) {
+    localStorage.setItem('busquedas_fecha', hoy);
+    localStorage.setItem('busquedas_dia', '0');
+  }
+  const usadasHoy = parseInt(localStorage.getItem('busquedas_dia') || '0');
+  if (usadasHoy >= maxDiario) {
+    mostrarLimiteAlcanzado(maxDiario);
+    return;
+  }
+  localStorage.setItem('busquedas_dia', String(usadasHoy + 1));
+  busquedasCount++;
+
   const query = document.getElementById('busquedaQuery').value.trim();
   if (!query) { showToast('⚠ Describe qué trabajo buscas', true); return; }
   const ciudad = document.getElementById('busquedaCiudad').value;
@@ -2011,7 +2092,6 @@ async function buscarEmpleo() {
     const clean = text.replace(/```json|```/g,'').trim();
     const parsed = JSON.parse(clean);
     anim.classList.remove('visible');
-    busquedasCount++;
     if (currentUser) { currentUser.stats = currentUser.stats||{}; currentUser.stats.busquedas = busquedasCount; await saveToStorage('talento_user', currentUser); }
     updateStats(parsed.jobs);
     renderJobCards(parsed.jobs);
@@ -2025,7 +2105,6 @@ async function buscarEmpleo() {
       {cargo:'Desarrollador Backend', empresa:'Banco Pichincha', ciudad:'Quito', salario:'$1,600-2,200', fuente:'Computrabajo', match:82, email:'rrhh@pichincha.com', descripcion:'Desarrollo y mantenimiento de microservicios para plataforma digital del banco.', url:'https://computrabajo.com.ec'},
       {cargo:'Analista Programador', empresa:'CNT Ecuador', ciudad:'Quito', salario:'$1,400-1,800', fuente:'OLX Ecuador', match:78, email:'empleo@cnt.gob.ec', descripcion:'Desarrollar soluciones tecnológicas para telecomunicaciones.', url:'https://olx.com.ec'}
     ];
-    busquedasCount++;
     updateStats(demoJobs);
     renderJobCards(demoJobs);
     showToast('Procesando — conecta API key para búsqueda real');
@@ -2034,7 +2113,13 @@ async function buscarEmpleo() {
 
 function renderJobCards(jobs) {
   const el = document.getElementById('candResultados');
-  el.innerHTML = `<div style="font-size:12px;color:var(--texto-secundario);margin-bottom:14px">${jobs.length} oportunidades encontradas en Ecuador</div>` +
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+      <div style="font-size:12px;color:var(--texto-secundario)">${jobs.length} oportunidades encontradas en Ecuador</div>
+      <button onclick="candTab('busqueda')" style="background:var(--verde);color:var(--negro);border:none;padding:8px 16px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px">
+        🔍 Nueva búsqueda
+      </button>
+    </div>` +
     jobs.map((j,i)=>`
     <div class="job-card" style="animation:fadeIn .4s ease ${i*.08}s forwards;opacity:0">
       <div class="job-card-top">
@@ -2421,6 +2506,29 @@ function descargarCVMejorado() {
   showToast('✓ CV descargado y guardado en tu cuenta');
 }
 
+function mostrarLimiteAlcanzado(maxDiario) {
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  modal.innerHTML = `
+    <div style="background:var(--gris-oscuro);border:1px solid var(--rojo);border-radius:16px;padding:32px;max-width:420px;text-align:center">
+      <div style="width:64px;height:64px;background:rgba(255,77,109,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:32px">⏰</div>
+      <h3 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin:0 0 10px;color:var(--texto-primario)">Límite diario alcanzado</h3>
+      <p style="color:var(--texto-secundario);font-size:14px;line-height:1.6;margin:0 0 20px">
+        Ya usaste tus <strong style="color:var(--verde)">${maxDiario} búsquedas</strong> de hoy con tu plan actual.
+        Vuelve mañana o mejora tu plan para más búsquedas diarias.
+      </p>
+      <div style="background:var(--negro);border-radius:10px;padding:12px;margin-bottom:20px;text-align:left;font-size:12px;color:var(--texto-secundario)">
+        💡 <strong style="color:var(--texto-primario)">Tu cuenta de búsquedas se reinicia cada día a las 00:00</strong>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button onclick="this.closest('div[style*=fixed]').remove()" style="flex:1;background:var(--gris-medio);border:1px solid var(--gris-borde);color:var(--texto-secundario);padding:12px;border-radius:8px;cursor:pointer">Cerrar</button>
+        <button onclick="this.closest('div[style*=fixed]').remove();showPage('landing');setTimeout(()=>document.querySelector('.planes-section')?.scrollIntoView({behavior:'smooth'}),300)" style="flex:1;background:var(--verde);color:var(--negro);border:none;padding:12px;border-radius:8px;cursor:pointer;font-weight:700">Mejorar plan →</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
 async function ejecutarCorreosFrio() {
   if (!currentUser) { openAuth('register'); return; }
   const sector = document.getElementById('frioSector').value;
@@ -2625,6 +2733,30 @@ function updateStats(jobs) {
     const avg = Math.round(jobs.reduce((s,j)=>s+j.match,0)/jobs.length);
     document.getElementById('statMatch').textContent = avg + '%';
   }
+  // Mostrar búsquedas diarias restantes
+  const limites = { basico: 5, estandar: 10, pro: 20, emp_basico: 999, emp_pro: 999, emp_enterprise: 999 };
+  const planUser = currentUser?.plan || 'basico';
+  const maxDiario = limites[planUser] || 5;
+  const hoy = new Date().toDateString();
+  if (localStorage.getItem('busquedas_fecha') !== hoy) {
+    localStorage.setItem('busquedas_fecha', hoy);
+    localStorage.setItem('busquedas_dia', '0');
+  }
+  const usadas = parseInt(localStorage.getItem('busquedas_dia') || '0');
+  const restantes = maxDiario - usadas;
+  const el = document.getElementById('busquedasDia');
+  if (el) {
+    if (restantes <= 0) {
+      el.textContent = '⏰ Límite diario alcanzado';
+      el.style.color = 'var(--rojo)';
+    } else if (restantes <= 2) {
+      el.textContent = '⚠ ' + restantes + ' restantes hoy';
+      el.style.color = 'var(--amarillo)';
+    } else {
+      el.textContent = usadas + ' / ' + maxDiario + ' búsquedas hoy';
+      el.style.color = 'var(--verde)';
+    }
+  }
   updateLimitBar();
 }
 
@@ -2790,42 +2922,201 @@ setTimeout(() => {
 // ── Autocompletado buscador empleador ─────────────────────
 // Base de sugerencias con palabras clave para búsqueda inteligente
 const SUGERENCIAS_BASE = [
+  // INGENIERÍA
   { texto:'Ingeniero de sistemas / software senior', tags:['ing','sis','soft','tech','tecno','sistema','programador','dev'] },
-  { texto:'Ingeniero civil con experiencia en construcción', tags:['ing','civil','construc','obra','arquitect'] },
+  { texto:'Ingeniero civil con experiencia en construcción', tags:['ing','civil','construc','obra'] },
   { texto:'Ingeniero industrial para manufactura', tags:['ing','indus','manufactur','planta','produc'] },
-  { texto:'Ingeniero eléctrico en Guayaquil', tags:['ing','elec','electr','guaya'] },
-  { texto:'Ingeniero mecánico con 5 años de experiencia', tags:['ing','mec','mecanic'] },
-  { texto:'Ingeniero químico para industria', tags:['ing','quim','quimic','industria'] },
-  { texto:'Contador CPA con experiencia en auditoría', tags:['cont','cpa','audit','contad'] },
-  { texto:'Contador general para empresa mediana', tags:['cont','contad','general','empresa'] },
-  { texto:'Contador público con conocimiento tributario', tags:['cont','tribut','impuest','sri'] },
-  { texto:'Administrador de empresas para gerencia', tags:['admin','gerenc','empresa','direct'] },
-  { texto:'Administrador financiero en Quito', tags:['admin','financ','quito','finanz'] },
+  { texto:'Ingeniero eléctrico / electromecánico', tags:['ing','elec','electr','electro'] },
+  { texto:'Ingeniero mecánico con experiencia', tags:['ing','mec','mecanic'] },
+  { texto:'Ingeniero químico para industria alimentaria', tags:['ing','quim','quimic','aliment'] },
+  { texto:'Ingeniero ambiental / sostenibilidad', tags:['ing','amb','ambient','eco','sostenib','medio'] },
+  { texto:'Ingeniero agrónomo / agropecuario', tags:['ing','agro','agron','agropec','campo'] },
+  { texto:'Ingeniero petrolero / minero', tags:['ing','petro','min','miner','oil'] },
+  // DESARROLLO Y TECH
   { texto:'Desarrollador web full stack con React', tags:['dev','desa','web','react','full','stack','program'] },
-  { texto:'Desarrollador backend con Node.js Python', tags:['dev','desa','back','node','python','program'] },
-  { texto:'Desarrollador móvil Android iOS', tags:['dev','desa','movil','android','ios','app','program'] },
-  { texto:'Diseñador gráfico con experiencia en branding', tags:['dise','graph','brand','creativ','visual'] },
-  { texto:'Diseñador UX/UI para aplicaciones web', tags:['dise','ux','ui','interfaz','web'] },
-  { texto:'Marketing digital con redes sociales', tags:['market','digital','redes','social','publi','comunic'] },
-  { texto:'Ventas y atención al cliente bilingüe', tags:['vent','vend','client','aten','comerc'] },
-  { texto:'Recursos humanos para empresa grande', tags:['rrhh','recurso','human','talento','personal','hr'] },
-  { texto:'Médico general para clínica privada', tags:['med','medic','doctor','clinic','salud'] },
-  { texto:'Abogado corporativo con experiencia tributaria', tags:['abog','legal','derech','juridi','law'] },
-  { texto:'Arquitecto para proyectos residenciales', tags:['arqu','arquit','diseño','construc','proyecto'] },
-  { texto:'Economista con experiencia en finanzas', tags:['econ','financ','finanz','banca','invers'] },
-  { texto:'Psicólogo organizacional para empresa', tags:['psic','psicol','organ','conduct','mental'] },
-  { texto:'Logística y supply chain en Guayaquil', tags:['logis','supply','cadena','bodeg','almac','import'] },
-  { texto:'Chef ejecutivo para restaurante', tags:['chef','cocin','gastrono','restaur','aliment'] },
-  { texto:'Docente universitario en ingeniería', tags:['docen','profes','enseñ','univers','acade'] },
-  { texto:'Mecánico automotriz con certificación', tags:['mecan','auto','carro','vehic','motor','automo'] },
-  { texto:'Electricista industrial con experiencia', tags:['electric','electr','indust','instal','panel'] },
-  { texto:'Enfermera titulada con experiencia clínica', tags:['enfer','salud','clinic','hospital','medic'] },
-  { texto:'Farmacéutico para cadena de farmacias', tags:['farma','farm','medic','salud','drug'] },
-  { texto:'Analista financiero con manejo de Excel', tags:['analis','financ','excel','datos','report'] },
+  { texto:'Desarrollador backend con Node.js Python', tags:['dev','desa','back','node','python','program','api'] },
+  { texto:'Desarrollador móvil Android iOS Flutter', tags:['dev','desa','movil','mobile','android','ios','app','flutter','react native'] },
+  { texto:'Desarrollador frontend Vue Angular React', tags:['dev','desa','front','vue','angular','react','ui'] },
+  { texto:'DevOps Engineer con AWS y Docker', tags:['devops','aws','azure','docker','kubernetes','cloud','infra'] },
+  { texto:'Data Scientist con Python y machine learning', tags:['data','ciencia','python','ml','ia','machine','science'] },
+  { texto:'Analista de datos con Power BI', tags:['analis','datos','data','bi','power','tableau','excel'] },
+  { texto:'Ingeniero en ciberseguridad', tags:['ciber','seguridad','security','hack','pentest','soc'] },
+  { texto:'QA Tester / Automation Engineer', tags:['qa','tester','test','calidad','automation','selenium'] },
+  { texto:'Técnico en redes y comunicaciones Cisco', tags:['tecn','redes','network','cisco','comunic','inform'] },
+  { texto:'Administrador de base de datos SQL', tags:['admin','dba','sql','base','datos','postgres','mysql','oracle'] },
+  // DISEÑO Y CREATIVO
+  { texto:'Diseñador gráfico con experiencia en branding', tags:['dise','design','graf','graph','brand','creativ','visual'] },
+  { texto:'Diseñador UX/UI para apps y web', tags:['dise','ux','ui','interfaz','figma','sketch','prototyp'] },
+  { texto:'Diseñador web / desarrollador frontend', tags:['dise','web','front','html','css','wordpress'] },
+  { texto:'Diseñador industrial / de producto', tags:['dise','indus','producto','product'] },
+  { texto:'Diseñador de modas / textil', tags:['dise','moda','textil','ropa','fashion'] },
+  { texto:'Animador 2D/3D / motion graphics', tags:['anima','motion','3d','2d','aftereffects','blender','video'] },
+  { texto:'Editor de video / fotografía profesional', tags:['edit','video','foto','fotograf','premiere','photoshop'] },
+  { texto:'Ilustrador digital / artista 2D', tags:['ilus','ilustr','arte','art','dibuj','digital'] },
+  { texto:'Director creativo para agencia', tags:['direc','creativ','art','arte','agencia'] },
+  // MARKETING Y VENTAS
+  { texto:'Marketing digital con redes sociales', tags:['market','digital','redes','social','publi','comunic','sem','seo'] },
+  { texto:'Community Manager para redes sociales', tags:['community','manager','redes','social','content','instagram','tiktok'] },
+  { texto:'Especialista SEO/SEM y Google Ads', tags:['seo','sem','google','ads','adwords','market','digital'] },
+  { texto:'Copywriter / redactor publicitario', tags:['copy','redact','escrit','content','publi','market'] },
+  { texto:'Vendedor / asesor comercial', tags:['vent','vend','comerc','asesor','sales','negocio'] },
+  { texto:'Ejecutivo de ventas B2B / corporativo', tags:['ejecut','vent','b2b','corporat','sales'] },
+  { texto:'Representante de atención al cliente bilingüe', tags:['aten','client','custom','servi','call','center'] },
+  { texto:'Gerente de marketing / brand manager', tags:['gerent','market','brand','manager'] },
+  // ADMINISTRACIÓN Y FINANZAS
+  { texto:'Administrador de empresas para gerencia', tags:['admin','gerenc','empresa','direct','manage'] },
   { texto:'Asistente administrativo bilingüe', tags:['asist','admin','secretar','oficin','bilingue'] },
-  { texto:'Coordinador de proyectos con PMP', tags:['coordin','proyec','pmp','gest','planif'] },
-  { texto:'Data scientist con Python y machine learning', tags:['data','ciencia','python','ml','ia','analis','machine'] },
-  { texto:'Técnico en redes y comunicaciones', tags:['tecn','redes','comunic','network','cisco','inform'] },
+  { texto:'Contador CPA con experiencia en auditoría', tags:['cont','cpa','audit','contad','contab'] },
+  { texto:'Contador general / contabilidad de empresa', tags:['cont','contad','general','contab'] },
+  { texto:'Contador público con conocimiento tributario SRI', tags:['cont','tribut','impuest','sri','fiscal'] },
+  { texto:'Analista financiero / Excel avanzado', tags:['analis','financ','finanz','excel','presupuesto'] },
+  { texto:'Tesorero / cash manager', tags:['tesor','cash','treasury','flujo','caja'] },
+  { texto:'Economista con experiencia en banca', tags:['econ','financ','banca','invers','economist'] },
+  { texto:'Auditor interno / externo', tags:['audit','control','riesgo','sox','interno','externo'] },
+  // RRHH Y LEGAL
+  { texto:'Recursos humanos / talent acquisition', tags:['rrhh','recurso','human','talento','hr','reclut'] },
+  { texto:'Reclutador IT / headhunter', tags:['reclut','headhunt','recurso','talento','hr','seleccion'] },
+  { texto:'Especialista en nómina y beneficios', tags:['nomin','payroll','beneficio','compens','rrhh'] },
+  { texto:'Abogado corporativo / tributario', tags:['abog','legal','derech','juridi','law','corporat'] },
+  { texto:'Abogado laboral / litigios', tags:['abog','labor','litigio','demand','derech'] },
+  // SALUD
+  { texto:'Médico general para clínica privada', tags:['med','medic','doctor','clinic','salud','hospital'] },
+  { texto:'Médico especialista / consulta', tags:['med','medic','especial','consult','doctor'] },
+  { texto:'Enfermera/o titulada con experiencia clínica', tags:['enfer','salud','clinic','hospital','medic'] },
+  { texto:'Odontólogo / dentista', tags:['odon','denti','dent','bucal','clinic'] },
+  { texto:'Psicólogo clínico / organizacional', tags:['psic','psicol','clinic','organ','mental'] },
+  { texto:'Nutricionista / dietista', tags:['nutri','dieti','aliment','salud'] },
+  { texto:'Fisioterapeuta / kinesiólogo', tags:['fisio','kinesio','rehab','terapia'] },
+  { texto:'Farmacéutico / químico farmacéutico', tags:['farma','farm','medic','salud','drug','quim'] },
+  // EDUCACIÓN
+  { texto:'Docente universitario / catedrático', tags:['docen','profes','enseñ','univers','catedrat','acade'] },
+  { texto:'Profesor de inglés / idiomas', tags:['profes','docen','ingl','english','idiom','toefl'] },
+  { texto:'Profesor de matemáticas / ciencias', tags:['profes','docen','matem','math','cienc','fisic','quim'] },
+  { texto:'Profesor de educación inicial / parvularia', tags:['profes','docen','inicial','parvul','niño','educ'] },
+  // GASTRONOMÍA Y HOSPITALIDAD
+  { texto:'Chef ejecutivo para restaurante', tags:['chef','cocin','gastrono','restaur','aliment'] },
+  { texto:'Cocinero / sous chef', tags:['cocin','chef','sous','aliment','restaur'] },
+  { texto:'Bartender / mixólogo', tags:['barten','mix','bar','tragos','cocktail'] },
+  { texto:'Mesero / capitán de meseros', tags:['meser','waiter','restaur','servic'] },
+  { texto:'Hotelería / front desk / recepcionista hotel', tags:['hotel','recep','front','desk','turism'] },
+  { texto:'Guía turístico bilingüe', tags:['guia','turism','tour','bilingue'] },
+  // OPERACIONES Y LOGÍSTICA
+  { texto:'Logística y supply chain', tags:['logis','supply','cadena','bodeg','almac','import','export'] },
+  { texto:'Coordinador de proyectos PMP', tags:['coordin','proyec','pmp','gest','planif','project'] },
+  { texto:'Jefe de bodega / inventarios', tags:['bodeg','almac','invent','wms','logis'] },
+  { texto:'Comercio exterior / aduanas', tags:['comerc','exter','aduan','import','export'] },
+  // OFICIOS TÉCNICOS
+  { texto:'Mecánico automotriz con certificación', tags:['mecan','auto','carro','vehic','motor','automo'] },
+  { texto:'Electricista industrial / residencial', tags:['electric','electr','indust','instal','panel'] },
+  { texto:'Soldador / fabricación metalmecánica', tags:['sold','metal','metalmec','fab','weld'] },
+  { texto:'Maestro de obra / albañil', tags:['maestr','obra','albañ','construc'] },
+  { texto:'Técnico en refrigeración / aire acondicionado', tags:['tecn','refri','frio','aire','clima','hvac'] },
+  { texto:'Conductor profesional / chofer', tags:['conduc','chofer','driver','transport','licen'] },
+  // ARQUITECTURA Y CONSTRUCCIÓN
+  { texto:'Arquitecto para proyectos residenciales', tags:['arqu','arquit','dise','construc','proyect'] },
+  { texto:'Diseñador de interiores / decorador', tags:['dise','interior','decora','space'] },
+  { texto:'Topógrafo / agrimensor', tags:['top','topograf','agrim','mediciόn'] },
+  // PERIODISMO Y COMUNICACIÓN
+  { texto:'Periodista / comunicador social', tags:['period','comunic','redact','prensa','reportaj'] },
+  { texto:'Productor audiovisual / podcast', tags:['produc','audiovis','podcast','video','radio'] },
+  { texto:'Locutor / voice talent', tags:['locu','voice','radio','voz','audio'] },
+,
+// PROFESIONES ADICIONALES
+  { texto:'Otorrinolaringólogo / médico ORL', tags:['otor','otorrin','orl','oido','garganta','nariz','medic'] },
+  { texto:'Cardiólogo / médico cardiovascular', tags:['cardio','corazon','medic','cardiovasc'] },
+  { texto:'Pediatra / médico pediátrico', tags:['pedia','niño','medic'] },
+  { texto:'Ginecólogo / obstetra', tags:['gineco','obstet','mujer','medic'] },
+  { texto:'Dermatólogo / piel', tags:['derma','piel','medic'] },
+  { texto:'Oftalmólogo / oculista', tags:['oftal','ocul','ojo','vista','medic'] },
+  { texto:'Neurólogo / neurocirujano', tags:['neuro','cirujan','cerebro','medic'] },
+  { texto:'Psiquiatra / salud mental', tags:['psiqu','mental','medic','salud'] },
+  { texto:'Traumatólogo / ortopedista', tags:['traumat','ortop','huesos','medic'] },
+  { texto:'Anestesiólogo', tags:['anest','medic','quirof'] },
+  { texto:'Cirujano general / especialista', tags:['ciruj','cirug','quirof','medic'] },
+  { texto:'Veterinario / médico veterinario', tags:['veter','animal','mascota','medic'] },
+  { texto:'Optometrista', tags:['opto','vista','ojo','lentes'] },
+  { texto:'Terapeuta del lenguaje / fonoaudiólogo', tags:['terap','leng','fono','audio','habla'] },
+  { texto:'Tecnólogo médico / laboratorista', tags:['tecnol','medic','labor','clinic'] },
+  { texto:'Auxiliar de enfermería', tags:['auxil','enfer','asist','salud'] },
+
+  // SEGURIDAD
+  { texto:'Guardia de seguridad / vigilante', tags:['guard','segur','vigil','protec'] },
+  { texto:'Jefe de seguridad / supervisor', tags:['jefe','segur','super','vigil'] },
+  { texto:'Seguridad informática / SOC analyst', tags:['segur','infor','soc','ciber','it'] },
+  { texto:'Investigador privado / detective', tags:['invest','priv','detect','segur'] },
+
+  // LIMPIEZA Y MANTENIMIENTO
+  { texto:'Personal de limpieza / aseo general', tags:['limp','aseo','servic','manten'] },
+  { texto:'Conserje / portero edificio', tags:['conser','porter','edifi','vigil'] },
+  { texto:'Jardinero / paisajismo', tags:['jardin','paisa','plant','exterior'] },
+  { texto:'Técnico de mantenimiento general', tags:['manten','tecn','repar','servi'] },
+  { texto:'Plomero / fontanero', tags:['plom','fontan','tuber','agua'] },
+  { texto:'Carpintero / ebanista', tags:['carpin','eban','mader','muebl'] },
+  { texto:'Pintor de casas / brocha gorda', tags:['pint','pintur','casa','brocha'] },
+
+  // BELLEZA Y ESTÉTICA
+  { texto:'Estilista / peluquero', tags:['estil','peluq','cabello','salon','barber'] },
+  { texto:'Maquillador profesional / makeup artist', tags:['maqui','make','makeup','belle'] },
+  { texto:'Manicurista / pedicurista', tags:['mani','pedi','uñas','nail'] },
+  { texto:'Barbero profesional', tags:['barber','peluq','corte','cabello'] },
+  { texto:'Esteticista / cosmetología', tags:['estet','cosme','belle','facial','spa'] },
+  { texto:'Masajista terapéutico', tags:['masaj','spa','terap','relax'] },
+
+  // DEPORTES Y FITNESS
+  { texto:'Entrenador personal / personal trainer', tags:['entren','train','fitness','gym','deport'] },
+  { texto:'Instructor de yoga / pilates', tags:['yoga','pilat','instructor','fitness','meditac'] },
+  { texto:'Profesor de natación', tags:['profes','natac','piscina','swim'] },
+  { texto:'Profesor de baile / coreógrafo', tags:['baile','dance','coreo','salsa'] },
+  { texto:'Nutricionista deportivo', tags:['nutri','deport','fitness','sport'] },
+  { texto:'Preparador físico', tags:['prep','fisic','deport','train'] },
+  { texto:'Árbitro / referee deportivo', tags:['arbit','refer','deport'] },
+
+  // ARTE Y MÚSICA
+  { texto:'Músico profesional / instrumentista', tags:['music','instrum','toca','banda','orquest'] },
+  { texto:'Cantante / vocalista', tags:['cant','voz','vocal','music','singer'] },
+  { texto:'DJ / productor musical', tags:['dj','music','produc','sound','audio'] },
+  { texto:'Profesor de música', tags:['profes','music','piano','guitar','instrum'] },
+  { texto:'Artista plástico / pintor', tags:['arti','plast','pint','arte','obra'] },
+  { texto:'Escultor', tags:['escult','arte','obra'] },
+  { texto:'Tatuador profesional', tags:['tat','tatu','tattoo','arte'] },
+
+  // RELIGIOSO Y SOCIAL
+  { texto:'Trabajador social', tags:['trab','social','servic','comunidad'] },
+  { texto:'Sociólogo / antropólogo', tags:['socio','antrop','social','invest'] },
+  { texto:'Voluntario / cooperante', tags:['volun','coop','social','ong','ayuda'] },
+
+  // AGRICULTURA Y GANADERÍA
+  { texto:'Agricultor / campesino', tags:['agric','campes','campo','siembra'] },
+  { texto:'Ganadero / criador de animales', tags:['ganad','cria','animal','vaca','pollo'] },
+  { texto:'Floricultor / vivero', tags:['flor','viver','rosa','plant'] },
+
+  // PETRÓLEO Y MINERÍA
+  { texto:'Operador de planta petrolera', tags:['oper','planta','petro','oil','gas'] },
+  { texto:'Geólogo / geofísico', tags:['geol','geo','min','petro'] },
+  { texto:'Operador de maquinaria pesada', tags:['oper','maquin','pesad','excavad','grua'] },
+
+  // RETAIL Y COMERCIO
+  { texto:'Cajero / cajera de supermercado', tags:['caj','super','retail','mercado','cobr'] },
+  { texto:'Vendedor de tienda / dependiente', tags:['vend','tienda','depend','retail'] },
+  { texto:'Supervisor de tienda / store manager', tags:['super','tienda','store','retail','manag'] },
+  { texto:'Repositor / surtidor', tags:['repos','surt','tienda','almac'] },
+  { texto:'Visual merchandiser', tags:['visual','merch','tienda','vitrin'] },
+
+  // TRANSPORTE
+  { texto:'Conductor de Uber / taxi', tags:['cond','uber','taxi','chofer','viaje'] },
+  { texto:'Repartidor / delivery / motorizado', tags:['repart','delive','moto','motorizad','envio'] },
+  { texto:'Conductor de bus / camión', tags:['cond','bus','camion','chofer','transport'] },
+  { texto:'Piloto comercial / aviación', tags:['pilot','avion','aviac','comerc'] },
+
+  // EVENTOS Y BODAS
+  { texto:'Wedding planner / organizador de eventos', tags:['wedding','event','boda','organiz'] },
+  { texto:'Fotógrafo de bodas / eventos', tags:['fotograf','foto','boda','event'] },
+  { texto:'Animador de fiestas / show', tags:['anima','fiesta','show','event','infant'] },
+
+  // GENERALES
+  { texto:'Aprendiz / pasante / practicante', tags:['aprend','pasant','practi','intern','junior'] },
+  { texto:'Freelancer / trabajo independiente', tags:['free','indepen','remot','self'] },
+  { texto:'Asistente virtual', tags:['asist','virt','remot','admin'] },
 ];
 
 function mostrarSugerencias(valor) {
@@ -2877,6 +3168,55 @@ function seleccionarSugerencia(texto) {
   document.getElementById('empSearchInput').value = texto;
   cerrarSugerencias();
   buscarCandidatos();
+}
+
+function mostrarSugerenciasCand(valor) {
+  const box = document.getElementById('busquedaSuggestions');
+  if (!valor || valor.length < 2) { box.style.display = 'none'; return; }
+  const v = valor.toLowerCase().trim();
+  const palabras = v.split(/\s+/);
+  const filtradas = SUGERENCIAS_BASE.filter(s => {
+    const textoMatch = s.texto.toLowerCase().includes(v);
+    const tagMatch = palabras.every(p =>
+      s.tags.some(t => t.includes(p) || p.includes(t)) ||
+      s.texto.toLowerCase().includes(p)
+    );
+    return textoMatch || tagMatch;
+  }).slice(0, 7);
+
+  if (!filtradas.length) {
+    box.innerHTML = `<div onclick="seleccionarSugerenciaCand('${valor}')"
+      style="padding:10px 16px;cursor:pointer;font-size:13px;color:var(--texto-secundario);border-bottom:1px solid var(--gris-borde)"
+      onmouseover="this.style.background='rgba(0,196,140,0.08)';this.style.color='var(--verde)'"
+      onmouseout="this.style.background='';this.style.color='var(--texto-secundario)'">
+      🔍 Buscar "<strong style="color:var(--verde)">${valor}</strong>" en Ecuador
+    </div>`;
+    box.style.display = 'block';
+    return;
+  }
+
+  box.innerHTML = filtradas.map(s => {
+    return `<div onclick="seleccionarSugerenciaCand('${s.texto}')"
+      style="padding:10px 16px;cursor:pointer;font-size:13px;color:var(--texto-secundario);border-bottom:1px solid var(--gris-borde)"
+      onmouseover="this.style.background='rgba(0,196,140,0.08)';this.style.color='var(--texto-primario)'"
+      onmouseout="this.style.background='';this.style.color='var(--texto-secundario)'">
+      🔍 ${s.texto}
+    </div>`;
+  }).join('') + `<div onclick="seleccionarSugerenciaCand('${valor}')"
+    style="padding:8px 16px;cursor:pointer;font-size:12px;color:var(--verde);background:rgba(0,196,140,0.05)">
+    Buscar exactamente "<strong>${valor}</strong>"
+  </div>`;
+  box.style.display = 'block';
+}
+
+function seleccionarSugerenciaCand(texto) {
+  document.getElementById('busquedaQuery').value = texto;
+  cerrarSugerenciasCand();
+}
+
+function cerrarSugerenciasCand() {
+  const box = document.getElementById('busquedaSuggestions');
+  if (box) box.style.display = 'none';
 }
 
 function cerrarSugerencias() {
