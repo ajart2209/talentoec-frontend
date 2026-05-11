@@ -1651,13 +1651,24 @@ async function solicitarRecuperacion() {
       body: JSON.stringify({ email })
     });
     if (res.success) {
-      showToast('✓ Código enviado a tu email');
       document.getElementById('step1Recover').style.display = 'none';
       document.getElementById('step2Recover').style.display = 'block';
-      // Para demo, mostrar el código (en producción se envía solo por email)
-      if (res.codigo) {
-        showToast('📧 Código demo: ' + res.codigo);
+
+      const step2 = document.getElementById('step2Recover');
+      const infoDiv = document.createElement('div');
+
+      if (res.emailEnviado) {
+        // Email enviado por Resend
+        infoDiv.style.cssText = 'background:rgba(0,196,140,0.1);border:1px solid var(--verde);border-radius:10px;padding:14px;margin-bottom:14px;text-align:center';
+        infoDiv.innerHTML = '<div style="font-size:14px;color:var(--verde);font-weight:600;margin-bottom:4px">📧 Email enviado</div><div style="font-size:12px;color:var(--texto-secundario)">Revisa tu bandeja de entrada (y spam) para el código de 6 dígitos</div>';
+      } else if (res.codigo) {
+        // Fallback: mostrar código en pantalla
+        infoDiv.style.cssText = 'background:rgba(245,230,66,0.15);border:1px solid var(--amarillo);border-radius:10px;padding:14px;margin-bottom:14px;text-align:center';
+        infoDiv.innerHTML = '<div style="font-size:11px;color:var(--texto-secundario);margin-bottom:6px">📧 TU CÓDIGO:</div><div style="font-size:28px;font-weight:700;color:var(--amarillo);font-family:monospace;letter-spacing:4px">' + res.codigo + '</div>';
+        document.getElementById('recoverCodigo').value = res.codigo;
       }
+      step2.insertBefore(infoDiv, step2.firstChild);
+      showToast('✓ ' + (res.message || 'Código generado'));
     }
   } catch(err) {
     showToast('⚠ ' + err.message, true);
