@@ -2799,7 +2799,7 @@ Saludos cordiales`;
 }
 
 function cerrarEmail() { document.getElementById('emailModal').classList.remove('open'); }
-async async function enviarEmail() {
+async function enviarEmail() {
   const plan = getPlan();
   if (plan.tipo === 'candidato' && !puedeEnviarCorreo()) { cerrarEmail(); return; }
   if (plan.tipo === 'empleador' && plan.correos_mes !== 9999) {
