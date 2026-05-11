@@ -1381,6 +1381,27 @@ if (window.pdfjsLib) {
       </div>
     </div>
 
+    <!-- INDICADOR USO DE RESEND -->
+    <div class="section-box" style="margin-top:16px;background:linear-gradient(135deg,rgba(0,196,140,0.05),rgba(245,230,66,0.05))">
+      <div class="section-box-title">
+        <span>📧 Uso de Resend este mes</span>
+        <span id="resendStatus" style="font-size:11px;padding:3px 10px;border-radius:10px;background:rgba(0,196,140,0.15);color:var(--verde)">Plan Free</span>
+      </div>
+      <div style="margin-top:14px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          <span style="font-size:13px;color:var(--texto-secundario)">Emails enviados</span>
+          <span style="font-size:13px;font-weight:600"><span id="resendUsados">0</span> / <span id="resendLimite">3,000</span></span>
+        </div>
+        <div style="height:10px;background:var(--negro);border-radius:5px;overflow:hidden">
+          <div id="resendBar" style="height:100%;background:var(--verde);border-radius:5px;width:0%;transition:width .5s ease"></div>
+        </div>
+        <div id="resendAlerta" style="margin-top:12px;padding:10px 14px;border-radius:8px;font-size:12px;display:none"></div>
+        <div style="font-size:11px;color:var(--texto-secundario);margin-top:10px">
+          💡 Resend Free: 3,000 emails/mes gratis. Pasados, considera Resend Pro ($20/mes - 50,000 emails) o migrar a Amazon SES.
+        </div>
+      </div>
+    </div>
+
     <!-- Lista de usuarios -->
     <div class="section-box" style="margin-top:20px">
       <div class="section-box-title">
@@ -2778,7 +2799,7 @@ Saludos cordiales`;
 }
 
 function cerrarEmail() { document.getElementById('emailModal').classList.remove('open'); }
-async function enviarEmail() {
+async async function enviarEmail() {
   const plan = getPlan();
   if (plan.tipo === 'candidato' && !puedeEnviarCorreo()) { cerrarEmail(); return; }
   if (plan.tipo === 'empleador' && plan.correos_mes !== 9999) {
@@ -2793,13 +2814,43 @@ async function enviarEmail() {
   const to = document.getElementById('modalTo').value;
   const subject = document.getElementById('modalSubject').value;
   const body = document.getElementById('modalBody').value;
-  window.open(`mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+
+  // Intentar enviar vía backend (en nombre del candidato, reply-to a su email)
+  let enviadoBackend = false;
+  try {
+    const res = await apiCall('/api/auth/enviar-postulacion', {
+      method: 'POST',
+      body: JSON.stringify({
+        empresa_email: to,
+        empresa_nombre: subject.split('—')[0]?.trim() || 'Empresa',
+        cargo: subject,
+        asunto: subject,
+        mensaje: body
+      })
+    });
+    if (res.success) {
+      enviadoBackend = true;
+      showToast('✓ Correo enviado en tu nombre — las respuestas llegarán a tu email');
+    }
+  } catch(err) {
+    console.warn('Backend no envió email:', err.message);
+  }
+
+  // Fallback: abrir cliente de correo
+  if (!enviadoBackend) {
+    window.open(`mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+    showToast('✓ Correo abierto en tu cliente de correo');
+  }
+
   correosCount++;
   correosEnviados.push({ to, subject, fecha: new Date().toLocaleString('es-EC'), estado: 'Enviado' });
-  if (currentUser) { currentUser.stats = currentUser.stats||{}; currentUser.stats.correos = correosCount; await saveToStorage('talento_user', currentUser); }
+  if (currentUser) {
+    currentUser.stats = currentUser.stats||{};
+    currentUser.stats.correos = correosCount;
+    await saveToStorage('talento_user', currentUser);
+  }
   updateStats();
   cerrarEmail();
-  showToast('✓ Correo abierto en tu cliente de correo');
 }
 
 async function mejorarCV() {
@@ -2971,6 +3022,32 @@ function cargarDatosAdmin() {
   const pagos = lista.filter(u => u.plan && u.plan !== 'free').length;
   const conv = lista.length ? Math.round((pagos / lista.length) * 100) : 0;
   document.getElementById('adminConversion').textContent = conv + '%';
+
+  // Calcular uso de Resend (estimado por correos enviados)
+  const correosEsteMs = totCorr; // todos los correos enviados
+  const limiteResend = 3000;
+  const porcentaje = Math.min(100, Math.round((correosEsteMs / limiteResend) * 100));
+  document.getElementById('resendUsados').textContent = correosEsteMs.toLocaleString();
+  document.getElementById('resendLimite').textContent = limiteResend.toLocaleString();
+  const bar = document.getElementById('resendBar');
+  bar.style.width = porcentaje + '%';
+  const alerta = document.getElementById('resendAlerta');
+  if (porcentaje < 60) {
+    bar.style.background = 'var(--verde)';
+    alerta.style.display = 'none';
+  } else if (porcentaje < 85) {
+    bar.style.background = 'var(--amarillo)';
+    alerta.style.display = 'block';
+    alerta.style.background = 'rgba(245,230,66,0.1)';
+    alerta.style.color = 'var(--amarillo)';
+    alerta.innerHTML = '⚠ Estás usando el ' + porcentaje + '% de tu cuota Resend. Considera pasar a plan Pro pronto.';
+  } else {
+    bar.style.background = 'var(--rojo)';
+    alerta.style.display = 'block';
+    alerta.style.background = 'rgba(255,77,109,0.1)';
+    alerta.style.color = 'var(--rojo)';
+    alerta.innerHTML = '🚨 ATENCIÓN: Estás al ' + porcentaje + '% del límite Resend. Migra a Resend Pro ($20/mes) o Amazon SES YA mismo o tus emails no se enviarán.';
+  }
 
   renderUsersAdmin();
 }
