@@ -3194,12 +3194,12 @@ function getPlan() {
 }
 
 function updateStats(jobs) {
-  // El contador grande es el TOTAL acumulado del usuario (no se reinicia diariamente)
+  // El contador grande es el TOTAL acumulado del usuario
   const userKey = currentUser ? currentUser.email : 'guest';
   const totalKey = 'busquedas_total_' + userKey;
-  let totalAcumulado = parseInt(localStorage.getItem(totalKey) || '0');
-  // Si el total está en 0 pero ya hay búsquedas diarias, sincronizar
   const diaActual = parseInt(localStorage.getItem('busquedas_dia_' + userKey) || '0');
+  let totalAcumulado = parseInt(localStorage.getItem(totalKey) || '0');
+  // El total siempre debe ser >= que el contador diario de hoy
   if (totalAcumulado < diaActual) {
     totalAcumulado = diaActual;
     localStorage.setItem(totalKey, String(totalAcumulado));
