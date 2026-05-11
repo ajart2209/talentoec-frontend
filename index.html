@@ -1239,6 +1239,9 @@ if (window.pdfjsLib) {
       <div class="field"><label>Email</label><input type="email" id="logEmail" placeholder="tu@email.com"></div>
       <div class="field"><label>Contraseña</label><input type="password" id="logPass" placeholder="Tu contraseña"></div>
       <button class="btn-full" onclick="iniciarSesion()">Iniciar sesión</button>
+    <div style="text-align:center;margin-top:14px">
+      <a href="#" onclick="event.preventDefault();mostrarOlvideContrasena()" style="color:var(--verde);font-size:12px;text-decoration:none">¿Olvidaste tu contraseña?</a>
+    </div>
 
     </div>
   </div>
@@ -1596,6 +1599,92 @@ function fechaEcuador() {
   return yyyy + '-' + mm + '-' + dd;
 }
 
+// Modal de olvido contraseña
+function mostrarOlvideContrasena() {
+  closeAuth();
+  const modal = document.createElement('div');
+  modal.id = 'modalRecuperar';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  modal.innerHTML = `
+    <div style="background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:16px;padding:32px;max-width:400px;width:100%">
+      <h3 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin:0 0 8px">Recuperar contraseña</h3>
+      <p style="color:var(--texto-secundario);font-size:13px;margin:0 0 20px">Te enviaremos un código a tu email para restablecer tu contraseña.</p>
+
+      <div id="step1Recover">
+        <div class="field">
+          <label>Email registrado</label>
+          <input type="email" id="recoverEmail" placeholder="tu@email.com">
+        </div>
+        <button class="btn-full" onclick="solicitarRecuperacion()">Enviar código</button>
+      </div>
+
+      <div id="step2Recover" style="display:none">
+        <div class="field">
+          <label>Código recibido por email</label>
+          <input type="text" id="recoverCodigo" placeholder="123456" maxlength="6">
+        </div>
+        <div class="field">
+          <label>Nueva contraseña</label>
+          <input type="password" id="recoverNuevaPass" placeholder="Mínimo 6 caracteres">
+        </div>
+        <button class="btn-full" onclick="restablecerContrasena()">Cambiar contraseña</button>
+      </div>
+
+      <button onclick="cerrarRecuperar()" style="width:100%;background:transparent;border:1px solid var(--gris-borde);color:var(--texto-secundario);padding:10px;border-radius:8px;margin-top:10px;cursor:pointer">Cancelar</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function cerrarRecuperar() {
+  const m = document.getElementById('modalRecuperar');
+  if (m) m.remove();
+}
+
+async function solicitarRecuperacion() {
+  const email = document.getElementById('recoverEmail').value.trim();
+  if (!email) { showToast('⚠ Ingresa tu email', true); return; }
+
+  try {
+    const res = await apiCall('/api/auth/solicitar-recuperacion', {
+      method: 'POST',
+      body: JSON.stringify({ email })
+    });
+    if (res.success) {
+      showToast('✓ Código enviado a tu email');
+      document.getElementById('step1Recover').style.display = 'none';
+      document.getElementById('step2Recover').style.display = 'block';
+      // Para demo, mostrar el código (en producción se envía solo por email)
+      if (res.codigo) {
+        showToast('📧 Código demo: ' + res.codigo);
+      }
+    }
+  } catch(err) {
+    showToast('⚠ ' + err.message, true);
+  }
+}
+
+async function restablecerContrasena() {
+  const email = document.getElementById('recoverEmail').value.trim();
+  const codigo = document.getElementById('recoverCodigo').value.trim();
+  const nuevaPass = document.getElementById('recoverNuevaPass').value;
+
+  if (!codigo || !nuevaPass) { showToast('⚠ Completa todos los campos', true); return; }
+  if (nuevaPass.length < 6) { showToast('⚠ Contraseña mínimo 6 caracteres', true); return; }
+
+  try {
+    await apiCall('/api/auth/restablecer-contrasena', {
+      method: 'POST',
+      body: JSON.stringify({ email, codigo, nuevaPass })
+    });
+    showToast('✓ Contraseña actualizada. Inicia sesión.');
+    cerrarRecuperar();
+    setTimeout(() => openAuth('login'), 600);
+  } catch(err) {
+    showToast('⚠ ' + err.message, true);
+  }
+}
+
 // Hash de contraseña con SHA-256 (mejor que texto plano)
 // Sincroniza datos del usuario con el backend (Supabase)
 async function syncToBackend(datos) {
@@ -1896,17 +1985,15 @@ async function iniciarSesion() {
   correosCount = 0;
   cvData = {};
 
-  // Cargar datos del usuario
+  // Cargar datos del usuario (rol DEL BACKEND, no del cliente)
   const sessionToken = 'tok_' + Date.now() + '_' + Math.random().toString(36).substr(2, 16);
-  const ADMINS_LIST = ['ajart6420@gmail.com'];
-  const esAdmin = ADMINS_LIST.includes(email);
 
   currentUser = {
     id: user.id,
     nombre: user.nombre,
     email: email,
-    tipo: esAdmin ? 'admin' : user.tipo,
-    rol: esAdmin ? 'admin' : (user.rol || 'usuario'),
+    tipo: user.tipo, // ROL DEL BACKEND
+    rol: user.rol,   // ROL DEL BACKEND (no confiar en el cliente)
     empresa: user.empresa || '',
     plan: user.plan || 'basico',
     creado: user.creado,
@@ -2402,6 +2489,14 @@ async function buscarEmpleo() {
   const totalActual = parseInt(localStorage.getItem(totalKey) || '0');
   localStorage.setItem(totalKey, String(totalActual + 1));
   busquedasCount = totalActual + 1;
+
+  // Registrar búsqueda en backend (auditoría)
+  const queryLog = document.getElementById('busquedaQuery').value.trim();
+  const ciudadLog = document.getElementById('busquedaCiudad').value;
+  apiCall('/api/auth/registrar-busqueda', {
+    method: 'POST',
+    body: JSON.stringify({ query: queryLog, ciudad: ciudadLog })
+  }).catch(e => console.warn('Sin auditoría:', e.message));
 
   const query = document.getElementById('busquedaQuery').value.trim();
   if (!query) { showToast('⚠ Describe qué trabajo buscas', true); return; }
