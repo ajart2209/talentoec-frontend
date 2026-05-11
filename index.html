@@ -3196,9 +3196,14 @@ function getPlan() {
 function updateStats(jobs) {
   // El contador grande es el TOTAL acumulado del usuario (no se reinicia diariamente)
   const userKey = currentUser ? currentUser.email : 'guest';
-  // Total histórico del usuario
   const totalKey = 'busquedas_total_' + userKey;
-  const totalAcumulado = parseInt(localStorage.getItem(totalKey) || '0');
+  let totalAcumulado = parseInt(localStorage.getItem(totalKey) || '0');
+  // Si el total está en 0 pero ya hay búsquedas diarias, sincronizar
+  const diaActual = parseInt(localStorage.getItem('busquedas_dia_' + userKey) || '0');
+  if (totalAcumulado < diaActual) {
+    totalAcumulado = diaActual;
+    localStorage.setItem(totalKey, String(totalAcumulado));
+  }
   document.getElementById('statBusquedas').textContent = totalAcumulado;
   document.getElementById('statCorreos').textContent = correosCount;
   if (jobs && jobs.length) {
