@@ -1429,9 +1429,9 @@ if (window.pdfjsLib) {
       <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">4. Planes y pagos</h2>
       <p style="margin:0 0 8px">TalentoEC ofrece planes de suscripción mensual con los siguientes precios en dólares americanos (USD):</p>
       <ul style="margin:0 0 12px;padding-left:20px">
-        <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Plan Básico:</strong> $9.99/mes — para candidatos, hasta 20 correos diarios</li>
-        <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Plan Estándar:</strong> $19.99/mes — para candidatos, hasta 40 correos diarios</li>
-        <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Plan Pro:</strong> $34.99/mes — para candidatos, hasta 60 correos diarios</li>
+        <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Plan Básico:</strong> $9.99/mes — para candidatos, 5 búsquedas y hasta 12 correos diarios</li>
+        <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Plan Estándar:</strong> $19.99/mes — para candidatos, 10 búsquedas y hasta 25 correos diarios</li>
+        <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Plan Pro:</strong> $34.99/mes — para candidatos, 10 búsquedas y hasta 35 correos diarios</li>
         <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Empleador Básico:</strong> $49/mes — hasta 20 correos al mes</li>
         <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Empleador Pro:</strong> $149/mes — hasta 200 correos al mes</li>
         <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Empleador Enterprise:</strong> $399/mes — correos ilimitados</li>
@@ -1492,6 +1492,25 @@ if (window.pdfjsLib) {
 <script>
 // ======= CONFIG =======
 const BACKEND_URL = 'https://talentoec-backend-production.up.railway.app';
+
+// Helper para llamar al backend con manejo de errores
+async function apiCall(endpoint, options = {}) {
+  try {
+    const token = localStorage.getItem('talento_token');
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(token && { 'Authorization': 'Bearer ' + token }),
+      ...(options.headers || {})
+    };
+    const res = await fetch(BACKEND_URL + endpoint, { ...options, headers });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || data.message || 'Error de servidor');
+    return data;
+  } catch(err) {
+    console.error('API Error:', err);
+    throw err;
+  }
+}
 const SUPABASE_URL = 'https://mgxokvsbxzuvscbibmus.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_fo6XXSuS6ujoBIGcWfPa5Q_X4YB_07Hup14kZk1luV1T';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -1563,7 +1582,38 @@ let correosCount = 0;
 async function saveToStorage(key, val) {
   try { await window.storage.set(key, JSON.stringify(val)); } catch(e) {}
 }
+// Devuelve la fecha actual de Ecuador (GMT-5) como string YYYY-MM-DD
+function fechaEcuador() {
+  const ahora = new Date();
+  // Convertir a GMT-5 (Ecuador continental)
+  const offsetEC = -5 * 60; // minutos
+  const offsetLocal = ahora.getTimezoneOffset(); // minutos
+  const diff = (offsetLocal + offsetEC) * 60 * 1000;
+  const fechaEC = new Date(ahora.getTime() + diff);
+  const yyyy = fechaEC.getUTCFullYear();
+  const mm = String(fechaEC.getUTCMonth() + 1).padStart(2, '0');
+  const dd = String(fechaEC.getUTCDate()).padStart(2, '0');
+  return yyyy + '-' + mm + '-' + dd;
+}
+
 // Hash de contraseña con SHA-256 (mejor que texto plano)
+// Sincroniza datos del usuario con el backend (Supabase)
+async function syncToBackend(datos) {
+  try {
+    const token = localStorage.getItem('talento_token');
+    if (!token) return false;
+    await apiCall('/api/auth/sync', {
+      method: 'POST',
+      body: JSON.stringify(datos)
+    });
+    console.log('✓ Sincronizado con nube');
+    return true;
+  } catch(err) {
+    console.warn('Sync falló, datos solo en local:', err.message);
+    return false;
+  }
+}
+
 async function hashPassword(pass) {
   try {
     const data = new TextEncoder().encode(pass + 'talentoec_salt_2026');
@@ -1634,16 +1684,35 @@ async function registrar() {
       showToast('⚠ Contraseña mínimo 6 caracteres', true);
       return;
     }
-
-    // Validar email
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       showToast('⚠ Email inválido', true);
       return;
     }
 
-    // Verificar duplicado
+    // PRIORIDAD 1: Intentar registrar en backend (nube)
+    let backendOk = false;
+    let serverData = null;
+    try {
+      serverData = await apiCall('/api/auth/registro', {
+        method: 'POST',
+        body: JSON.stringify({ nombre, email, pass, tipo: selectedTipo || 'candidato', empresa })
+      });
+      if (serverData && serverData.token) {
+        localStorage.setItem('talento_token', serverData.token);
+        backendOk = true;
+        console.log('✓ Usuario registrado en backend (nube)');
+      }
+    } catch(err) {
+      console.warn('Backend no disponible, usando local:', err.message);
+      if (err.message && err.message.includes('ya está registrado')) {
+        showToast('⚠ Este email ya está registrado. Inicia sesión.', true);
+        return;
+      }
+    }
+
+    // PRIORIDAD 2 (fallback): Guardar en localStorage si backend falló
     const usuarios = JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}');
-    if (usuarios[email]) {
+    if (!backendOk && usuarios[email]) {
       showToast('⚠ Este email ya está registrado. Inicia sesión.', true);
       return;
     }
@@ -1775,38 +1844,57 @@ function toggleProfileMenu() {
 }
 
 async function iniciarSesion() {
+  try {
   const email = document.getElementById('logEmail').value.trim().toLowerCase();
   const pass = document.getElementById('logPass').value;
 
   if (!email || !pass) { showToast('⚠ Ingresa email y contraseña', true); return; }
 
-  // Buscar usuario en la base de datos local
-  const usuarios = JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}');
-  const user = usuarios[email];
-
-  if (!user) {
-    showToast('⚠ Este email no está registrado. Crea una cuenta.', true);
-    return;
+  // PRIORIDAD 1: Intentar login en backend (nube)
+  let backendOk = false;
+  let serverUser = null;
+  try {
+    const serverData = await apiCall('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, pass })
+    });
+    if (serverData && serverData.token) {
+      localStorage.setItem('talento_token', serverData.token);
+      serverUser = serverData.usuario;
+      backendOk = true;
+      console.log('✓ Login exitoso vía backend (nube)');
+    }
+  } catch(err) {
+    console.warn('Backend no disponible, intentando local:', err.message);
+    if (err.message && (err.message.includes('Contraseña incorrecta') || err.message.includes('Credenciales'))) {
+      showToast('⚠ Contraseña incorrecta', true);
+      return;
+    }
   }
 
-  // Verificar contraseña
-  const passHash = await hashPassword(pass);
-  if (user.passHash !== passHash) {
-    showToast('⚠ Contraseña incorrecta', true);
-    return;
+  // PRIORIDAD 2 (fallback): Login local si backend falló
+  let user = null;
+  if (!backendOk) {
+    const usuarios = JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}');
+    user = usuarios[email];
+    if (!user) {
+      showToast('⚠ Este email no está registrado. Crea una cuenta.', true);
+      return;
+    }
+    const passHash = await hashPassword(pass);
+    if (user.passHash !== passHash) {
+      showToast('⚠ Contraseña incorrecta', true);
+      return;
+    }
+  } else {
+    // Usar datos del servidor
+    user = serverUser;
   }
 
-  // Si es otro usuario, limpiar TODO del anterior
-  const saved = await getFromStorage('talento_user');
-  if (saved && saved.email !== email) {
-    localStorage.removeItem('busquedas_dia');
-    localStorage.removeItem('busquedas_fecha');
-    localStorage.removeItem('correos_empleador_mes');
-    localStorage.removeItem('candidatos_guardados');
-    busquedasCount = 0;
-    correosCount = 0;
-    cvData = {};
-  }
+  // Limpieza solo de variables temporales (los contadores son por usuario)
+  busquedasCount = 0;
+  correosCount = 0;
+  cvData = {};
 
   // Cargar datos del usuario
   const sessionToken = 'tok_' + Date.now() + '_' + Math.random().toString(36).substr(2, 16);
@@ -1829,21 +1917,30 @@ async function iniciarSesion() {
   busquedasCount = currentUser.stats.busquedas || 0;
   correosCount = currentUser.stats.correos || 0;
   cvData = user.cvData || {};
+  // Si hay CV guardado, restaurar el panel
+  if (cvData && cvData.texto) {
+    setTimeout(() => { if (typeof mostrarCVGuardado === 'function') mostrarCVGuardado(); }, 800);
+  }
 
   await saveToStorage('talento_user', currentUser);
   closeAuth();
   setLoggedInUI();
   showToast('✓ Sesión iniciada. Bienvenido ' + currentUser.nombre.split(' ')[0]);
   setTimeout(() => {
-    showPage(userTipo);
+    const destino = currentUser.rol === 'admin' ? 'admin' : userTipo;
+    showPage(destino);
     if (cvData) mostrarCVGuardado();
     if (typeof updateStats === 'function') updateStats();
     if (typeof updateLimitBar === 'function') updateLimitBar();
   }, 600);
+  } catch(err) {
+    console.error('Error login:', err);
+    showToast('⚠ Error: ' + (err.message || 'algo salió mal'), true);
+  }
 }
 
 
-async function cerrarSesion() {
+async function cerrarSesionDuplicado_unused() {
   currentUser = null;
   document.getElementById('navRight').innerHTML = `<button class="btn-nav-login" onclick="openAuth('login')">Iniciar sesión</button><button class="btn-nav-cta" onclick="openAuth('register')">Registrarse gratis</button>`;
   // Mostrar de nuevo todos los tabs al cerrar sesión
@@ -1896,7 +1993,12 @@ function candTab(tab) {
   // Si va a correos en frio, ajustar límites según plan
   if (tab === 'frio') {
     const plan = getPlan();
-    const maxFrio = plan.max_frio || plan.max_dia;
+    const maxFrio = plan.max_frio || 0;
+    if (maxFrio === 0) {
+      showToast('⚠ Tu plan no incluye correos en frío. Mejora a Estándar o Pro.', true);
+      candTab('busqueda');
+      return;
+    }
     const select = document.getElementById('frioNumero');
     const label = document.getElementById('frioLimitLabel');
     if (label) label.textContent = '(máx. ' + maxFrio + ' según tu plan)';
@@ -2076,14 +2178,55 @@ function editarCV() {
   if (cvData.email) document.getElementById('cvEmail').value = cvData.email;
 }
 function mostrarCVGuardado() {
-  document.getElementById('cvSavedBanner').style.display = 'flex';
-  document.getElementById('uploadSection').style.display = 'none';
-  document.getElementById('cvSavedDate').textContent = 'Guardado el ' + (cvData.fecha || 'hoy');
+  if (!cvData || !cvData.texto) return;
+  const banner = document.getElementById('cvSavedBanner');
+  const upload = document.getElementById('uploadSection');
+  const savedDate = document.getElementById('cvSavedDate');
+  if (banner) banner.style.display = 'flex';
+  if (upload) upload.style.display = 'none';
+  if (savedDate) savedDate.textContent = 'Guardado el ' + (cvData.fecha || 'hoy');
+
+  // Mostrar análisis si existe
   if (cvData.analysis) {
-    document.getElementById('cvAnalysis').style.display = 'block';
-    document.getElementById('analysisStatus').textContent = '✓ Análisis completado';
-    document.getElementById('analysisContent').textContent = cvData.analysis;
-    document.getElementById('mejorarCVBtn').style.display = 'block';
+    const analysisEl = document.getElementById('cvAnalysis');
+    const statusEl = document.getElementById('analysisStatus');
+    const contentEl = document.getElementById('analysisContent');
+    const mejorarBtn = document.getElementById('mejorarCVBtn');
+    if (analysisEl) analysisEl.style.display = 'block';
+    if (statusEl) statusEl.textContent = '✓ Análisis completado';
+    if (contentEl) contentEl.textContent = cvData.analysis;
+    if (mejorarBtn) mejorarBtn.style.display = 'block';
+  }
+
+  // Mostrar áreas detectadas si existen
+  if (cvData.areasDetectadas && cvData.areasDetectadas.length) {
+    const areasDet = document.getElementById('areasDetectadas');
+    const areasChips = document.getElementById('areasChips');
+    if (areasDet) areasDet.style.display = 'block';
+    if (areasChips) {
+      areasChips.innerHTML = cvData.areasDetectadas.map(a => 
+        '<span style="background:rgba(0,196,140,0.15);color:var(--verde);padding:5px 12px;border-radius:14px;font-size:12px;font-weight:500;border:1px solid rgba(0,196,140,0.3)">' + a + '</span>'
+      ).join('');
+    }
+  }
+
+  // Mostrar CV mejorado o carta si existen
+  if (cvData.cvMejorado || cvData.cartaPresentacion) {
+    const panel = document.getElementById('cvMejoradoPanel');
+    const status = document.getElementById('mejorarStatus');
+    const content = document.getElementById('cvMejoradoContent');
+    const descarga = document.getElementById('descargarBtn');
+    if (panel) panel.style.display = 'block';
+    
+    // Priorizar CV mejorado, sino mostrar carta
+    if (cvData.cvMejorado) {
+      if (status) status.textContent = '✨ CV mejorado guardado';
+      if (content) content.textContent = cvData.cvMejorado;
+      if (descarga) descarga.style.display = 'flex';
+    } else if (cvData.cartaPresentacion) {
+      if (status) status.textContent = '📝 Carta de presentación guardada';
+      if (content) content.textContent = cvData.cartaPresentacion;
+    }
   }
 }
 async function guardarYAnalizar() {
@@ -2215,6 +2358,19 @@ ${area}, Ecuador, ${ciudad}, profesional, experiencia, tiempo completo, empresas
   if (currentUser) {
     currentUser.cvData = cvData;
     await saveToStorage('talento_user', currentUser);
+    // Guardar también en la "BD" de usuarios
+    const usuarios = JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}');
+    if (usuarios[currentUser.email]) {
+      usuarios[currentUser.email].cvData = cvData;
+      localStorage.setItem('talento_usuarios_db', JSON.stringify(usuarios));
+    }
+    // Sincronizar con backend en segundo plano
+    syncToBackend({
+      cv_texto: cvData.texto,
+      cv_mejorado: cvData.cvMejorado,
+      carta_presentacion: cvData.cartaPresentacion,
+      areas_detectadas: cvData.areasDetectadas
+    });
   }
   mostrarCVGuardado();
 }
@@ -2223,22 +2379,29 @@ ${area}, Ecuador, ${ciudad}, profesional, experiencia, tiempo completo, empresas
 async function buscarEmpleo() {
   if (!currentUser) { openAuth('register'); return; }
 
-  // Verificar limite diario de busquedas
+  // Verificar limite diario de busquedas (POR USUARIO)
   const limites = { basico: 5, estandar: 10, pro: 20, emp_basico: 999, emp_pro: 999, emp_enterprise: 999 };
   const planUser = (currentUser && currentUser.plan) || 'basico';
   const maxDiario = limites[planUser] || 5;
-  const hoy = new Date().toDateString();
-  if (localStorage.getItem('busquedas_fecha') !== hoy) {
-    localStorage.setItem('busquedas_fecha', hoy);
-    localStorage.setItem('busquedas_dia', '0');
+  const hoy = fechaEcuador();
+  const userKey = currentUser.email;
+  const fechaKey = 'busquedas_fecha_' + userKey;
+  const diaKey = 'busquedas_dia_' + userKey;
+  if (localStorage.getItem(fechaKey) !== hoy) {
+    localStorage.setItem(fechaKey, hoy);
+    localStorage.setItem(diaKey, '0');
   }
-  const usadasHoy = parseInt(localStorage.getItem('busquedas_dia') || '0');
+  const usadasHoy = parseInt(localStorage.getItem(diaKey) || '0');
   if (usadasHoy >= maxDiario) {
     mostrarLimiteAlcanzado(maxDiario);
     return;
   }
-  localStorage.setItem('busquedas_dia', String(usadasHoy + 1));
-  busquedasCount++;
+  localStorage.setItem(diaKey, String(usadasHoy + 1));
+  // Incrementar también el contador TOTAL del usuario
+  const totalKey = 'busquedas_total_' + userKey;
+  const totalActual = parseInt(localStorage.getItem(totalKey) || '0');
+  localStorage.setItem(totalKey, String(totalActual + 1));
+  busquedasCount = totalActual + 1;
 
   const query = document.getElementById('busquedaQuery').value.trim();
   if (!query) { showToast('⚠ Describe qué trabajo buscas', true); return; }
@@ -2627,6 +2790,11 @@ CERTIFICACIONES Y FORMACIÓN CONTINUA
   if (currentUser) {
     currentUser.cvData = cvData;
     await saveToStorage('talento_user', currentUser);
+    const usuarios = JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}');
+    if (usuarios[currentUser.email]) {
+      usuarios[currentUser.email].cvData = cvData;
+      localStorage.setItem('talento_usuarios_db', JSON.stringify(usuarios));
+    }
   }
 }
 
@@ -2665,6 +2833,11 @@ async function generarCarta() {
   if (currentUser) {
     currentUser.cvData = cvData;
     await saveToStorage('talento_user', currentUser);
+    const usuarios = JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}');
+    if (usuarios[currentUser.email]) {
+      usuarios[currentUser.email].cvData = cvData;
+      localStorage.setItem('talento_usuarios_db', JSON.stringify(usuarios));
+    }
   }
   showToast('✓ Carta generada y guardada');
 }
@@ -3007,9 +3180,9 @@ function cerrarPagoExito() { cerrarPago(); if(currentUser) showPage('empleador')
 
 // ======= UTILS =======
 const PLANES = {
-  'basico':        { nombre:'Básico $9.99',          min:10,  max:20,   precio:'9.99',   max_frio:10,  tipo:'candidato' },
-  'estandar':      { nombre:'Estándar $19.99',        min:20,  max:40,   precio:'19.99',  max_frio:30,  tipo:'candidato' },
-  'pro':           { nombre:'Pro $34.99',             min:30,  max:60,   precio:'34.99',  max_frio:40,  tipo:'candidato' },
+  'basico':        { nombre:'Básico $9.99',          min:8,   max:12,   precio:'9.99',   max_frio:0,   tipo:'candidato' },
+  'estandar':      { nombre:'Estándar $19.99',        min:15,  max:25,   precio:'19.99',  max_frio:10,  tipo:'candidato' },
+  'pro':           { nombre:'Pro $34.99',             min:20,  max:35,   precio:'34.99',  max_frio:20,  tipo:'candidato' },
   'emp_basico':    { nombre:'Empleador Básico $49',   min:0,   max:20,   precio:'49',     max_frio:0,   tipo:'empleador', busquedas:10,  correos_mes:20  },
   'emp_pro':       { nombre:'Empleador Pro $149',     min:0,   max:200,  precio:'149',    max_frio:0,   tipo:'empleador', busquedas:999, correos_mes:200 },
   'emp_enterprise':{ nombre:'Empleador Enterprise $399', min:0, max:9999, precio:'399',  max_frio:0,   tipo:'empleador', busquedas:999, correos_mes:9999 }
@@ -3021,22 +3194,29 @@ function getPlan() {
 }
 
 function updateStats(jobs) {
-  document.getElementById('statBusquedas').textContent = busquedasCount;
+  // El contador grande es el TOTAL acumulado del usuario (no se reinicia diariamente)
+  const userKey = currentUser ? currentUser.email : 'guest';
+  // Total histórico del usuario
+  const totalKey = 'busquedas_total_' + userKey;
+  const totalAcumulado = parseInt(localStorage.getItem(totalKey) || '0');
+  document.getElementById('statBusquedas').textContent = totalAcumulado;
   document.getElementById('statCorreos').textContent = correosCount;
   if (jobs && jobs.length) {
     const avg = Math.round(jobs.reduce((s,j)=>s+j.match,0)/jobs.length);
     document.getElementById('statMatch').textContent = avg + '%';
   }
-  // Mostrar búsquedas diarias restantes
+  // Mostrar búsquedas diarias restantes (POR USUARIO)
   const limites = { basico: 5, estandar: 10, pro: 20, emp_basico: 999, emp_pro: 999, emp_enterprise: 999 };
   const planUser = currentUser?.plan || 'basico';
   const maxDiario = limites[planUser] || 5;
-  const hoy = new Date().toDateString();
-  if (localStorage.getItem('busquedas_fecha') !== hoy) {
-    localStorage.setItem('busquedas_fecha', hoy);
-    localStorage.setItem('busquedas_dia', '0');
+  const hoy = fechaEcuador();
+  const fechaKey = 'busquedas_fecha_' + userKey;
+  const diaKey = 'busquedas_dia_' + userKey;
+  if (localStorage.getItem(fechaKey) !== hoy) {
+    localStorage.setItem(fechaKey, hoy);
+    localStorage.setItem(diaKey, '0');
   }
-  const usadas = parseInt(localStorage.getItem('busquedas_dia') || '0');
+  const usadas = parseInt(localStorage.getItem(diaKey) || '0');
   const restantes = maxDiario - usadas;
   const el = document.getElementById('busquedasDia');
   if (el) {
