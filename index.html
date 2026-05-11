@@ -2952,6 +2952,13 @@ CERTIFICACIONES Y FORMACIÓN CONTINUA
       usuarios[currentUser.email].cvData = cvData;
       localStorage.setItem('talento_usuarios_db', JSON.stringify(usuarios));
     }
+    // SINCRONIZAR CV mejorado con backend (Supabase)
+    syncToBackend({
+      cv_texto: cvData.texto,
+      cv_mejorado: cvMejorado,
+      carta_presentacion: cvData.cartaPresentacion,
+      areas_detectadas: cvData.areasDetectadas
+    });
   }
 }
 
