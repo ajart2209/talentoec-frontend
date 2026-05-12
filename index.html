@@ -2748,7 +2748,7 @@ async function buscarEmpleo() {
   apiCall('/api/auth/registrar-busqueda', {
     method: 'POST',
     body: JSON.stringify({ query: queryLog, ciudad: ciudadLog })
-  }).catch(e => 
+  }).catch(e => {});
 
   const query = document.getElementById('busquedaQuery').value.trim();
   if (!query) { showToast('⚠ Describe qué trabajo buscas', true); return; }
@@ -4312,7 +4312,7 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').then(reg => {
       
-    }).catch(err => 
+    }).catch(err => {});
   });
 }
 
