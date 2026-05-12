@@ -3087,9 +3087,12 @@ async function cargarDatosAdmin() {
   document.getElementById('adminCandidatos').textContent = lista.filter(u => u.tipo === 'candidato').length;
   document.getElementById('adminEmpleadores').textContent = lista.filter(u => u.tipo === 'empleador').length;
 
-  // Calcular ingresos estimados del mes
+  // Calcular ingresos estimados del mes (sin contar admins)
   const precios = { basico: 9.99, estandar: 19.99, pro: 34.99, emp_basico: 49, emp_pro: 149, emp_enterprise: 399 };
-  const ingresos = lista.reduce((sum, u) => sum + (precios[u.plan] || 0), 0);
+  const ingresos = lista.reduce((sum, u) => {
+    if (u.rol === 'admin') return sum; // Admins no pagan
+    return sum + (precios[u.plan] || 0);
+  }, 0);
   document.getElementById('adminIngresos').textContent = '$' + ingresos.toFixed(2);
 
   // Stats agregados
@@ -3294,25 +3297,29 @@ function ejecutarExportar(formato) {
   const headers = ['Nombre', 'Email', 'Tipo', 'Rol', 'Plan', 'Búsquedas', 'Correos', 'Fecha registro', 'Pago $', 'Ganancia neta $'];
   const filas = filtrados.map(u => {
     const plan = u.plan || 'basico';
-    const pago = precios[plan] || 0;
-    // Ganancia neta estimada (descontando ~35% de costos: API + PayPhone + Infra)
-    const ganancia = pago > 0 ? (pago * 0.65).toFixed(2) : 0;
+    const esAdmin = u.rol === 'admin';
+    // Admins NO pagan
+    const pago = esAdmin ? 0 : (precios[plan] || 0);
+    const ganancia = (!esAdmin && pago > 0) ? (pago * 0.65).toFixed(2) : 0;
     return [
       u.nombre || '',
       u.email || '',
       u.tipo || '',
       u.rol || 'usuario',
-      plan,
+      esAdmin ? plan + ' (gratis)' : plan,
       u.stats?.busquedas || 0,
       u.stats?.correos || 0,
       u.creado ? new Date(u.creado).toLocaleDateString('es-EC') : '',
-      pago.toFixed(2),
+      esAdmin ? '0.00' : pago.toFixed(2),
       ganancia
     ];
   });
 
-  // Calcular totales
-  const totalPago = filtrados.reduce((s, u) => s + (precios[u.plan] || 0), 0);
+  // Calcular totales (excluyendo admins)
+  const totalPago = filtrados.reduce((s, u) => {
+    if (u.rol === 'admin') return s;
+    return s + (precios[u.plan] || 0);
+  }, 0);
   const totalGanancia = totalPago * 0.65;
 
   // Agregar fila de totales
