@@ -1459,7 +1459,7 @@ if (window.pdfjsLib) {
     <div class="section-box" style="margin-top:16px">
       <div class="section-box-title">⚡ Acciones rápidas</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <button onclick="exportarUsuarios()" class="btn-sm-outline" style="padding:10px">📥 Exportar usuarios CSV</button>
+        <button onclick="exportarUsuarios()" class="btn-sm-outline" style="padding:10px">📥 Exportar usuarios (Excel/CSV)</button>
         <button onclick="resetearContadores()" class="btn-sm-outline" style="padding:10px">🔄 Resetear contadores diarios</button>
       </div>
     </div>
@@ -3208,17 +3208,154 @@ function eliminarUsuario(email) {
 }
 
 function exportarUsuarios() {
-  const usuarios = JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}');
-  const lista = Object.values(usuarios);
-  const csv = 'Nombre,Email,Tipo,Plan,Búsquedas,Correos,Creado\n' +
-    lista.map(u => [u.nombre, u.email, u.tipo, u.plan, u.stats?.busquedas || 0, u.stats?.correos || 0, u.creado].join(',')).join('\n');
-  const blob = new Blob([csv], { type: 'text/csv' });
+  const lista = window._adminUsersList || Object.values(JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}'));
+  if (!lista.length) { showToast('⚠ No hay usuarios para exportar', true); return; }
+
+  // Modal para elegir mes
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+
+  // Obtener meses únicos con registros
+  const mesesDisponibles = new Set();
+  lista.forEach(u => {
+    if (u.creado) {
+      const fecha = new Date(u.creado);
+      const mesAno = fecha.getFullYear() + '-' + String(fecha.getMonth() + 1).padStart(2, '0');
+      mesesDisponibles.add(mesAno);
+    }
+  });
+  const mesesOrdenados = Array.from(mesesDisponibles).sort().reverse();
+
+  modal.innerHTML = `
+    <div style="background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:16px;padding:28px;max-width:440px;width:100%">
+      <h3 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin:0 0 16px">📥 Exportar usuarios</h3>
+      <p style="color:var(--texto-secundario);font-size:13px;margin-bottom:18px">Elige qué exportar y el formato</p>
+
+      <div class="field">
+        <label>📅 Filtrar por mes</label>
+        <select id="expMes" style="width:100%">
+          <option value="todos">Todos los meses (${lista.length} usuarios)</option>
+          ${mesesOrdenados.map(m => {
+            const [ano, mes] = m.split('-');
+            const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+            const cant = lista.filter(u => {
+              if (!u.creado) return false;
+              const f = new Date(u.creado);
+              return f.getFullYear() == ano && (f.getMonth() + 1) == parseInt(mes);
+            }).length;
+            return '<option value="' + m + '">' + meses[parseInt(mes)-1] + ' ' + ano + ' (' + cant + ' usuarios)</option>';
+          }).join('')}
+        </select>
+      </div>
+
+      <div class="field">
+        <label>📄 Formato</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <button onclick="ejecutarExportar('csv')" class="btn-sm-outline" style="padding:14px;display:flex;flex-direction:column;align-items:center;gap:6px">
+            <span style="font-size:24px">📊</span>
+            <span style="font-weight:700">CSV</span>
+            <span style="font-size:10px;color:var(--texto-secundario)">Compatible con Excel</span>
+          </button>
+          <button onclick="ejecutarExportar('xlsx')" class="btn-sm-outline" style="padding:14px;display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(0,196,140,0.1);border-color:var(--verde)">
+            <span style="font-size:24px">📈</span>
+            <span style="font-weight:700;color:var(--verde)">Excel</span>
+            <span style="font-size:10px;color:var(--texto-secundario)">.xlsx con formato</span>
+          </button>
+        </div>
+      </div>
+
+      <button onclick="this.closest('div[style*=fixed]').remove()" style="width:100%;background:transparent;border:1px solid var(--gris-borde);color:var(--texto-secundario);padding:10px;border-radius:8px;margin-top:12px;cursor:pointer">Cancelar</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function ejecutarExportar(formato) {
+  const mes = document.getElementById('expMes').value;
+  const lista = window._adminUsersList || Object.values(JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}'));
+
+  // Filtrar por mes
+  const filtrados = mes === 'todos' ? lista : lista.filter(u => {
+    if (!u.creado) return false;
+    const f = new Date(u.creado);
+    const userMes = f.getFullYear() + '-' + String(f.getMonth() + 1).padStart(2, '0');
+    return userMes === mes;
+  });
+
+  if (!filtrados.length) {
+    showToast('⚠ No hay usuarios en ese mes', true);
+    return;
+  }
+
+  const fechaArchivo = mes === 'todos' ? 'todos' : mes;
+  // Precios por plan
+  const precios = { basico: 9.99, estandar: 19.99, pro: 34.99, emp_basico: 49, emp_pro: 149, emp_enterprise: 399 };
+
+  const headers = ['Nombre', 'Email', 'Tipo', 'Rol', 'Plan', 'Búsquedas', 'Correos', 'Fecha registro', 'Pago $', 'Ganancia neta $'];
+  const filas = filtrados.map(u => {
+    const plan = u.plan || 'basico';
+    const pago = precios[plan] || 0;
+    // Ganancia neta estimada (descontando ~35% de costos: API + PayPhone + Infra)
+    const ganancia = pago > 0 ? (pago * 0.65).toFixed(2) : 0;
+    return [
+      u.nombre || '',
+      u.email || '',
+      u.tipo || '',
+      u.rol || 'usuario',
+      plan,
+      u.stats?.busquedas || 0,
+      u.stats?.correos || 0,
+      u.creado ? new Date(u.creado).toLocaleDateString('es-EC') : '',
+      pago.toFixed(2),
+      ganancia
+    ];
+  });
+
+  // Calcular totales
+  const totalPago = filtrados.reduce((s, u) => s + (precios[u.plan] || 0), 0);
+  const totalGanancia = totalPago * 0.65;
+
+  // Agregar fila de totales
+  filas.push(['', '', '', '', '', '', '', 'TOTAL:', totalPago.toFixed(2), totalGanancia.toFixed(2)]);
+
+  if (formato === 'csv') {
+    const csv = headers.join(',') + '\n' + filas.map(row => row.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join('\n');
+    descargarArchivo('usuarios_' + fechaArchivo + '.csv', csv, 'text/csv');
+  } else {
+    // XLSX (Excel)
+    const xlsxContent = generarExcel(headers, filas);
+    descargarArchivo('usuarios_' + fechaArchivo + '.xls', xlsxContent, 'application/vnd.ms-excel');
+  }
+
+  // Cerrar modal
+  document.querySelectorAll('div[style*=fixed]').forEach(m => {
+    if (m.innerHTML.includes('Exportar usuarios')) m.remove();
+  });
+
+  showToast('✓ ' + filtrados.length + ' usuarios exportados a ' + formato.toUpperCase());
+}
+
+function generarExcel(headers, filas) {
+  // Excel-compatible HTML format
+  let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
+  html += '<head><meta charset="UTF-8"><style>table{border-collapse:collapse}th{background:#00C48C;color:white;font-weight:bold;padding:8px;border:1px solid #ccc}td{padding:6px;border:1px solid #ccc}</style></head>';
+  html += '<body><table>';
+  html += '<tr>' + headers.map(h => '<th>' + h + '</th>').join('') + '</tr>';
+  filas.forEach(row => {
+    html += '<tr>' + row.map(c => '<td>' + c + '</td>').join('') + '</tr>';
+  });
+  html += '</table></body></html>';
+  return html;
+}
+
+function descargarArchivo(nombre, contenido, tipo) {
+  const blob = new Blob(['\ufeff' + contenido], { type: tipo + ';charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = 'usuarios_talentoec.csv';
+  a.href = url;
+  a.download = nombre;
   a.click();
   URL.revokeObjectURL(url);
-  showToast('✓ CSV exportado');
 }
 
 function resetearContadores() {
