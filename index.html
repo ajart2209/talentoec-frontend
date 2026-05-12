@@ -768,7 +768,7 @@ if (window.pdfjsLib) {
               <div style="font-size:13px;font-weight:500;margin-bottom:3px">¿Quieres que TalentoEC mejore tu CV automáticamente?</div>
               <div style="font-size:11px;color:var(--texto-secundario)">Reescribimos tu CV de forma profesional optimizado para Ecuador · Incluido en tu plan</div>
             </div>
-            <button onclick="mejorarCV()" style="background:var(--verde);color:var(--negro);border:none;padding:10px 20px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap">
+            <button id="mejorarBtnAction" onclick="mejorarCV()" style="background:var(--verde);color:var(--negro);border:none;padding:10px 20px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap">
               ✨ Mejorar mi CV
             </button>
           </div>
@@ -2408,6 +2408,17 @@ function mostrarCVGuardado() {
       areasChips.innerHTML = cvData.areasDetectadas.map(a => 
         '<span style="background:rgba(0,196,140,0.15);color:var(--verde);padding:5px 12px;border-radius:14px;font-size:12px;font-weight:500;border:1px solid rgba(0,196,140,0.3)">' + a + '</span>'
       ).join('');
+    }
+  }
+
+  // Si ya tiene CV mejorado, ocultar botón "Mejorar mi CV"
+  if (cvData.cvMejorado) {
+    const btn = document.getElementById('mejorarBtnAction');
+    if (btn) {
+      const wrapper = btn.parentElement;
+      if (wrapper) {
+        wrapper.innerHTML = '<div style="display:flex;align-items:center;gap:10px;color:var(--verde);font-size:13px;font-weight:500"><span style="background:var(--verde);color:var(--negro);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700">✓</span>Tu CV ya está mejorado y guardado</div>';
+      }
     }
   }
 
