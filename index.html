@@ -2079,10 +2079,26 @@ async function iniciarSesion() {
   userTipo = currentUser.tipo;
   busquedasCount = currentUser.stats.busquedas || 0;
   correosCount = currentUser.stats.correos || 0;
-  cvData = user.cvData || {};
-  // Si hay CV guardado, restaurar el panel
+  // Mapear cvData desde el backend (que usa snake_case) a formato frontend (camelCase)
+  if (user.cvData) {
+    cvData = {
+      texto: user.cvData.texto || user.cvData.cv_texto || '',
+      cvMejorado: user.cvData.cvMejorado || user.cvData.cv_mejorado || '',
+      cartaPresentacion: user.cvData.cartaPresentacion || user.cvData.carta_presentacion || '',
+      areasDetectadas: user.cvData.areasDetectadas || user.cvData.areas_detectadas || [],
+      fecha: user.cvData.fecha || user.cvData.cv_fecha || ''
+    };
+  } else {
+    cvData = {};
+  }
+
+  console.log('CV cargado:', cvData.texto ? 'SI (' + cvData.texto.length + ' chars)' : 'NO');
+
+  // Si hay CV guardado, restaurar el panel después de que carga la página
   if (cvData && cvData.texto) {
-    setTimeout(() => { if (typeof mostrarCVGuardado === 'function') mostrarCVGuardado(); }, 800);
+    setTimeout(() => {
+      if (typeof mostrarCVGuardado === 'function') mostrarCVGuardado();
+    }, 800);
   }
 
   await saveToStorage('talento_user', currentUser);
@@ -2152,6 +2168,28 @@ function candTab(tab) {
   document.querySelectorAll('#page-candidato .tab-btn').forEach((b,i) => {
     b.classList.toggle('active', ['cv','busqueda','resultados','frio'][i]===tab);
   });
+
+  // Autocompletar búsqueda con CV cuando entra a tab búsqueda o frío
+  if ((tab === 'busqueda' || tab === 'frio') && cvData && cvData.areasDetectadas && cvData.areasDetectadas.length > 0) {
+    const queryInput = tab === 'busqueda' ? 'busquedaQuery' : 'frioArea';
+    const input = document.getElementById(queryInput);
+    if (input && !input.value.trim()) {
+      // Tomar la primera área detectada como sugerencia inicial
+      input.value = cvData.areasDetectadas[0];
+      // Mostrar mensaje sutil
+      setTimeout(() => {
+        const banner = document.getElementById('autoFillBanner');
+        if (!banner) {
+          const b = document.createElement('div');
+          b.id = 'autoFillBanner';
+          b.style.cssText = 'background:rgba(0,196,140,0.08);border:1px solid rgba(0,196,140,0.2);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--verde);display:flex;align-items:center;gap:8px';
+          b.innerHTML = '✦ Búsqueda autocompletada con tu CV guardado — puedes editarla';
+          const form = input.closest('.field') || input.parentElement;
+          if (form && form.parentElement) form.parentElement.insertBefore(b, form);
+        }
+      }, 100);
+    }
+  }
 
   // Si va a correos en frio, ajustar límites según plan
   if (tab === 'frio') {
