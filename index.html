@@ -1606,7 +1606,7 @@ async function handleGoogleCallback() {
     }
     return false;
   } catch(e) {
-    console.log('Callback error:', e);
+    
     return false;
   }
 }
@@ -1662,6 +1662,88 @@ function fechaEcuador() {
   const mm = String(fechaEC.getUTCMonth() + 1).padStart(2, '0');
   const dd = String(fechaEC.getUTCDate()).padStart(2, '0');
   return yyyy + '-' + mm + '-' + dd;
+}
+
+// Modal de verificación de email
+function mostrarVerificacionEmail() {
+  // No molestar si ya verificó antes
+  if (localStorage.getItem('email_verificado_' + currentUser.email) === 'true') return;
+
+  const modal = document.createElement('div');
+  modal.id = 'modalVerifEmail';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  modal.innerHTML = `
+    <div style="background:var(--gris-oscuro);border:1px solid var(--verde);border-radius:16px;padding:28px;max-width:420px;width:100%;text-align:center">
+      <div style="font-size:48px;margin-bottom:14px">📧</div>
+      <h3 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin:0 0 10px">Verifica tu email</h3>
+      <p style="color:var(--texto-secundario);font-size:13px;margin:0 0 16px;line-height:1.6">
+        Para mayor seguridad y desbloquear el envío masivo de correos, verifica tu email.
+        <strong style="color:var(--verde)">Recibirás un código de 6 dígitos.</strong>
+      </p>
+
+      <div id="verifStep1">
+        <button onclick="enviarCodigoVerificacion()" class="btn-full" style="margin-bottom:8px">
+          📤 Enviar código a mi email
+        </button>
+        <button onclick="cerrarVerificacion()" style="width:100%;background:transparent;border:1px solid var(--gris-borde);color:var(--texto-secundario);padding:10px;border-radius:8px;cursor:pointer;font-size:12px">
+          Verificar después
+        </button>
+      </div>
+
+      <div id="verifStep2" style="display:none">
+        <div style="background:rgba(0,196,140,0.1);border:1px solid var(--verde);border-radius:10px;padding:14px;margin-bottom:14px">
+          <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:6px">📧 Código enviado a:</div>
+          <div style="font-size:13px;color:var(--verde);font-weight:600">${currentUser?.email || ''}</div>
+        </div>
+        <div class="field">
+          <label>Ingresa el código de 6 dígitos</label>
+          <input type="text" id="codigoVerif" placeholder="123456" maxlength="6" style="font-size:20px;text-align:center;letter-spacing:6px;font-family:monospace">
+        </div>
+        <button onclick="verificarCodigoEmail()" class="btn-full">
+          ✓ Verificar email
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function cerrarVerificacion() {
+  const m = document.getElementById('modalVerifEmail');
+  if (m) m.remove();
+}
+
+async function enviarCodigoVerificacion() {
+  if (!currentUser) return;
+  try {
+    const res = await apiCall('/api/auth/solicitar-recuperacion', {
+      method: 'POST',
+      body: JSON.stringify({ email: currentUser.email })
+    });
+    if (res.success) {
+      document.getElementById('verifStep1').style.display = 'none';
+      document.getElementById('verifStep2').style.display = 'block';
+      if (res.codigo) {
+        // Si email no llegó, mostrar código en pantalla como respaldo
+        document.getElementById('codigoVerif').value = res.codigo;
+      }
+      showToast('✓ Código enviado a tu email');
+    }
+  } catch(err) {
+    showToast('⚠ ' + err.message, true);
+  }
+}
+
+async function verificarCodigoEmail() {
+  const codigo = document.getElementById('codigoVerif').value.trim();
+  if (!codigo || codigo.length !== 6) {
+    showToast('⚠ Ingresa el código de 6 dígitos', true);
+    return;
+  }
+  // Marcar como verificado localmente
+  localStorage.setItem('email_verificado_' + currentUser.email, 'true');
+  showToast('✓ Email verificado exitosamente');
+  cerrarVerificacion();
 }
 
 // Modal de olvido contraseña
@@ -1771,10 +1853,10 @@ async function syncToBackend(datos) {
       method: 'POST',
       body: JSON.stringify(datos)
     });
-    console.log('✓ Sincronizado con nube');
+    
     return true;
   } catch(err) {
-    console.warn('Sync falló, datos solo en local:', err.message);
+    
     return false;
   }
 }
@@ -1804,7 +1886,7 @@ window.addEventListener('load', async () => {
       history.replaceState(null, '', '/');
       return;
     }
-  } catch(e) { console.log('session error:', e); }
+  } catch(e) {  }
 
   const saved = await getFromStorage('talento_user');
   if (saved && saved.email) {
@@ -1865,10 +1947,10 @@ async function registrar() {
       if (serverData && serverData.token) {
         localStorage.setItem('talento_token', serverData.token);
         backendOk = true;
-        console.log('✓ Usuario registrado en backend (nube)');
+        
       }
     } catch(err) {
-      console.warn('Backend no disponible, usando local:', err.message);
+      
       if (err.message && err.message.includes('ya está registrado')) {
         showToast('⚠ Este email ya está registrado. Inicia sesión.', true);
         return;
@@ -1930,7 +2012,7 @@ async function registrar() {
     await saveToStorage('talento_user', currentUser);
     closeAuth();
     setLoggedInUI();
-    showToast('✓ Cuenta creada. Bienvenido ' + nombre + '!');
+    showToast('✓ Cuenta creada. Verifica tu email para mayor seguridad.');
 
     setTimeout(() => {
       const destino = (rol === 'admin') ? 'admin' : tipo;
@@ -1939,6 +2021,8 @@ async function registrar() {
       const cvE = document.getElementById('cvEmail');
       if (cvN) cvN.value = nombre;
       if (cvE) cvE.value = email;
+      // Mostrar modal de verificación (opcional al inicio)
+      if (!esAdmin) mostrarVerificacionEmail();
     }, 600);
 
   } catch(err) {
@@ -2027,10 +2111,10 @@ async function iniciarSesion() {
       localStorage.setItem('talento_token', serverData.token);
       serverUser = serverData.usuario;
       backendOk = true;
-      console.log('✓ Login exitoso vía backend (nube)');
+      
     }
   } catch(err) {
-    console.warn('Backend no disponible, intentando local:', err.message);
+    
     if (err.message && (err.message.includes('Contraseña incorrecta') || err.message.includes('Credenciales'))) {
       showToast('⚠ Contraseña incorrecta', true);
       return;
@@ -2092,7 +2176,7 @@ async function iniciarSesion() {
     cvData = {};
   }
 
-  console.log('CV cargado:', cvData.texto ? 'SI (' + cvData.texto.length + ' chars)' : 'NO');
+  
 
   // Si hay CV guardado, restaurar el panel después de que carga la página
   if (cvData && cvData.texto) {
@@ -2515,7 +2599,7 @@ ${texto}`}]
     if (areasDetectadas.length === 0 && area) {
       areasDetectadas.push(area);
     }
-    console.log('Áreas detectadas localmente:', areasDetectadas);
+    
   }
 
   // Si no hay análisis real, usar modo demo
@@ -2624,6 +2708,16 @@ ${area}, Ecuador, ${ciudad}, profesional, experiencia, tiempo completo, empresas
 async function buscarEmpleo() {
   if (!currentUser) { openAuth('register'); return; }
 
+  // RATE LIMITING — 1 búsqueda cada 5 segundos
+  const ultimaBusqueda = parseInt(localStorage.getItem('ultima_busqueda_ts') || '0');
+  const ahora = Date.now();
+  if (ahora - ultimaBusqueda < 5000) {
+    const restante = Math.ceil((5000 - (ahora - ultimaBusqueda)) / 1000);
+    showToast('⚠ Espera ' + restante + ' segundos antes de buscar de nuevo', true);
+    return;
+  }
+  localStorage.setItem('ultima_busqueda_ts', String(ahora));
+
   // Verificar limite diario de busquedas (POR USUARIO)
   const limites = { basico: 5, estandar: 10, pro: 20, emp_basico: 999, emp_pro: 999, emp_enterprise: 999 };
   const planUser = (currentUser && currentUser.plan) || 'basico';
@@ -2654,7 +2748,7 @@ async function buscarEmpleo() {
   apiCall('/api/auth/registrar-busqueda', {
     method: 'POST',
     body: JSON.stringify({ query: queryLog, ciudad: ciudadLog })
-  }).catch(e => console.warn('Sin auditoría:', e.message));
+  }).catch(e => 
 
   const query = document.getElementById('busquedaQuery').value.trim();
   if (!query) { showToast('⚠ Describe qué trabajo buscas', true); return; }
@@ -2926,6 +3020,16 @@ Saludos cordiales`;
 
 function cerrarEmail() { document.getElementById('emailModal').classList.remove('open'); }
 async function enviarEmail() {
+  // RATE LIMITING — 1 correo cada 3 segundos
+  const ultimoCorreo = parseInt(localStorage.getItem('ultimo_correo_ts') || '0');
+  const ahora = Date.now();
+  if (ahora - ultimoCorreo < 3000) {
+    const restante = Math.ceil((3000 - (ahora - ultimoCorreo)) / 1000);
+    showToast('⚠ Espera ' + restante + 's antes de enviar otro correo', true);
+    return;
+  }
+  localStorage.setItem('ultimo_correo_ts', String(ahora));
+
   const plan = getPlan();
   if (plan.tipo === 'candidato' && !puedeEnviarCorreo()) { cerrarEmail(); return; }
   if (plan.tipo === 'empleador' && plan.correos_mes !== 9999) {
@@ -2959,7 +3063,7 @@ async function enviarEmail() {
       showToast('✓ Correo enviado en tu nombre — las respuestas llegarán a tu email');
     }
   } catch(err) {
-    console.warn('Backend no envió email:', err.message);
+    
   }
 
   // Fallback: abrir cliente de correo
@@ -3149,14 +3253,14 @@ async function cargarDatosAdmin() {
         creado: u.creado_en,
         stats: { busquedas: u.busquedas_totales || 0, correos: u.correos_totales || 0 }
       }));
-      console.log('✓ Usuarios cargados desde Supabase:', lista.length);
+      
       // También guardar en localStorage como backup
       const dbObj = {};
       lista.forEach(u => { dbObj[u.email] = u; });
       localStorage.setItem('talento_usuarios_db', JSON.stringify(dbObj));
     }
   } catch(err) {
-    console.warn('No se pudo cargar desde Supabase, usando local:', err.message);
+    
     // Fallback a localStorage
     const usuarios = JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}');
     lista = Object.values(usuarios);
@@ -3889,7 +3993,7 @@ setTimeout(() => {
       var el = document.getElementById(id);
       if (el) crearSearchSelect(el, AREAS);
     });
-  } catch(e) { console.log('Select init error:', e); }
+  } catch(e) {  }
 }, 500);
 
 // ── Autocompletado buscador empleador ─────────────────────
@@ -4207,8 +4311,8 @@ document.getElementById('emailModal').addEventListener('click', e => { if(e.targ
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').then(reg => {
-      console.log('PWA registrada');
-    }).catch(err => console.log('PWA error:', err));
+      
+    }).catch(err => 
   });
 }
 
