@@ -2485,6 +2485,39 @@ ${texto}`}]
     if (areasMatch) { areasDetectadas = areasMatch[1].split(',').map(function(a){return a.trim();}).filter(Boolean); }
   } catch(e) {}
 
+  // Detectar áreas básicas del CV si no se detectaron por IA
+  if (areasDetectadas.length === 0) {
+    const textoLower = texto.toLowerCase();
+    const areasPosibles = {
+      'Tecnología': ['programador', 'desarrollador', 'developer', 'software', 'tech', 'sistemas', 'react', 'javascript', 'python', 'java', 'web', 'frontend', 'backend', 'fullstack', 'devops', 'data', 'tecnología', 'informática'],
+      'Marketing y Ventas': ['marketing', 'ventas', 'vendedor', 'comercial', 'sales', 'publicidad', 'redes sociales', 'community', 'seo', 'sem'],
+      'Administración': ['administrador', 'administración', 'gerente', 'gerencia', 'asistente', 'secretaria', 'ejecutivo'],
+      'Contabilidad y Finanzas': ['contador', 'contabilidad', 'finanzas', 'financiero', 'auditor', 'cpa', 'tributario', 'economista'],
+      'Recursos Humanos': ['rrhh', 'recursos humanos', 'reclutador', 'talento', 'selección', 'hr'],
+      'Diseño': ['diseñador', 'diseño', 'design', 'ux', 'ui', 'gráfico', 'creativo', 'figma', 'photoshop'],
+      'Educación': ['profesor', 'docente', 'maestro', 'educación', 'enseñanza', 'pedagogía'],
+      'Salud': ['médico', 'enfermera', 'enfermero', 'doctor', 'odontólogo', 'farmacéutico', 'psicólogo', 'salud'],
+      'Ingeniería': ['ingeniero', 'ingeniería', 'civil', 'industrial', 'mecánico', 'eléctrico', 'químico'],
+      'Legal': ['abogado', 'derecho', 'legal', 'jurídico', 'notario'],
+      'Construcción': ['constructor', 'construcción', 'arquitecto', 'obra', 'maestro de obra'],
+      'Gastronomía': ['chef', 'cocinero', 'gastronomía', 'restaurante', 'cocina', 'mesero'],
+      'Logística': ['logística', 'bodega', 'supply', 'almacén', 'transporte'],
+      'Atención al Cliente': ['servicio', 'cliente', 'atención', 'call center', 'soporte', 'customer']
+    };
+
+    Object.keys(areasPosibles).forEach(function(area) {
+      const palabras = areasPosibles[area];
+      const tieneCoincidencia = palabras.some(function(p) { return textoLower.includes(p); });
+      if (tieneCoincidencia) areasDetectadas.push(area);
+    });
+
+    // Si aún no hay áreas, poner una genérica basada en el área que escribió
+    if (areasDetectadas.length === 0 && area) {
+      areasDetectadas.push(area);
+    }
+    console.log('Áreas detectadas localmente:', areasDetectadas);
+  }
+
   // Si no hay análisis real, usar modo demo
   if (!analysis) {
     analysis = `📋 RESUMEN DEL PERFIL
