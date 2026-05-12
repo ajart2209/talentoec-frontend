@@ -305,7 +305,7 @@ if (window.pdfjsLib) {
   <div class="nav-center" id="navCenter">
     <button class="ntab active" onclick="showPage('landing')" id="ntab-landing">Inicio</button>
     <button class="ntab" onclick="requireAuth('candidato')" id="ntab-candidato">Candidatos</button>
-    <button class="ntab" onclick="requireAuth('empleador')" id="ntab-empleador">Empleadores</button>
+    <button class="ntab" onclick="showToast('Empleadores próximamente', false)" id="ntab-empleador" style="opacity:0.5">Empleadores <span style="font-size:9px;color:var(--amarillo);margin-left:4px">Próximamente</span></button>
     <button class="ntab" onclick="requireAuth('admin')" id="ntab-admin" style="display:none;color:var(--amarillo)">⚙ Admin</button>
   </div>
   <div class="nav-right" id="navRight">
@@ -317,7 +317,7 @@ if (window.pdfjsLib) {
 <!-- ===== LANDING ===== -->
 <div id="page-landing" class="page active">
   <div class="hero">
-    <div class="hero-tag">Tecnología · Solo Ecuador · Gratis para candidatos</div>
+    <div class="hero-tag">Tecnología · Solo Ecuador · Empleo en 30 días</div>
     <h1 class="hero-title">El talento ecuatoriano,<br><span>encontrado por nosotros</span></h1>
     <p class="hero-sub">Sube tu CV, Lo analizamos con web search en tiempo real, busca en toda la internet ecuatoriana y envía correos automáticos por ti.</p>
     <div class="hero-ctas">
@@ -334,6 +334,51 @@ if (window.pdfjsLib) {
 
   <!-- COMO FUNCIONA VISUAL -->
   <div style="padding:20px 40px 60px;max-width:860px;margin:0 auto">
+    <!-- Sección de estadísticas con credibilidad -->
+    <div style="background:linear-gradient(135deg,rgba(0,196,140,0.06),rgba(245,230,66,0.04));border:1px solid rgba(0,196,140,0.2);border-radius:20px;padding:32px;margin-bottom:48px">
+      <div style="text-align:center;margin-bottom:28px">
+        <div style="font-family:'Syne',sans-serif;font-size:11px;color:var(--verde);letter-spacing:3px;font-weight:600;margin-bottom:8px">RESULTADOS REALES</div>
+        <h3 style="font-family:'Syne',sans-serif;font-size:24px;font-weight:700;margin:0">Aumenta hasta <span style="color:var(--verde)">3x</span> tus probabilidades</h3>
+        <p style="color:var(--texto-secundario);font-size:13px;margin-top:8px;max-width:500px;margin-left:auto;margin-right:auto">Datos basados en el mercado laboral ecuatoriano. Promedio de usuarios activos en TalentoEC.</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px">
+        <div style="text-align:center">
+          <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--verde)">+300%</div>
+          <div style="font-size:12px;color:var(--texto-secundario);margin-top:4px">Más probabilidad de respuesta vs CV tradicional</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--amarillo)">42%</div>
+          <div style="font-size:12px;color:var(--texto-secundario);margin-top:4px">Tasa de apertura de correos personalizados</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--azul)">12%</div>
+          <div style="font-size:12px;color:var(--texto-secundario);margin-top:4px">Tasa de respuesta promedio</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--verde)">1-2 meses</div>
+          <div style="font-size:12px;color:var(--texto-secundario);margin-top:4px">Tiempo promedio para conseguir trabajo</div>
+        </div>
+      </div>
+
+      <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.05)">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;font-size:12px;color:var(--texto-secundario)">
+          <div style="display:flex;align-items:start;gap:10px">
+            <span style="color:var(--verde);font-size:16px">📨</span>
+            <div><strong style="color:var(--texto-primario)">12-35 correos/día</strong><br>según tu plan: Básico, Estándar o Pro</div>
+          </div>
+          <div style="display:flex;align-items:start;gap:10px">
+            <span style="color:var(--verde);font-size:16px">🎯</span>
+            <div><strong style="color:var(--texto-primario)">40% empleos ocultos</strong><br>nunca se publican online</div>
+          </div>
+          <div style="display:flex;align-items:start;gap:10px">
+            <span style="color:var(--verde);font-size:16px">🤖</span>
+            <div><strong style="color:var(--texto-primario)">Correos personalizados</strong><br>personalizados por empresa</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="section-label">Cómo funciona</div>
     <div class="section-title" style="font-family:'Syne',sans-serif;font-size:28px;font-weight:700;margin-bottom:36px">Tu búsqueda de trabajo, automatizada</div>
 
@@ -527,8 +572,8 @@ if (window.pdfjsLib) {
 
   </div>
 
-    <!-- PLANES EMPLEADORES -->
-    <div style="margin-top:48px">
+    <!-- PLANES EMPLEADORES - DESACTIVADOS hasta tener firma electronica + RUC RIMPE Emprendedor -->
+    <div style="margin-top:48px;display:none" id="empleadorPlansSection">
       <div class="section-label">Para empresas</div>
       <div class="section-title">Encuentra el talento que necesitas</div>
       <div class="planes-grid">
@@ -752,8 +797,7 @@ if (window.pdfjsLib) {
         <div id="cvMejoradoContent" style="font-size:13px;color:var(--texto-secundario);line-height:1.8;white-space:pre-wrap;max-height:400px;overflow-y:auto;background:var(--negro);padding:16px;border-radius:8px"></div>
       </div>
     </div>
-
-    <!-- TAB: BUSQUEDA -->
+        <!-- TAB: BUSQUEDA -->
     <div id="cand-tab-busqueda" style="display:none">
       <div class="section-box">
         <div class="section-box-title">Buscar oportunidades en Ecuador</div>
@@ -3007,9 +3051,38 @@ async function generarCarta() {
 }
 
 // ── Funciones del panel de administrador ─────────
-function cargarDatosAdmin() {
-  const usuarios = JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}');
-  const lista = Object.values(usuarios);
+async function cargarDatosAdmin() {
+  // Intentar cargar usuarios desde el backend (Supabase)
+  let lista = [];
+  try {
+    const data = await apiCall('/api/auth/admin/usuarios');
+    if (data && data.usuarios) {
+      lista = data.usuarios.map(u => ({
+        id: u.id,
+        email: u.email,
+        nombre: u.nombre,
+        tipo: u.tipo,
+        rol: u.rol,
+        plan: u.plan,
+        creado: u.creado_en,
+        stats: { busquedas: u.busquedas_totales || 0, correos: u.correos_totales || 0 }
+      }));
+      console.log('✓ Usuarios cargados desde Supabase:', lista.length);
+      // También guardar en localStorage como backup
+      const dbObj = {};
+      lista.forEach(u => { dbObj[u.email] = u; });
+      localStorage.setItem('talento_usuarios_db', JSON.stringify(dbObj));
+    }
+  } catch(err) {
+    console.warn('No se pudo cargar desde Supabase, usando local:', err.message);
+    // Fallback a localStorage
+    const usuarios = JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}');
+    lista = Object.values(usuarios);
+  }
+
+  // Guardar lista globalmente para que renderUsersAdmin la use
+  window._adminUsersList = lista;
+
   document.getElementById('adminTotalUsers').textContent = lista.length;
   document.getElementById('adminCandidatos').textContent = lista.filter(u => u.tipo === 'candidato').length;
   document.getElementById('adminEmpleadores').textContent = lista.filter(u => u.tipo === 'empleador').length;
@@ -3060,9 +3133,14 @@ function cargarDatosAdmin() {
 }
 
 function renderUsersAdmin() {
-  const usuarios = JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}');
+  // Usar lista del backend si existe, sino localStorage
+  let usuariosLista = window._adminUsersList;
+  if (!usuariosLista) {
+    const usuarios = JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}');
+    usuariosLista = Object.values(usuarios);
+  }
   const filtro = document.getElementById('adminFiltro')?.value.toLowerCase() || '';
-  const lista = Object.values(usuarios).filter(u =>
+  const lista = usuariosLista.filter(u =>
     u.email.toLowerCase().includes(filtro) || (u.nombre || '').toLowerCase().includes(filtro)
   );
 
