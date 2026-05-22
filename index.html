@@ -3166,7 +3166,16 @@ function verPerfil(nombre) { showToast('Perfil completo próximamente'); }
 
 // ======= EMAIL =======
 async function abrirEmailModal(email, empresa, cargo, nombre, esParaEmpresa) {
-  document.getElementById('modalTo').value = email;
+  // Si no hay email, sugerir uno común para RRHH
+  if (!email || email === 'undefined' || email === '') {
+    if (empresa) {
+      // Sugerir formato común
+      const dominio = empresa.toLowerCase().replace(/[^a-z]/g, '');
+      email = 'rrhh@' + dominio + '.com';
+      showToast('⚠ Email no encontrado en la oferta — sugerimos uno, revísalo antes de enviar', false);
+    }
+  }
+  document.getElementById('modalTo').value = email || '';
   document.getElementById('modalSubject').value = 'Oportunidad laboral — ' + cargo;
   document.getElementById('modalBody').value = '⟳ Generando con TalentoEC...';
   document.getElementById('emailModal').classList.add('open');
