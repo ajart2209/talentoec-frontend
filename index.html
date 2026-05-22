@@ -2933,7 +2933,7 @@ async function buscarEmpleo() {
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:1000,
         tools:[{type:'web_search_20250305',name:'web_search'}],
-        messages:[{role:'user',content:`Busca ofertas de trabajo REALES en Ecuador para: "${query}". Ciudad preferida: ${ciudad}. Modalidad: ${modalidad}. Fuentes: ${fuentes.join(', ')}.\n\nIMPORTANTE sobre el campo "email":\n- SOLO incluye email si lo viste explícitamente en la fuente\n- Si NO viste un email real, deja el campo "email" vacío como ""\n- NUNCA inventes emails como info@empresa.com o talento@empresa.com\n- Es mejor un campo vacío que un email falso\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa ecuatoriana real","cargo":"título puesto","ciudad":"ciudad Ecuador","salario":"rango USD","fuente":"fuente donde se encontró","match":85,"email":"rrhh@empresa.com.ec","descripcion":"descripción breve","url":"https://..."}]}\n\nGenera 5 trabajos con datos realistas de Ecuador.`}]
+        messages:[{role:'user',content:`Busca ofertas de trabajo REALES en Ecuador para: "${query}". Ciudad preferida: ${ciudad}. Modalidad: ${modalidad}. Fuentes: ${fuentes.join(', ')}.\n\nINSTRUCCIONES CRITICAS sobre el campo "email":\n- SOLO incluye email si lo viste explícitamente en la fuente original (LinkedIn, Multitrabajos, etc)\n- Busca activamente emails de contacto en las descripciones, sitios oficiales, perfiles de LinkedIn\n- Si la oferta menciona "envia tu CV a X@empresa.com" → ese es el email correcto\n- Si NO viste un email real, deja el campo "email" como cadena vacía ""\n- NUNCA inventes emails como info@empresa.com, rrhh@empresa.com o talento@empresa.com\n- Es PREFERIBLE un campo vacío que un email falso o inventado\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa ecuatoriana real","cargo":"título puesto","ciudad":"ciudad Ecuador","salario":"rango USD","fuente":"fuente donde se encontró","match":85,"email":"rrhh@empresa.com.ec","descripcion":"descripción breve","url":"https://..."}]}\n\nGenera 5 trabajos con datos realistas de Ecuador.`}]
       })
     });
     const data = await res.json();
@@ -3183,16 +3183,13 @@ async function abrirEmailModal(email, empresa, cargo, nombre, esParaEmpresa) {
   window._lastJobEmpresa = empresa || '';
   window._lastJobCargo = cargo || '';
 
-  // Si no hay email, sugerir uno común para RRHH
+  // Si no hay email real, NO sugerir uno falso
   if (!email || email === 'undefined' || email === '') {
-    if (empresa) {
-      // Sugerir formato común
-      const dominio = empresa.toLowerCase().replace(/[^a-z]/g, '');
-      email = 'rrhh@' + dominio + '.com';
-      showToast('⚠ Email no encontrado en la oferta — sugerimos uno, revísalo antes de enviar', false);
-    }
+    document.getElementById('modalTo').value = '';
+    showToast('⚠ No encontramos el email de la empresa. Búscalo en su web o LinkedIn y póntelo aquí.', true);
+  } else {
+    document.getElementById('modalTo').value = email;
   }
-  document.getElementById('modalTo').value = email || '';
   document.getElementById('modalSubject').value = 'Oportunidad laboral — ' + cargo;
   document.getElementById('modalBody').value = '⟳ Generando con TalentoEC...';
   document.getElementById('emailModal').classList.add('open');
