@@ -1635,6 +1635,19 @@ let selectedTipo = 'candidato';
 let cvData = {};
 let candidatosData = [];
 let correosEnviados = [];
+// Cargar correos enviados del usuario actual
+function cargarCorreosEnviados() {
+  if (currentUser && currentUser.email) {
+    const key = 'correos_enviados_' + currentUser.email;
+    correosEnviados = JSON.parse(localStorage.getItem(key) || '[]');
+  }
+}
+function guardarCorreosEnviados() {
+  if (currentUser && currentUser.email) {
+    const key = 'correos_enviados_' + currentUser.email;
+    localStorage.setItem(key, JSON.stringify(correosEnviados));
+  }
+}
 let busquedasCount = 0;
 let correosCount = 0;
 
@@ -2250,6 +2263,27 @@ async function iniciarSesion() {
   userTipo = currentUser.tipo;
   busquedasCount = currentUser.stats.busquedas || 0;
   correosCount = currentUser.stats.correos || 0;
+  // Cargar correos enviados del usuario DESDE LA NUBE (Supabase)
+  if (currentUser && currentUser.email) {
+    try {
+      const correosRes = await apiCall('/api/auth/mis-correos');
+      if (correosRes && correosRes.correos) {
+        correosEnviados = correosRes.correos.map(c => ({
+          to: c.destinatario_email,
+          subject: c.cargo || c.empresa || '',
+          empresa: c.empresa,
+          fecha: c.fecha_envio,
+          estado: 'Enviado'
+        }));
+        console.log('✓ Correos enviados cargados desde nube:', correosEnviados.length);
+      }
+    } catch(err) {
+      // Fallback a localStorage si falla la nube
+      const correosKey = 'correos_enviados_' + currentUser.email;
+      correosEnviados = JSON.parse(localStorage.getItem(correosKey) || '[]');
+    }
+  }
+
   // Mapear cvData desde el backend (que usa snake_case) a formato frontend (camelCase)
   if (user.cvData) {
     cvData = {
@@ -2872,12 +2906,34 @@ async function buscarEmpleo() {
   const fuentes = [...document.querySelectorAll('#fuentesChips .chip.on')].map(c=>c.textContent);
 
   candTab('resultados');
-  document.getElementById('candResultados').innerHTML = '';
-  const anim = document.getElementById('candSearchAnim'); anim.classList.add('visible');
-  const srcs = document.getElementById('candSearchSrcs'); srcs.innerHTML = '';
-  fuentes.forEach((f,i) => setTimeout(()=>{ const el=document.createElement('div');el.className='src-item';el.textContent=f;srcs.appendChild(el); },i*350));
+  // Mostrar pantalla de carga grande en el tab resultados
+  document.getElementById('candResultados').innerHTML = `
+    <div style="text-align:center;padding:60px 20px;min-height:400px;display:flex;flex-direction:column;justify-content:center;align-items:center">
+      <div style="position:relative;width:90px;height:90px;margin-bottom:24px">
+        <div style="width:90px;height:90px;border:4px solid rgba(0,196,140,0.1);border-top-color:var(--verde);border-radius:50%;animation:spin 1.2s linear infinite"></div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:36px">🔍</div>
+      </div>
+      <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:700;color:var(--verde);margin-bottom:10px">TalentoEC está trabajando</div>
+      <div style="font-size:14px;color:var(--texto-secundario);margin-bottom:24px;max-width:380px">Analizando tu CV y buscando las mejores oportunidades laborales en Ecuador</div>
+      <div id="searchSourcesProgress" style="display:flex;flex-direction:column;gap:6px;align-items:flex-start"></div>
+      <div style="margin-top:24px;font-size:12px;color:var(--texto-secundario);font-style:italic">Esto puede tomar 20-40 segundos</div>
+    </div>
+  `;
 
-  await new Promise(r=>setTimeout(r, fuentes.length*350+600));
+  const srcsProgress = document.getElementById('searchSourcesProgress');
+  fuentes.forEach((f, i) => setTimeout(() => {
+    if (srcsProgress) {
+      const el = document.createElement('div');
+      el.style.cssText = 'padding:8px 16px;background:rgba(0,196,140,0.1);border:1px solid rgba(0,196,140,0.3);border-radius:8px;font-size:13px;color:var(--verde);display:flex;align-items:center;gap:10px;animation:fadeIn .3s ease';
+      el.innerHTML = '<span style="background:var(--verde);color:var(--negro);width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">✓</span>' + f;
+      srcsProgress.appendChild(el);
+    }
+  }, i * 400));
+
+  const anim = document.getElementById('candSearchAnim');
+  if (anim) anim.classList.add('visible');
+
+  await new Promise(r => setTimeout(r, fuentes.length * 400 + 1000));
 
   try {
     const res = await fetch(BACKEND_URL + '/api/claude/messages', {
@@ -3222,6 +3278,7 @@ async function enviarEmail() {
 
   correosCount++;
   correosEnviados.push({ to, subject, fecha: new Date().toLocaleString('es-EC'), estado: 'Enviado' });
+  guardarCorreosEnviados();
   if (currentUser) {
     currentUser.stats = currentUser.stats||{};
     currentUser.stats.correos = correosCount;
