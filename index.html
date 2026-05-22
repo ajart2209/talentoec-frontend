@@ -2961,13 +2961,18 @@ async function buscarEmpleo() {
 }
 
 function renderJobCards(jobs) {
-  // Filtrar trabajos ya postulados (por email)
-  const enviados = correosEnviados.map(c => (c.to || '').toLowerCase());
+  // Filtrar trabajos ya postulados (por email O por empresa)
+  const enviadosEmails = correosEnviados.map(c => (c.to || '').toLowerCase());
+  const enviadosEmpresas = correosEnviados.map(c => (c.empresa || c.subject || '').toLowerCase().split('—')[0].trim());
   const jobsOriginales = jobs.length;
   jobs = jobs.filter(j => {
     const jobEmail = (j.email || j.contacto_email || '').toLowerCase();
-    if (!jobEmail) return true;
-    return !enviados.includes(jobEmail);
+    const jobEmpresa = (j.empresa || '').toLowerCase();
+    // Si ya enviamos email a este destinatario, ocultar
+    if (jobEmail && enviadosEmails.includes(jobEmail)) return false;
+    // Si ya contactamos a esta empresa antes (aunque sea otro cargo), ocultar
+    if (jobEmpresa && enviadosEmpresas.some(e => e && (e.includes(jobEmpresa) || jobEmpresa.includes(e)))) return false;
+    return true;
   });
 
   const filtrados = jobsOriginales - jobs.length;
@@ -3155,6 +3160,10 @@ function verPerfil(nombre) { showToast('Perfil completo próximamente'); }
 
 // ======= EMAIL =======
 async function abrirEmailModal(email, empresa, cargo, nombre, esParaEmpresa) {
+  // Guardar empresa y cargo para usarlos al enviar
+  window._lastJobEmpresa = empresa || '';
+  window._lastJobCargo = cargo || '';
+
   // Si no hay email, sugerir uno común para RRHH
   if (!email || email === 'undefined' || email === '') {
     if (empresa) {
@@ -3250,12 +3259,16 @@ async function enviarEmail() {
   // Intentar enviar vía backend (en nombre del candidato, reply-to a su email)
   let enviadoBackend = false;
   try {
+    // Extraer empresa real del subject o usar la variable global del último job seleccionado
+    const empresaReal = window._lastJobEmpresa || subject.split('—')[0]?.trim() || 'Empresa';
+    const cargoReal = window._lastJobCargo || subject.replace(/^Oportunidad laboral\s*—\s*/, '').trim() || subject;
+
     const res = await apiCall('/api/auth/enviar-postulacion', {
       method: 'POST',
       body: JSON.stringify({
         empresa_email: to,
-        empresa_nombre: subject.split('—')[0]?.trim() || 'Empresa',
-        cargo: subject,
+        empresa_nombre: empresaReal,
+        cargo: cargoReal,
         asunto: subject,
         mensaje: body
       })
@@ -3275,7 +3288,14 @@ async function enviarEmail() {
   }
 
   correosCount++;
-  correosEnviados.push({ to, subject, fecha: new Date().toLocaleString('es-EC'), estado: 'Enviado' });
+  correosEnviados.push({
+    to,
+    subject,
+    empresa: window._lastJobEmpresa || subject.split('—')[0]?.trim() || '',
+    cargo: window._lastJobCargo || '',
+    fecha: new Date().toLocaleString('es-EC'),
+    estado: 'Enviado'
+  });
   guardarCorreosEnviados();
   if (currentUser) {
     currentUser.stats = currentUser.stats||{};
