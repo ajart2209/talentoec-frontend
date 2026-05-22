@@ -2962,18 +2962,37 @@ async function buscarEmpleo() {
 
 function renderJobCards(jobs) {
   // Filtrar trabajos ya postulados (por email O por empresa)
+  const normalizar = (s) => (s || '').toLowerCase().trim().replace(/[^a-z0-9]/g, '');
+
   const enviadosEmails = correosEnviados.map(c => (c.to || '').toLowerCase());
-  const enviadosEmpresas = correosEnviados.map(c => (c.empresa || c.subject || '').toLowerCase().split('—')[0].trim());
+  const enviadosEmpresas = correosEnviados.map(c => normalizar(c.empresa || ''));
+
+  console.log('🔍 Filtro - empresas ya contactadas:', enviadosEmpresas);
+
   const jobsOriginales = jobs.length;
   jobs = jobs.filter(j => {
     const jobEmail = (j.email || j.contacto_email || '').toLowerCase();
-    const jobEmpresa = (j.empresa || '').toLowerCase();
+    const jobEmpresaNorm = normalizar(j.empresa || '');
+
     // Si ya enviamos email a este destinatario, ocultar
-    if (jobEmail && enviadosEmails.includes(jobEmail)) return false;
-    // Si ya contactamos a esta empresa antes (aunque sea otro cargo), ocultar
-    if (jobEmpresa && enviadosEmpresas.some(e => e && (e.includes(jobEmpresa) || jobEmpresa.includes(e)))) return false;
+    if (jobEmail && enviadosEmails.includes(jobEmail)) {
+      console.log('🚫 Filtrado por email:', j.empresa);
+      return false;
+    }
+    // Si ya contactamos a esta empresa (comparación más flexible)
+    if (jobEmpresaNorm) {
+      for (const empresaEnviada of enviadosEmpresas) {
+        if (!empresaEnviada) continue;
+        // Si una empresa contiene a la otra (más permisivo)
+        if (jobEmpresaNorm.includes(empresaEnviada) || empresaEnviada.includes(jobEmpresaNorm)) {
+          console.log('🚫 Filtrado por empresa:', j.empresa, '=', empresaEnviada);
+          return false;
+        }
+      }
+    }
     return true;
   });
+  console.log('✅ Filtro completado. Original:', jobsOriginales, 'Mostrado:', jobs.length);
 
   const filtrados = jobsOriginales - jobs.length;
 
