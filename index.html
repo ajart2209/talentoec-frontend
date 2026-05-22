@@ -2102,6 +2102,14 @@ async function registrar() {
 }
 
 function setLoggedInUI() {
+  // Autocompletar campos del CV con datos del usuario logueado
+  if (currentUser) {
+    const cvN = document.getElementById('cvNombre');
+    const cvE = document.getElementById('cvEmail');
+    if (cvN && !cvN.value) cvN.value = currentUser.nombre || '';
+    if (cvE && !cvE.value) cvE.value = currentUser.email || '';
+  }
+
   // Ocultar tab Inicio
   var inicioTab = document.getElementById('ntab-landing');
   if (inicioTab) inicioTab.style.display = 'none';
