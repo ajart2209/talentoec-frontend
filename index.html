@@ -768,8 +768,8 @@ if (window.pdfjsLib) {
               <div style="font-size:13px;font-weight:500;margin-bottom:3px">¿Quieres que TalentoEC mejore tu CV automáticamente?</div>
               <div style="font-size:11px;color:var(--texto-secundario)">Reescribimos tu CV de forma profesional optimizado para Ecuador · Incluido en tu plan</div>
             </div>
-            <button id="mejorarBtnAction" onclick="mejorarCV()" style="background:var(--verde);color:var(--negro);border:none;padding:10px 20px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap">
-              ✨ Mejorar mi CV
+            <button id="mejorarBtnAction" onclick="generarCartaPersonalizada()" style="background:var(--verde);color:var(--negro);border:none;padding:10px 20px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap">
+              💌 Generar carta de presentación
             </button>
           </div>
           <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--gris-borde);background:rgba(245,230,66,0.06);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px">
@@ -1664,6 +1664,82 @@ function fechaEcuador() {
   return yyyy + '-' + mm + '-' + dd;
 }
 
+// Generar carta de presentación personalizada
+async function generarCartaPersonalizada() {
+  if (!cvData || !cvData.texto) {
+    showToast('⚠ Primero sube tu CV', true);
+    return;
+  }
+
+  document.getElementById('cvMejoradoPanel').style.display = 'block';
+  document.getElementById('mejorarStatus').textContent = '✨ TalentoEC generando tu carta...';
+  document.getElementById('cvMejoradoContent').innerHTML = '<div style="color:var(--verde)">⟳ Generando carta personalizada...</div>';
+  document.getElementById('descargarBtn').style.display = 'none';
+  document.getElementById('cvMejoradoPanel').scrollIntoView({ behavior: 'smooth' });
+
+  let carta = '';
+  try {
+    const res = await fetch(BACKEND_URL + '/api/claude/messages', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
+      },
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:800,
+        messages:[{role:'user', content:`Eres un experto en recursos humanos del Ecuador. Genera una CARTA DE PRESENTACIÓN profesional, breve y personalizada basada en este CV del candidato.
+
+INSTRUCCIONES:
+- Máximo 250 palabras
+- Tono profesional pero cercano
+- Destacar 2-3 fortalezas principales del candidato según su CV
+- Mostrar interés por integrar un equipo profesional
+- Lenguaje ecuatoriano (no español de España)
+- NO usar markdown ni asteriscos, solo texto plano
+
+CV DEL CANDIDATO:
+${cvData.texto}
+
+Genera SOLO la carta sin explicaciones adicionales.`}]
+      })
+    });
+    const data = await res.json();
+    carta = data.content?.[0]?.text || '';
+  } catch(e) {}
+
+  if (!carta) {
+    carta = `Estimados señores,
+
+Mediante la presente, me permito presentar mi candidatura para integrar su equipo profesional. Soy un profesional ecuatoriano con experiencia comprobada en mi área, comprometido con la excelencia y los resultados.
+
+A lo largo de mi trayectoria he desarrollado sólidas competencias técnicas y habilidades interpersonales que me permiten aportar valor en entornos dinámicos. Mi pasión por el aprendizaje continuo y la innovación me motivan a seguir creciendo profesionalmente.
+
+Estoy seguro de que mi experiencia y compromiso pueden contribuir al éxito de su organización. Adjunto mi CV para su revisión.
+
+Quedo a su disposición para una entrevista personal.
+
+Atentamente,
+${cvData.nombre || currentUser?.nombre || 'Candidato'}`;
+  }
+
+  cvData.cartaPresentacion = carta;
+  document.getElementById('cvMejoradoContent').textContent = carta;
+  document.getElementById('mejorarStatus').textContent = '✓ Carta de presentación lista';
+  document.getElementById('descargarBtn').style.display = 'flex';
+
+  if (currentUser) {
+    currentUser.cvData = cvData;
+    await saveToStorage('talento_user', currentUser);
+    syncToBackend({
+      cv_texto: cvData.texto,
+      cv_mejorado: cvData.cvMejorado || '',
+      carta_presentacion: carta,
+      areas_detectadas: cvData.areasDetectadas
+    });
+  }
+}
+
 // Modal de verificación de email
 function mostrarVerificacionEmail() {
   // No molestar si ya verificó antes
@@ -2506,15 +2582,9 @@ function mostrarCVGuardado() {
     }
   }
 
-  // Si ya tiene CV mejorado, ocultar botón "Mejorar mi CV"
-  if (cvData.cvMejorado) {
-    const btn = document.getElementById('mejorarBtnAction');
-    if (btn) {
-      const wrapper = btn.parentElement;
-      if (wrapper) {
-        wrapper.innerHTML = '<div style="display:flex;align-items:center;gap:10px;color:var(--verde);font-size:13px;font-weight:500"><span style="background:var(--verde);color:var(--negro);width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700">✓</span>Tu CV ya está mejorado y guardado</div>';
-      }
-    }
+  // Si ya tiene carta, ocultar botón generar carta
+  if (cvData.cartaPresentacion) {
+    // Mantener el botón disponible para regenerar
   }
 
   // Mostrar CV mejorado o carta si existen
@@ -3141,6 +3211,7 @@ INSTRUCCIONES:
 - Adapta el lenguaje al mercado ecuatoriano
 - Estructura: Datos de contacto, Perfil profesional, Experiencia, Educación, Habilidades, Idiomas, Certificaciones
 - Máximo 1 página equivalente
+- IMPORTANTE: NO uses asteriscos (**) ni guiones (---) ni símbolos markdown. Usa solo texto plano con saltos de línea, mayúsculas para títulos, y emojis cuando corresponda
 
 CV ORIGINAL:
 ${cvData.texto}
