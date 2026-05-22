@@ -2906,34 +2906,23 @@ async function buscarEmpleo() {
   const fuentes = [...document.querySelectorAll('#fuentesChips .chip.on')].map(c=>c.textContent);
 
   candTab('resultados');
-  // Mostrar pantalla de carga grande en el tab resultados
+  // Mostrar pantalla de carga grande - solo hombre trabajando
   document.getElementById('candResultados').innerHTML = `
-    <div style="text-align:center;padding:60px 20px;min-height:400px;display:flex;flex-direction:column;justify-content:center;align-items:center">
-      <div style="position:relative;width:90px;height:90px;margin-bottom:24px">
-        <div style="width:90px;height:90px;border:4px solid rgba(0,196,140,0.1);border-top-color:var(--verde);border-radius:50%;animation:spin 1.2s linear infinite"></div>
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:36px">🔍</div>
+    <div style="text-align:center;padding:80px 20px;min-height:400px;display:flex;flex-direction:column;justify-content:center;align-items:center">
+      <div style="position:relative;width:110px;height:110px;margin-bottom:30px">
+        <div style="width:110px;height:110px;border:4px solid rgba(0,196,140,0.1);border-top-color:var(--verde);border-radius:50%;animation:spin 1.5s linear infinite"></div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px">👨‍💼</div>
       </div>
-      <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:700;color:var(--verde);margin-bottom:10px">TalentoEC está trabajando</div>
-      <div style="font-size:14px;color:var(--texto-secundario);margin-bottom:24px;max-width:380px">Analizando tu CV y buscando las mejores oportunidades laborales en Ecuador</div>
-      <div id="searchSourcesProgress" style="display:flex;flex-direction:column;gap:6px;align-items:flex-start"></div>
-      <div style="margin-top:24px;font-size:12px;color:var(--texto-secundario);font-style:italic">Esto puede tomar 20-40 segundos</div>
+      <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:700;color:var(--verde);margin-bottom:14px">TalentoEC está trabajando</div>
+      <div style="font-size:14px;color:var(--texto-secundario);margin-bottom:24px;max-width:380px">Encontrando las mejores oportunidades laborales para ti</div>
+      <div style="font-size:12px;color:var(--texto-secundario);font-style:italic;opacity:0.7">Por favor espera unos segundos...</div>
     </div>
   `;
-
-  const srcsProgress = document.getElementById('searchSourcesProgress');
-  fuentes.forEach((f, i) => setTimeout(() => {
-    if (srcsProgress) {
-      const el = document.createElement('div');
-      el.style.cssText = 'padding:8px 16px;background:rgba(0,196,140,0.1);border:1px solid rgba(0,196,140,0.3);border-radius:8px;font-size:13px;color:var(--verde);display:flex;align-items:center;gap:10px;animation:fadeIn .3s ease';
-      el.innerHTML = '<span style="background:var(--verde);color:var(--negro);width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">✓</span>' + f;
-      srcsProgress.appendChild(el);
-    }
-  }, i * 400));
 
   const anim = document.getElementById('candSearchAnim');
   if (anim) anim.classList.add('visible');
 
-  await new Promise(r => setTimeout(r, fuentes.length * 400 + 1000));
+  await new Promise(r => setTimeout(r, 1500));
 
   try {
     const res = await fetch(BACKEND_URL + '/api/claude/messages', {
@@ -3295,6 +3284,20 @@ async function enviarEmail() {
   }
   updateStats();
   cerrarEmail();
+
+  // Eliminar visualmente el trabajo al que ya se envió correo
+  setTimeout(() => {
+    // Buscar todos los botones que tengan ese email y eliminar la card padre
+    document.querySelectorAll('button[onclick*="' + to + '"]').forEach(btn => {
+      const card = btn.closest('.job-card') || btn.closest('[class*="card"]') || btn.closest('.section-box');
+      if (card) {
+        card.style.transition = 'all 0.4s ease';
+        card.style.opacity = '0';
+        card.style.transform = 'translateX(20px)';
+        setTimeout(() => card.remove(), 400);
+      }
+    });
+  }, 500);
 }
 
 async function mejorarCV() {
