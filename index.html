@@ -2272,7 +2272,7 @@ async function iniciarSesion() {
           to: c.destinatario_email,
           subject: c.cargo || c.empresa || '',
           empresa: c.empresa,
-          fecha: c.fecha_envio,
+          fecha: c.enviado_en,
           estado: 'Enviado'
         }));
         console.log('✓ Correos enviados cargados desde nube:', correosEnviados.length);
