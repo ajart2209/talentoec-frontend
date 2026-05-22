@@ -1723,11 +1723,22 @@ async function enviarCodigoVerificacion() {
     if (res.success) {
       document.getElementById('verifStep1').style.display = 'none';
       document.getElementById('verifStep2').style.display = 'block';
-      if (res.codigo) {
-        // Si email no llegó, mostrar código en pantalla como respaldo
+
+      const step2 = document.getElementById('verifStep2');
+
+      if (res.emailEnviado) {
+        // Email enviado correctamente por Resend
+        showToast('✓ Código enviado a tu email');
+      } else if (res.codigo) {
+        // Resend no envió, mostrar código en pantalla
         document.getElementById('codigoVerif').value = res.codigo;
+        // Banner amarillo de advertencia
+        const banner = document.createElement('div');
+        banner.style.cssText = 'background:rgba(245,230,66,0.15);border:1px solid var(--amarillo);border-radius:10px;padding:14px;margin-bottom:14px;text-align:center';
+        banner.innerHTML = '<div style="font-size:11px;color:var(--texto-secundario);margin-bottom:6px">⚠ Email no llegó, usa este código:</div><div style="font-size:24px;font-weight:700;color:var(--amarillo);font-family:monospace;letter-spacing:6px">' + res.codigo + '</div>';
+        step2.insertBefore(banner, step2.firstChild);
+        showToast('✓ Código generado');
       }
-      showToast('✓ Código enviado a tu email');
     }
   } catch(err) {
     showToast('⚠ ' + err.message, true);
@@ -2541,9 +2552,12 @@ async function guardarYAnalizar() {
   let areasDetectadas = [];
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(BACKEND_URL + '/api/claude/messages', {
       method:'POST',
-      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization': 'Bearer ' + (currentUser?.sessionToken || localStorage.getItem('talento_token') || '')
+      },
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:1200,
         messages:[{role:'user',content:`Analiza este CV para el mercado laboral de Ecuador. Responde en español con emojis:
@@ -2651,9 +2665,12 @@ ${area}, Ecuador, ${ciudad}, profesional, experiencia, tiempo completo, empresas
   // Generar carta de presentación automáticamente
   let carta = '';
   try {
-    const resCarta = await fetch('https://api.anthropic.com/v1/messages', {
+    const resCarta = await fetch(BACKEND_URL + '/api/claude/messages', {
       method:'POST',
-      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization': 'Bearer ' + (currentUser?.sessionToken || localStorage.getItem('talento_token') || '')
+      },
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:600,
         messages:[{role:'user',content:'Redacta una carta de presentación profesional en español para Ecuador para este CV. 3 párrafos: presentación, experiencia clave y cierre. Tono profesional ecuatoriano, máximo 300 palabras. Sin nombre de empresa específica.\n\nCV:\n' + texto}]
@@ -2765,8 +2782,11 @@ async function buscarEmpleo() {
   await new Promise(r=>setTimeout(r, fuentes.length*350+600));
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST', headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    const res = await fetch(BACKEND_URL + '/api/claude/messages', {
+      method:'POST', headers:{
+        'Content-Type':'application/json',
+        'Authorization': 'Bearer ' + (currentUser?.sessionToken || localStorage.getItem('talento_token') || '')
+      },
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:1000,
         tools:[{type:'web_search_20250305',name:'web_search'}],
@@ -2843,8 +2863,11 @@ async function buscarCandidatos() {
 
   try {
     const filtros = [ciudad&&`ciudad: ${ciudad}`,area&&`área: ${area}`,exp&&`experiencia mínima: ${exp}`,modalidad&&`modalidad: ${modalidad}`].filter(Boolean).join(', ');
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST', headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    const res = await fetch(BACKEND_URL + '/api/claude/messages', {
+      method:'POST', headers:{
+        'Content-Type':'application/json',
+        'Authorization': 'Bearer ' + (currentUser?.sessionToken || localStorage.getItem('talento_token') || '')
+      },
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:1000,
         tools:[{type:'web_search_20250305',name:'web_search'}],
@@ -2982,8 +3005,11 @@ async function abrirEmailModal(email, empresa, cargo, nombre, esParaEmpresa) {
     : `Redacta un correo profesional en español para contactar a "${nombre}", actualmente como "${cargo}". Cordial, 3 párrafos, informa que encontramos su perfil y hay una oportunidad interesante. Sin revelar empresa. Tono respetuoso. Sin asunto, solo el cuerpo.`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST', headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    const res = await fetch(BACKEND_URL + '/api/claude/messages', {
+      method:'POST', headers:{
+        'Content-Type':'application/json',
+        'Authorization': 'Bearer ' + (currentUser?.sessionToken || localStorage.getItem('talento_token') || '')
+      },
       body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:500, messages:[{role:'user',content:prompt}] })
     });
     const data = await res.json();
@@ -3096,9 +3122,12 @@ async function mejorarCV() {
 
   let cvMejorado = '';
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(BACKEND_URL + '/api/claude/messages', {
       method:'POST',
-      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization': 'Bearer ' + (currentUser?.sessionToken || localStorage.getItem('talento_token') || '')
+      },
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:1500,
         messages:[{role:'user',content:`Eres un experto en recursos humanos de Ecuador. Mejora profesionalmente el siguiente CV para el mercado laboral ecuatoriano. 
@@ -3202,9 +3231,12 @@ async function generarCarta() {
 
   let carta = '';
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(BACKEND_URL + '/api/claude/messages', {
       method:'POST',
-      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization': 'Bearer ' + (currentUser?.sessionToken || localStorage.getItem('talento_token') || '')
+      },
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:800,
         messages:[{role:'user',content:'Redacta una carta de presentación profesional en español para Ecuador para el siguiente CV. La carta debe ser personalizable (sin nombre de empresa específica), 3 párrafos: presentación, experiencia clave y cierre. Tono profesional ecuatoriano, máximo 350 palabras.\n\nCV:\n' + cvData.texto}]
@@ -3617,9 +3649,12 @@ async function ejecutarCorreosFrio() {
   await new Promise(r => setTimeout(r, fuentes.length*400 + 500));
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(BACKEND_URL + '/api/claude/messages', {
       method:'POST',
-      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization': 'Bearer ' + (currentUser?.sessionToken || localStorage.getItem('talento_token') || '')
+      },
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:1000,
         messages:[{role:'user',content:`Genera ${numero} empresas ecuatorianas reales del sector ${sector} en ${ciudad} que probablemente NO tienen vacantes publicadas pero podrían necesitar personal de ${area}. Responde SOLO JSON:
@@ -3686,9 +3721,12 @@ async function abrirEmailFrio(email, empresa, area, nombre) {
   document.getElementById('emailModal').classList.add('open');
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(BACKEND_URL + '/api/claude/messages', {
       method:'POST',
-      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization': 'Bearer ' + (currentUser?.sessionToken || localStorage.getItem('talento_token') || '')
+      },
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:500,
         messages:[{role:'user',content:`Redacta un correo en frío profesional en español para enviar al área de RRHH de "${empresa}" presentando al candidato "${nombre}" que busca trabajo en ${area}. La empresa NO tiene vacante publicada. El correo debe ser: breve (3 párrafos máx), directo, destacar valor que puede aportar, solicitar consideración para futuras oportunidades. Tono profesional ecuatoriano. Solo el cuerpo del correo.`}]
