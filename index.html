@@ -2556,7 +2556,7 @@ async function guardarYAnalizar() {
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'Authorization': 'Bearer ' + (currentUser?.sessionToken || localStorage.getItem('talento_token') || '')
+        'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
       },
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:1200,
@@ -2669,7 +2669,7 @@ ${area}, Ecuador, ${ciudad}, profesional, experiencia, tiempo completo, empresas
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'Authorization': 'Bearer ' + (currentUser?.sessionToken || localStorage.getItem('talento_token') || '')
+        'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
       },
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:600,
@@ -2785,7 +2785,7 @@ async function buscarEmpleo() {
     const res = await fetch(BACKEND_URL + '/api/claude/messages', {
       method:'POST', headers:{
         'Content-Type':'application/json',
-        'Authorization': 'Bearer ' + (currentUser?.sessionToken || localStorage.getItem('talento_token') || '')
+        'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
       },
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:1000,
@@ -2866,7 +2866,7 @@ async function buscarCandidatos() {
     const res = await fetch(BACKEND_URL + '/api/claude/messages', {
       method:'POST', headers:{
         'Content-Type':'application/json',
-        'Authorization': 'Bearer ' + (currentUser?.sessionToken || localStorage.getItem('talento_token') || '')
+        'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
       },
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:1000,
@@ -3008,7 +3008,7 @@ async function abrirEmailModal(email, empresa, cargo, nombre, esParaEmpresa) {
     const res = await fetch(BACKEND_URL + '/api/claude/messages', {
       method:'POST', headers:{
         'Content-Type':'application/json',
-        'Authorization': 'Bearer ' + (currentUser?.sessionToken || localStorage.getItem('talento_token') || '')
+        'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
       },
       body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:500, messages:[{role:'user',content:prompt}] })
     });
@@ -3126,7 +3126,7 @@ async function mejorarCV() {
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'Authorization': 'Bearer ' + (currentUser?.sessionToken || localStorage.getItem('talento_token') || '')
+        'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
       },
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:1500,
@@ -3235,7 +3235,7 @@ async function generarCarta() {
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'Authorization': 'Bearer ' + (currentUser?.sessionToken || localStorage.getItem('talento_token') || '')
+        'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
       },
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:800,
@@ -3653,7 +3653,7 @@ async function ejecutarCorreosFrio() {
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'Authorization': 'Bearer ' + (currentUser?.sessionToken || localStorage.getItem('talento_token') || '')
+        'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
       },
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:1000,
@@ -3725,7 +3725,7 @@ async function abrirEmailFrio(email, empresa, area, nombre) {
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'Authorization': 'Bearer ' + (currentUser?.sessionToken || localStorage.getItem('talento_token') || '')
+        'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
       },
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:500,
