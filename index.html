@@ -855,9 +855,18 @@ if (window.pdfjsLib) {
       </div>
 
       <div class="searching-anim" id="candSearchAnim">
-        <div class="spin"></div>
-        <div style="font-size:13px;color:var(--texto-secundario);margin-bottom:10px">Buscamosndo en internet ecuatoriano...</div>
-        <div id="candSearchSrcs" style="max-width:400px;margin:0 auto"></div>
+        <div style="text-align:center;padding:40px 20px">
+          <div style="position:relative;width:80px;height:80px;margin:0 auto 24px">
+            <div class="spin" style="width:80px;height:80px;border:3px solid rgba(0,196,140,0.1);border-top-color:var(--verde);border-radius:50%;animation:spin 1.2s linear infinite"></div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:32px">🔍</div>
+          </div>
+          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--verde);margin-bottom:8px">TalentoEC está trabajando</div>
+          <div style="font-size:13px;color:var(--texto-secundario);margin-bottom:24px;max-width:340px;margin-left:auto;margin-right:auto">Analizando tu CV y buscando las mejores oportunidades en Ecuador</div>
+
+          <div id="candSearchSrcs" style="max-width:400px;margin:0 auto;text-align:left"></div>
+
+          <div style="margin-top:24px;font-size:11px;color:var(--texto-secundario);font-style:italic">Esto puede tomar 20-40 segundos</div>
+        </div>
       </div>
     </div>
 
@@ -2879,7 +2888,7 @@ async function buscarEmpleo() {
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:1000,
         tools:[{type:'web_search_20250305',name:'web_search'}],
-        messages:[{role:'user',content:`Busca ofertas de trabajo reales en Ecuador para: "${query}". Ciudad preferida: ${ciudad}. Modalidad: ${modalidad}. Fuentes: ${fuentes.join(', ')}.\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa ecuatoriana real","cargo":"título puesto","ciudad":"ciudad Ecuador","salario":"rango USD","fuente":"fuente donde se encontró","match":85,"email":"rrhh@empresa.com.ec","descripcion":"descripción breve","url":"https://..."}]}\n\nGenera 5 trabajos con datos realistas de Ecuador.`}]
+        messages:[{role:'user',content:`Busca ofertas de trabajo REALES en Ecuador para: "${query}". Ciudad preferida: ${ciudad}. Modalidad: ${modalidad}. Fuentes: ${fuentes.join(', ')}.\n\nIMPORTANTE sobre el campo "email":\n- SOLO incluye email si lo viste explícitamente en la fuente\n- Si NO viste un email real, deja el campo "email" vacío como ""\n- NUNCA inventes emails como info@empresa.com o talento@empresa.com\n- Es mejor un campo vacío que un email falso\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa ecuatoriana real","cargo":"título puesto","ciudad":"ciudad Ecuador","salario":"rango USD","fuente":"fuente donde se encontró","match":85,"email":"rrhh@empresa.com.ec","descripcion":"descripción breve","url":"https://..."}]}\n\nGenera 5 trabajos con datos realistas de Ecuador.`}]
       })
     });
     const data = await res.json();
@@ -3135,6 +3144,13 @@ Saludos cordiales`;
 
 function cerrarEmail() { document.getElementById('emailModal').classList.remove('open'); }
 async function enviarEmail() {
+  // VALIDAR EMAIL DESTINATARIO
+  const toCheck = document.getElementById('modalTo').value.trim();
+  if (!toCheck || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(toCheck)) {
+    showToast('⚠ Email destinatario no válido', true);
+    return;
+  }
+
   // RATE LIMITING — 1 correo cada 3 segundos
   const ultimoCorreo = parseInt(localStorage.getItem('ultimo_correo_ts') || '0');
   const ahora = Date.now();
