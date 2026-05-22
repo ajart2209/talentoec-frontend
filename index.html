@@ -2333,24 +2333,30 @@ function candTab(tab) {
 
   // Autocompletar búsqueda con CV cuando entra a tab búsqueda o frío
   if ((tab === 'busqueda' || tab === 'frio') && cvData && cvData.areasDetectadas && cvData.areasDetectadas.length > 0) {
-    const queryInput = tab === 'busqueda' ? 'busquedaQuery' : 'frioArea';
-    const input = document.getElementById(queryInput);
-    if (input && !input.value.trim()) {
-      // Tomar la primera área detectada como sugerencia inicial
-      input.value = cvData.areasDetectadas[0];
-      // Mostrar mensaje sutil
-      setTimeout(() => {
+    setTimeout(() => {
+      const queryInput = tab === 'busqueda' ? 'busquedaQuery' : 'frioArea';
+      const input = document.getElementById(queryInput);
+      if (input && !input.value.trim()) {
+        // Tomar la primera área detectada como sugerencia inicial
+        const areaSugerida = cvData.areasDetectadas[0];
+        input.value = areaSugerida;
+        input.setAttribute('value', areaSugerida);
+        // Disparar eventos por si hay listeners
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+
+        // Banner amarillo de confirmación
         const banner = document.getElementById('autoFillBanner');
         if (!banner) {
           const b = document.createElement('div');
           b.id = 'autoFillBanner';
           b.style.cssText = 'background:rgba(0,196,140,0.08);border:1px solid rgba(0,196,140,0.2);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--verde);display:flex;align-items:center;gap:8px';
-          b.innerHTML = '✦ Búsqueda autocompletada con tu CV guardado — puedes editarla';
+          b.innerHTML = '✦ Búsqueda autocompletada con tu CV: <strong style="margin-left:4px">' + areaSugerida + '</strong>';
           const form = input.closest('.field') || input.parentElement;
           if (form && form.parentElement) form.parentElement.insertBefore(b, form);
         }
-      }, 100);
-    }
+      }
+    }, 200);
   }
 
   // Si va a correos en frio, ajustar límites según plan
