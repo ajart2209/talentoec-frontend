@@ -2337,8 +2337,8 @@ function candTab(tab) {
       const queryInput = tab === 'busqueda' ? 'busquedaQuery' : 'frioArea';
       const input = document.getElementById(queryInput);
       if (input && !input.value.trim()) {
-        // Tomar la primera área detectada como sugerencia inicial
-        const areaSugerida = cvData.areasDetectadas[0];
+        // Usar TODAS las áreas detectadas separadas por comas
+        const areaSugerida = cvData.areasDetectadas.join(', ');
         input.value = areaSugerida;
         input.setAttribute('value', areaSugerida);
         // Disparar eventos por si hay listeners
@@ -2351,7 +2351,7 @@ function candTab(tab) {
           const b = document.createElement('div');
           b.id = 'autoFillBanner';
           b.style.cssText = 'background:rgba(0,196,140,0.08);border:1px solid rgba(0,196,140,0.2);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--verde);display:flex;align-items:center;gap:8px';
-          b.innerHTML = '✦ Búsqueda autocompletada con tu CV: <strong style="margin-left:4px">' + areaSugerida + '</strong>';
+          b.innerHTML = '✦ Búsqueda autocompletada con todas tus áreas del CV — puedes editar';
           const form = input.closest('.field') || input.parentElement;
           if (form && form.parentElement) form.parentElement.insertBefore(b, form);
         }
