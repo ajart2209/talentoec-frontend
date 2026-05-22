@@ -2341,6 +2341,28 @@ function candTab(tab) {
         const areaSugerida = cvData.areasDetectadas.join(', ');
         input.value = areaSugerida;
         input.setAttribute('value', areaSugerida);
+
+        // Autocompletar también la ciudad si está detectada
+        const ciudadInput = document.getElementById('busquedaCiudad');
+        if (ciudadInput && !ciudadInput.value) {
+          // Detectar ciudad del CV o usar la del usuario
+          let ciudadDetectada = '';
+          if (cvData.ciudad) {
+            ciudadDetectada = cvData.ciudad;
+          } else if (cvData.texto) {
+            // Buscar ciudad en el texto del CV
+            const ciudadesEC = ['Quito', 'Guayaquil', 'Cuenca', 'Ambato', 'Manta', 'Loja', 'Ibarra', 'Riobamba', 'Esmeraldas', 'Portoviejo', 'Santo Domingo', 'Machala', 'Durán', 'Quevedo', 'Milagro', 'Latacunga', 'Babahoyo', 'Sangolquí', 'Tulcán', 'Lago Agrio', 'Orellana', 'Tena', 'Puyo', 'Macas', 'Zamora', 'Guaranda', 'Azogues', 'Santa Rosa', 'Pasaje', 'Huaquillas'];
+            for (const c of ciudadesEC) {
+              if (cvData.texto.toLowerCase().includes(c.toLowerCase())) {
+                ciudadDetectada = c;
+                break;
+              }
+            }
+          }
+          if (ciudadDetectada) {
+            ciudadInput.value = ciudadDetectada;
+          }
+        }
         // Disparar eventos por si hay listeners
         input.dispatchEvent(new Event('input', { bubbles: true }));
         input.dispatchEvent(new Event('change', { bubbles: true }));
