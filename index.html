@@ -3213,24 +3213,7 @@ async function abrirEmailModal(email, empresa, cargo, nombre, esParaEmpresa) {
   window._lastJobEmpresa = empresa || '';
   window._lastJobCargo = cargo || '';
 
-  // PRIMERO buscar en BD verificada de empresas ecuatorianas
-  if (empresa) {
-    try {
-      const buscarRes = await apiCall('/api/auth/buscar-empresa', {
-        method: 'POST',
-        body: JSON.stringify({ empresa })
-      });
-      if (buscarRes && buscarRes.encontrada && buscarRes.empresa.email) {
-        // Tenemos email verificado en BD
-        email = buscarRes.empresa.email;
-        showToast('✓ Email verificado encontrado en nuestra base de datos');
-      }
-    } catch(e) {
-      console.warn('No se pudo buscar empresa en BD:', e.message);
-    }
-  }
-
-  // Si todavía no hay email, mostrar campo vacío con mensaje sutil
+  // Si no hay email, mostrar campo vacío con mensaje sutil
   if (!email || email === 'undefined' || email === '') {
     document.getElementById('modalTo').value = '';
     showToast('💡 Email no en nuestra BD. Búscalo en LinkedIn de la empresa.', false);
