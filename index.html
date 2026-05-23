@@ -2924,23 +2924,9 @@ async function buscarEmpleo() {
 
   await new Promise(r => setTimeout(r, 1500));
 
-  // PRIMERO intentar con Adzuna (URLs reales 100%)
+  // Buscar empleos con Claude + web search
   let parsed = null;
-  try {
-    const adzunaRes = await apiCall('/api/auth/buscar-empleos-adzuna', {
-      method: 'POST',
-      body: JSON.stringify({ query, ciudad, modalidad })
-    });
-    if (adzunaRes && adzunaRes.jobs && adzunaRes.jobs.length > 0) {
-      parsed = { jobs: adzunaRes.jobs };
-      console.log('✓ Empleos encontrados en Adzuna:', adzunaRes.jobs.length);
-    }
-  } catch(e) {
-    console.warn('Adzuna no disponible, usando Claude:', e.message);
-  }
-
-  // Si Adzuna no devolvió nada, usar Claude como fallback
-  if (!parsed || !parsed.jobs || parsed.jobs.length === 0) {
+  {
   try {
     const res = await fetch(BACKEND_URL + '/api/claude/messages', {
       method:'POST', headers:{
@@ -2950,7 +2936,7 @@ async function buscarEmpleo() {
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:2500,
         tools:[{type:'web_search_20250305',name:'web_search'}],
-        messages:[{role:'user',content:`Busca ofertas de trabajo REALES y ACTUALES en Ecuador para: "${query}". Ciudad: ${ciudad}. Modalidad: ${modalidad}.\n\nCRÍTICO - USA WEB SEARCH OBLIGATORIAMENTE:\n- Busca en: LinkedIn Jobs, Multitrabajos, Indeed Ecuador, Computrabajo Ecuador, Bumeran, OLX empleos, Facebook Empleos\n- Cada empleo DEBE tener una URL ESPECÍFICA al detalle de la oferta\n- EJEMPLOS VÁLIDOS de URL:\n  * https://ec.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-XXXXXX\n  * https://www.linkedin.com/jobs/view/123456789\n  * https://www.multitrabajos.com/empleos-busqueda/empleos-publicacion-XXXXXX\n  * https://ec.indeed.com/viewjob?jk=ABCDEF\n- EJEMPLOS INVÁLIDOS (NO USES):\n  * https://ec.computrabajo.com/ (es portal general, no oferta específica)\n  * https://linkedin.com/ (es portal general)\n  * https://multitrabajos.com/ (es portal general)\n- Si la URL no apunta a la OFERTA ESPECÍFICA, omite ese empleo\n- Sobre el campo "email": SOLO si está EXPLÍCITAMENTE publicado en la oferta. Si no, ponlo vacío ""\n- NUNCA inventes URLs ni emails\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa","cargo":"título puesto","ciudad":"ciudad","salario":"rango USD si está","fuente":"LinkedIn/Multitrabajos/etc","match":85,"email":"","descripcion":"descripción breve","url":"https://URL_REAL_DE_LA_OFERTA"}]}\n\nGenera 8-10 empleos con URLs REALES a portales reconocidos.`}]
+        messages:[{role:'user',content:`Busca ofertas de trabajo REALES y ACTUALES en Ecuador para: "${query}". Ciudad: ${ciudad}. Modalidad: ${modalidad}.\n\nCRÍTICO - USA WEB SEARCH PARA URLs REALES:\n- Busca empleos REALES y ACTUALES en: Multitrabajos, Computrabajo Ecuador, LinkedIn Jobs, Indeed Ecuador, Bumeran\n- Cada empleo DEBE tener URL específica que se vea como un detalle de oferta\n- URLs ACEPTABLES:\n  * https://ec.computrabajo.com/ofertas-de-trabajo/[texto-largo-de-la-oferta]\n  * https://www.linkedin.com/jobs/view/[NUMERO]\n  * https://www.multitrabajos.com/empleos-busqueda/[texto-y-numero]\n- Si NO encuentras una URL específica, en lugar de inventar URL, devuelve URL de BÚSQUEDA con filtros:\n  * https://ec.computrabajo.com/empleos-de-[CARGO]-en-[CIUDAD]\n  * https://www.linkedin.com/jobs/search/?keywords=[CARGO]&location=Ecuador\n  * https://www.multitrabajos.com/empleos-busqueda?keyword=[CARGO]&location=[CIUDAD]\n- Sobre el campo "email": SOLO si está EXPLÍCITAMENTE publicado en la oferta. Si no, ponlo vacío ""\n- NUNCA inventes URLs ni emails\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa","cargo":"título puesto","ciudad":"ciudad","salario":"rango USD si está","fuente":"LinkedIn/Multitrabajos/etc","match":85,"email":"","descripcion":"descripción breve","url":"https://URL_REAL_DE_LA_OFERTA"}]}\n\nGenera 8-10 empleos con URLs REALES a portales reconocidos.`}]
       })
     });
     const data = await res.json();
