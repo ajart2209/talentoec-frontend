@@ -2132,6 +2132,34 @@ function setLoggedInUI() {
     if (cvE && !cvE.value) cvE.value = currentUser.email || '';
   }
 
+  // Autocompletar búsqueda con áreas del CV inmediatamente
+  setTimeout(() => {
+    if (cvData && cvData.areasDetectadas && cvData.areasDetectadas.length > 0) {
+      const busquedaInput = document.getElementById('busquedaQuery');
+      if (busquedaInput && !busquedaInput.value.trim()) {
+        busquedaInput.value = cvData.areasDetectadas.join(', ');
+        console.log('✓ Búsqueda autocompletada con áreas:', cvData.areasDetectadas);
+      }
+
+      const frioInput = document.getElementById('frioArea');
+      if (frioInput && !frioInput.value.trim()) {
+        frioInput.value = cvData.areasDetectadas.join(', ');
+      }
+
+      // Ciudad
+      const ciudadInput = document.getElementById('busquedaCiudad');
+      if (ciudadInput && !ciudadInput.value && cvData.texto) {
+        const ciudadesEC = ['Quito', 'Guayaquil', 'Cuenca', 'Ambato', 'Manta', 'Loja', 'Ibarra', 'Riobamba', 'Esmeraldas', 'Portoviejo', 'Santo Domingo', 'Machala', 'Durán', 'Quevedo', 'Milagro', 'Latacunga', 'Babahoyo', 'Sangolquí', 'Tulcán'];
+        for (const c of ciudadesEC) {
+          if (cvData.texto.toLowerCase().includes(c.toLowerCase())) {
+            ciudadInput.value = c;
+            break;
+          }
+        }
+      }
+    }
+  }, 800);
+
   // Ocultar tab Inicio
   var inicioTab = document.getElementById('ntab-landing');
   if (inicioTab) inicioTab.style.display = 'none';
