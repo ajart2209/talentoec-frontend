@@ -2936,7 +2936,7 @@ async function buscarEmpleo() {
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:2500,
         tools:[{type:'web_search_20250305',name:'web_search'}],
-        messages:[{role:'user',content:`Busca ofertas de trabajo REALES y ACTUALES en Ecuador para: "${query}". Ciudad: ${ciudad}. Modalidad: ${modalidad}.\n\nINSTRUCCIONES SOBRE SALARIOS:\n- Solo incluye salario si está EXPLÍCITAMENTE publicado en la oferta real\n- Si NO hay salario, usa "A convenir"\n- NUNCA inventes salarios. En Ecuador típicos: $470-$1500\n\nUSA WEB SEARCH OBLIGATORIAMENTE. Busca ofertas REALES en estos portales y obtén las URLs ESPECÍFICAS de cada oferta individual:\n\n1. ec.computrabajo.com → busca y obtén URL tipo https://ec.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-XXXX-en-YYYY\n2. www.multitrabajos.com → busca y obtén URL tipo https://www.multitrabajos.com/empleos/[slug-especifico]-NNNNNN.html\n3. www.linkedin.com/jobs → obtén URLs tipo https://www.linkedin.com/jobs/view/NNNNNNNNN\n4. ec.indeed.com → obtén URLs tipo https://ec.indeed.com/viewjob?jk=XXXXXX\n5. ec.bumeran.com → obtén URLs tipo https://www.bumeran.com.ec/empleos/[slug]-NNNNN.html\n\nREGLA ESTRICTA: SOLO incluye un empleo si TIENES la URL específica al detalle de la oferta. La URL debe ser larga (50+ caracteres), específica, no genérica.\n\nNO INVENTES URLs. Si no encontraste 5 empleos con URL real, devuelve solo los que sí encontraste (puede ser 2 o 3).\n\nPara email: solo si la oferta lo publica explícitamente. Si no, vacío.\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa","cargo":"título puesto","ciudad":"ciudad","salario":"rango USD si está","fuente":"LinkedIn/Multitrabajos/etc","match":85,"email":"","descripcion":"descripción breve","url":"https://URL_REAL_DE_LA_OFERTA"}]}\n\nDevuelve entre 4-8 empleos VERIFICADOS con URLs reales que tengan resultados. Es preferible menos empleos pero todos reales.`}]
+        messages:[{role:'user',content:`Busca ofertas de trabajo REALES y ACTUALES en Ecuador para: "${query}". Ciudad: ${ciudad}. Modalidad: ${modalidad}.\n\nINSTRUCCIONES SOBRE SALARIOS:\n- Solo incluye salario si está EXPLÍCITAMENTE publicado en la oferta real\n- Si NO hay salario, usa "A convenir"\n- NUNCA inventes salarios. En Ecuador típicos: $470-$1500\n\nBusca empleos REALES y ACTUALES en Ecuador.\n\nUsa web search para buscar en:\n- Multitrabajos.com, Computrabajo Ecuador, LinkedIn Jobs, Indeed Ecuador, Bumeran, Porfinempleo\n- Grupos de Facebook: Empleos Quito, Empleos Guayaquil, Trabajos Ecuador\n\nDevuelve 6-8 empleos relevantes.\n\nPara el campo "url": incluye SOLO si tienes URL específica al detalle de la oferta. Si solo tienes URL al portal general, deja "url" vacío como "".\n\nPara "email": solo si la oferta lo publica explícitamente, si no, "" vacío.\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa","cargo":"título puesto","ciudad":"ciudad","salario":"rango USD si está","fuente":"LinkedIn/Multitrabajos/etc","match":85,"email":"","descripcion":"descripción breve","url":"","portales":["multitrabajos","computrabajo","linkedin","indeed","facebook"]}]}\n\nDevuelve entre 4-8 empleos VERIFICADOS con URLs reales que tengan resultados. Es preferible menos empleos pero todos reales.`}]
       })
     });
     const data = await res.json();
@@ -3035,20 +3035,47 @@ function renderJobCards(jobs) {
       <div class="tags-row"><span class="tag">${j.fuente}</span><span class="tag">${j.salario}</span><span class="tag">${j.ciudad}</span></div>
       <div style="font-size:12px;color:var(--texto-secundario)">${j.descripcion}</div>
       <div class="card-actions">
-        ${j.url && j.url.startsWith('http') && !j.url.includes('404') && j.url.length > 50 ? `<button class="btn-sm-green" onclick="window.open('${j.url}','_blank')">🔗 Postular en oferta</button>` : ''}
+        ${j.url && j.url.startsWith('http') && !j.url.includes('404') && j.url.length > 50 ? `<button class="btn-sm-green" onclick="window.open('${j.url}','_blank')">🔗 Postular en oferta</button>` : `<button class="btn-sm-green" onclick='buscarOfertaReal(${JSON.stringify(j.cargo)}, ${JSON.stringify(j.empresa)}, ${JSON.stringify(j.ciudad)}, ${JSON.stringify(j.portales||[])})'>🔍 Buscar esta oferta</button>`}
         ${j.email && j.email!=='' && j.email!=='undefined' ? `<button class="btn-sm-outline" onclick="abrirEmailModal('${j.email}','${j.empresa}','${j.cargo}','${currentUser?.nombre||'Candidato'}',true)">✉ Correo automático</button>` : ''}
       </div>
     </div>`).join('');
 }
 
-// Buscar oferta real en portales - muestra modal con múltiples opciones
-function buscarOfertaReal(cargo, empresa, ciudad) {
+// Buscar oferta real - modal con solo los portales donde se confirmó la oferta
+function buscarOfertaReal(cargo, empresa, ciudad, portales) {
   const cargoEnc = encodeURIComponent(cargo);
-  const empresaEnc = encodeURIComponent(empresa);
   const ciudadEnc = encodeURIComponent(ciudad);
-  const cargoEmpresa = encodeURIComponent(cargo + ' ' + empresa);
+  const cargoEmpresa = encodeURIComponent(cargo + ' ' + empresa + ' Ecuador');
 
-  // Crear modal con opciones de búsqueda
+  // Lista de todos los portales posibles
+  const todosPortales = {
+    multitrabajos: { nombre: '🟠 Multitrabajos', url: `https://www.multitrabajos.com/empleos-busqueda?keyword=${cargoEnc}`, color: '#ff6b00' },
+    computrabajo: { nombre: '🔵 Computrabajo', url: `https://ec.computrabajo.com/empleos?q=${cargoEnc}`, color: '#0db0e0' },
+    linkedin: { nombre: '💼 LinkedIn Jobs', url: `https://www.linkedin.com/jobs/search/?keywords=${cargoEnc}&location=Ecuador`, color: '#0077b5' },
+    indeed: { nombre: '💚 Indeed Ecuador', url: `https://ec.indeed.com/jobs?q=${cargoEnc}&l=${ciudadEnc}`, color: '#2557a7' },
+    bumeran: { nombre: '🟣 Bumeran', url: `https://www.bumeran.com.ec/empleos.html?keyword=${cargoEnc}`, color: '#7e3ff2' },
+    facebook: { nombre: '📘 Facebook Empleos', url: `https://www.facebook.com/search/posts?q=${cargoEmpresa}`, color: '#1877f2' }
+  };
+
+  // Filtrar solo los portales que Claude verificó
+  let portalesAMostrar = [];
+  if (portales && Array.isArray(portales) && portales.length > 0) {
+    portalesAMostrar = portales.map(p => p.toLowerCase());
+  } else {
+    // Si no hay info de portales, mostrar todos
+    portalesAMostrar = Object.keys(todosPortales);
+  }
+
+  let botones = portalesAMostrar
+    .filter(p => todosPortales[p])
+    .map(p => {
+      const portal = todosPortales[p];
+      return `<a href="${portal.url}" target="_blank" style="background:${portal.color};color:#fff;padding:12px;border-radius:8px;text-decoration:none;font-weight:600;text-align:center;font-size:13px">${portal.nombre}</a>`;
+    }).join('');
+
+  // Siempre incluir Google como respaldo
+  botones += `<a href="https://www.google.com/search?q=${cargoEmpresa}" target="_blank" style="background:#4285f4;color:#fff;padding:12px;border-radius:8px;text-decoration:none;font-weight:600;text-align:center;font-size:13px">🔍 Buscar en Google</a>`;
+
   const modal = document.createElement('div');
   modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
   modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
@@ -3056,15 +3083,11 @@ function buscarOfertaReal(cargo, empresa, ciudad) {
     <div style="background:var(--negro);border:1px solid var(--gris-borde);border-radius:14px;padding:24px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
       <h3 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--verde);margin-bottom:6px">Buscar esta oferta</h3>
       <p style="font-size:13px;color:var(--texto-secundario);margin-bottom:16px">${cargo} en ${empresa}</p>
-      <p style="font-size:12px;color:var(--texto-secundario);margin-bottom:14px">Búscalo directamente en estos portales:</p>
+      <p style="font-size:12px;color:var(--texto-secundario);margin-bottom:14px">Encontrada en ${portalesAMostrar.length} portal(es):</p>
       <div style="display:flex;flex-direction:column;gap:10px">
-        <a href="https://www.google.com/search?q=${cargoEmpresa}+vacante+Ecuador" target="_blank" style="background:#4285f4;color:#fff;padding:12px;border-radius:8px;text-decoration:none;font-weight:600;text-align:center;font-size:13px">🔍 Buscar en Google</a>
-        <a href="https://www.linkedin.com/jobs/search/?keywords=${cargoEnc}&location=Ecuador" target="_blank" style="background:#0077b5;color:#fff;padding:12px;border-radius:8px;text-decoration:none;font-weight:600;text-align:center;font-size:13px">💼 LinkedIn Jobs</a>
-        <a href="https://www.multitrabajos.com/empleos-busqueda?keyword=${cargoEnc}" target="_blank" style="background:#ff6b00;color:#fff;padding:12px;border-radius:8px;text-decoration:none;font-weight:600;text-align:center;font-size:13px">🟠 Multitrabajos</a>
-        <a href="https://ec.computrabajo.com/empleos?q=${cargoEnc}" target="_blank" style="background:#0db0e0;color:#fff;padding:12px;border-radius:8px;text-decoration:none;font-weight:600;text-align:center;font-size:13px">🔵 Computrabajo</a>
-        <a href="https://ec.indeed.com/jobs?q=${cargoEnc}&l=${ciudadEnc}" target="_blank" style="background:#2557a7;color:#fff;padding:12px;border-radius:8px;text-decoration:none;font-weight:600;text-align:center;font-size:13px">💚 Indeed Ecuador</a>
+        ${botones}
       </div>
-      <button onclick="this.closest('div[style*=\"position:fixed\"]').remove()" style="margin-top:18px;background:transparent;color:var(--texto-secundario);border:1px solid var(--gris-borde);padding:10px;border-radius:8px;width:100%;cursor:pointer;font-size:13px">Cerrar</button>
+      <button onclick="this.parentElement.parentElement.remove()" style="margin-top:18px;background:transparent;color:var(--texto-secundario);border:1px solid var(--gris-borde);padding:10px;border-radius:8px;width:100%;cursor:pointer;font-size:13px">Cerrar</button>
     </div>
   `;
   document.body.appendChild(modal);
@@ -3891,7 +3914,7 @@ function mostrarLimiteAlcanzado(maxDiario) {
         💡 <strong style="color:var(--texto-primario)">Tu cuenta de búsquedas se reinicia cada día a las 00:00</strong>
       </div>
       <div style="display:flex;gap:10px">
-        <button onclick="this.closest('div[style*=fixed]').remove()" style="flex:1;background:var(--gris-medio);border:1px solid var(--gris-borde);color:var(--texto-secundario);padding:12px;border-radius:8px;cursor:pointer">Cerrar</button>
+        <button onclick="this.parentElement.parentElement.remove()" style="margin-top:18px;background:transparent;color:var(--texto-secundario);border:1px solid var(--gris-borde);padding:10px;border-radius:8px;width:100%;cursor:pointer;font-size:13px">Cerrar</button>
         <button onclick="this.closest('div[style*=fixed]').remove();showPage('landing');setTimeout(()=>document.querySelector('.planes-section')?.scrollIntoView({behavior:'smooth'}),300)" style="flex:1;background:var(--verde);color:var(--negro);border:none;padding:12px;border-radius:8px;cursor:pointer;font-weight:700">Mejorar plan →</button>
       </div>
     </div>
