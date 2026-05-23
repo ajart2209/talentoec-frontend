@@ -3035,7 +3035,7 @@ function renderJobCards(jobs) {
       <div class="tags-row"><span class="tag">${j.fuente}</span><span class="tag">${j.salario}</span><span class="tag">${j.ciudad}</span></div>
       <div style="font-size:12px;color:var(--texto-secundario)">${j.descripcion}</div>
       <div class="card-actions">
-        <button class="btn-sm-green" onclick="window.open('${j.url||'#'}','_blank')">🔗 Postular en oferta</button>
+        ${j.url && j.url.startsWith('http') && !j.url.includes('404') && j.url.length > 30 ? `<button class="btn-sm-green" onclick="window.open('${j.url}','_blank')">🔗 Ver oferta original</button>` : `<button class="btn-sm-outline" onclick="buscarOfertaReal('${j.cargo}','${j.empresa}','${j.ciudad}')">🔍 Buscar en portales</button>`}
         ${j.email && j.email!=='' && j.email!=='undefined' ? `<button class="btn-sm-outline" onclick="abrirEmailModal('${j.email}','${j.empresa}','${j.cargo}','${currentUser?.nombre||'Candidato'}',true)">✉ Correo automático</button>` : ''}
       </div>
     </div>`).join('');
