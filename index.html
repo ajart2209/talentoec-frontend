@@ -2936,7 +2936,7 @@ async function buscarEmpleo() {
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:2500,
         tools:[{type:'web_search_20250305',name:'web_search'}],
-        messages:[{role:'user',content:`Busca ofertas de trabajo REALES y ACTUALES en Ecuador para: "${query}". Ciudad: ${ciudad}. Modalidad: ${modalidad}.\n\nINSTRUCCIONES DE URLs - MUY IMPORTANTE:\n- Busca empleos REALES y ACTUALES en: Multitrabajos, Computrabajo Ecuador, LinkedIn, Indeed Ecuador, Bumeran\n- Para el campo "url" SIEMPRE usa URLs de BÚSQUEDA (no de oferta específica), porque las URLs específicas pueden ser inventadas o caducar\n- URLs FORMATO OBLIGATORIO (usa SOLO estos formatos):\n  * LinkedIn: https://www.linkedin.com/jobs/search/?keywords=[CARGO_URL_ENCODED]&location=Ecuador\n  * Computrabajo: https://ec.computrabajo.com/trabajo-de-[CARGO_SIN_ESPACIOS]\n  * Multitrabajos: https://www.multitrabajos.com/empleos-busqueda?keyword=[CARGO]\n  * Indeed: https://ec.indeed.com/jobs?q=[CARGO]&l=[CIUDAD]\n- EJEMPLO para "Desarrollador" en "Quito":\n  * https://www.linkedin.com/jobs/search/?keywords=Desarrollador&location=Ecuador\n  * https://ec.computrabajo.com/trabajo-de-desarrollador\n  * https://www.multitrabajos.com/empleos-busqueda?keyword=desarrollador\n- NO inventes URLs específicas tipo /jobs/view/123456 — esas pueden no existir\n- Sobre el campo "email": SOLO si está EXPLÍCITAMENTE publicado en la oferta. Si no, ponlo vacío ""\n- NUNCA inventes URLs ni emails\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa","cargo":"título puesto","ciudad":"ciudad","salario":"rango USD si está","fuente":"LinkedIn/Multitrabajos/etc","match":85,"email":"","descripcion":"descripción breve","url":"https://URL_REAL_DE_LA_OFERTA"}]}\n\nGenera 8-10 empleos con URLs REALES a portales reconocidos.`}]
+        messages:[{role:'user',content:`Busca ofertas de trabajo REALES y ACTUALES en Ecuador para: "${query}". Ciudad: ${ciudad}. Modalidad: ${modalidad}.\n\nINSTRUCCIONES CRÍTICAS DE WEB SEARCH:\n\n1) USA WEB SEARCH para encontrar empleos REALES y VERIFICADOS en estos portales:\n   - Multitrabajos.com\n   - Computrabajo.com.ec / ec.computrabajo.com\n   - LinkedIn Jobs Ecuador\n   - Indeed.com.ec\n   - Bumeran.com.ec\n\n2) Para cada empleo que devuelvas, VERIFICA visitando el portal que:\n   - La empresa existe\n   - El cargo está siendo solicitado\n   - El empleo tiene resultados con esa búsqueda\n\n3) Para el campo "url" usa URLs de BÚSQUEDA que TÚ verificaste que tienen resultados:\n   - https://www.linkedin.com/jobs/search/?keywords=[CARGO]&location=Ecuador\n   - https://ec.computrabajo.com/trabajo-de-[CARGO_SLUG]\n   - https://www.multitrabajos.com/empleos-busqueda?keyword=[CARGO]\n   - https://ec.indeed.com/jobs?q=[CARGO]&l=[CIUDAD]\n\n4) IMPORTANTE: Si después de buscar NO encuentras empleos reales para "${query}" en Ecuador, devuelve menos empleos. Es mejor 3 empleos reales que 8 inventados.\n\n5) Para cada empleo intenta probar la URL en tu mente - debe ser una búsqueda que de resultados reales en Ecuador\n- Sobre el campo "email": SOLO si está EXPLÍCITAMENTE publicado en la oferta. Si no, ponlo vacío ""\n- NUNCA inventes URLs ni emails\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa","cargo":"título puesto","ciudad":"ciudad","salario":"rango USD si está","fuente":"LinkedIn/Multitrabajos/etc","match":85,"email":"","descripcion":"descripción breve","url":"https://URL_REAL_DE_LA_OFERTA"}]}\n\nDevuelve entre 4-8 empleos VERIFICADOS con URLs reales que tengan resultados. Es preferible menos empleos pero todos reales.`}]
       })
     });
     const data = await res.json();
@@ -3039,6 +3039,35 @@ function renderJobCards(jobs) {
         ${j.email && j.email!=='' && j.email!=='undefined' ? `<button class="btn-sm-outline" onclick="abrirEmailModal('${j.email}','${j.empresa}','${j.cargo}','${currentUser?.nombre||'Candidato'}',true)">✉ Correo automático</button>` : ''}
       </div>
     </div>`).join('');
+}
+
+// Buscar oferta real en portales - muestra modal con múltiples opciones
+function buscarOfertaReal(cargo, empresa, ciudad) {
+  const cargoEnc = encodeURIComponent(cargo);
+  const empresaEnc = encodeURIComponent(empresa);
+  const ciudadEnc = encodeURIComponent(ciudad);
+  const cargoEmpresa = encodeURIComponent(cargo + ' ' + empresa);
+
+  // Crear modal con opciones de búsqueda
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+  modal.innerHTML = `
+    <div style="background:var(--negro);border:1px solid var(--gris-borde);border-radius:14px;padding:24px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
+      <h3 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--verde);margin-bottom:6px">Buscar esta oferta</h3>
+      <p style="font-size:13px;color:var(--texto-secundario);margin-bottom:16px">${cargo} en ${empresa}</p>
+      <p style="font-size:12px;color:var(--texto-secundario);margin-bottom:14px">Búscalo directamente en estos portales:</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <a href="https://www.google.com/search?q=${cargoEmpresa}+vacante+Ecuador" target="_blank" style="background:#4285f4;color:#fff;padding:12px;border-radius:8px;text-decoration:none;font-weight:600;text-align:center;font-size:13px">🔍 Buscar en Google</a>
+        <a href="https://www.linkedin.com/jobs/search/?keywords=${cargoEnc}&location=Ecuador" target="_blank" style="background:#0077b5;color:#fff;padding:12px;border-radius:8px;text-decoration:none;font-weight:600;text-align:center;font-size:13px">💼 LinkedIn Jobs</a>
+        <a href="https://www.multitrabajos.com/empleos-busqueda?keyword=${cargoEnc}" target="_blank" style="background:#ff6b00;color:#fff;padding:12px;border-radius:8px;text-decoration:none;font-weight:600;text-align:center;font-size:13px">🟠 Multitrabajos</a>
+        <a href="https://ec.computrabajo.com/empleos?q=${cargoEnc}" target="_blank" style="background:#0db0e0;color:#fff;padding:12px;border-radius:8px;text-decoration:none;font-weight:600;text-align:center;font-size:13px">🔵 Computrabajo</a>
+        <a href="https://ec.indeed.com/jobs?q=${cargoEnc}&l=${ciudadEnc}" target="_blank" style="background:#2557a7;color:#fff;padding:12px;border-radius:8px;text-decoration:none;font-weight:600;text-align:center;font-size:13px">💚 Indeed Ecuador</a>
+      </div>
+      <button onclick="this.closest('div[style*=\"position:fixed\"]').remove()" style="margin-top:18px;background:transparent;color:var(--texto-secundario);border:1px solid var(--gris-borde);padding:10px;border-radius:8px;width:100%;cursor:pointer;font-size:13px">Cerrar</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
 }
 
 // ======= EMPLEADOR BUSQUEDA =======
