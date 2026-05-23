@@ -3178,7 +3178,7 @@ function eliminarGuardado(email) {
 function verPerfil(nombre) { showToast('Perfil completo próximamente'); }
 
 // ======= EMAIL =======
-async async function abrirEmailModal(email, empresa, cargo, nombre, esParaEmpresa) {
+async function abrirEmailModal(email, empresa, cargo, nombre, esParaEmpresa) {
   // Guardar empresa y cargo para usarlos al enviar
   window._lastJobEmpresa = empresa || '';
   window._lastJobCargo = cargo || '';
