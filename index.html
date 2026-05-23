@@ -2933,7 +2933,7 @@ async function buscarEmpleo() {
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:1000,
         tools:[{type:'web_search_20250305',name:'web_search'}],
-        messages:[{role:'user',content:`Busca ofertas de trabajo REALES en Ecuador para: "${query}". Ciudad preferida: ${ciudad}. Modalidad: ${modalidad}. Fuentes: ${fuentes.join(', ')}.\n\nINSTRUCCIONES CRITICAS sobre el campo "email":\n- SOLO incluye email si lo viste explícitamente en la fuente original (LinkedIn, Multitrabajos, etc)\n- Busca activamente emails de contacto en las descripciones, sitios oficiales, perfiles de LinkedIn\n- Si la oferta menciona "envia tu CV a X@empresa.com" → ese es el email correcto\n- Si NO viste un email real, deja el campo "email" como cadena vacía ""\n- NUNCA inventes emails como info@empresa.com, rrhh@empresa.com o talento@empresa.com\n- Es PREFERIBLE un campo vacío que un email falso o inventado\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa ecuatoriana real","cargo":"título puesto","ciudad":"ciudad Ecuador","salario":"rango USD","fuente":"fuente donde se encontró","match":85,"email":"rrhh@empresa.com.ec","descripcion":"descripción breve","url":"https://..."}]}\n\nGenera 5 trabajos con datos realistas de Ecuador.`}]
+        messages:[{role:'user',content:`Busca ofertas de trabajo REALES y ACTUALES en Ecuador para: "${query}". Ciudad: ${ciudad}. Modalidad: ${modalidad}.\n\nIMPORTANTE - USA WEB SEARCH:\n- Busca en: LinkedIn, Multitrabajos, Indeed Ecuador, Computrabajo Ecuador, Bumeran, OLX empleos, Facebook Empleos\n- Cada empleo DEBE tener una URL REAL y verificable a donde el candidato pueda ir a postular\n- La URL debe ser el LINK DIRECTO a la oferta en el portal original (ej: linkedin.com/jobs/view/123456789)\n- Si NO encuentras la URL real, NO incluyas ese empleo\n- Sobre el campo "email": SOLO si está EXPLÍCITAMENTE publicado en la oferta. Si no, ponlo vacío ""\n- NUNCA inventes URLs ni emails\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa","cargo":"título puesto","ciudad":"ciudad","salario":"rango USD si está","fuente":"LinkedIn/Multitrabajos/etc","match":85,"email":"","descripcion":"descripción breve","url":"https://URL_REAL_DE_LA_OFERTA"}]}\n\nGenera 8-10 empleos con URLs REALES a portales reconocidos.`}]
       })
     });
     const data = await res.json();
@@ -3019,8 +3019,8 @@ function renderJobCards(jobs) {
       <div class="tags-row"><span class="tag">${j.fuente}</span><span class="tag">${j.salario}</span><span class="tag">${j.ciudad}</span></div>
       <div style="font-size:12px;color:var(--texto-secundario)">${j.descripcion}</div>
       <div class="card-actions">
-        <button class="btn-sm-green" onclick="abrirEmailModal('${j.email}','${j.empresa}','${j.cargo}','${currentUser?.nombre||'Candidato'}',true)">Enviar correo automático</button>
-        <button class="btn-sm-outline" onclick="window.open('${j.url||'#'}')">Ver oferta →</button>
+        <button class="btn-sm-green" onclick="window.open('${j.url||'#'}','_blank')">🔗 Postular en oferta</button>
+        ${j.email && j.email!=='' && j.email!=='undefined' ? `<button class="btn-sm-outline" onclick="abrirEmailModal('${j.email}','${j.empresa}','${j.cargo}','${currentUser?.nombre||'Candidato'}',true)">✉ Correo automático</button>` : ''}
       </div>
     </div>`).join('');
 }
@@ -3178,15 +3178,32 @@ function eliminarGuardado(email) {
 function verPerfil(nombre) { showToast('Perfil completo próximamente'); }
 
 // ======= EMAIL =======
-async function abrirEmailModal(email, empresa, cargo, nombre, esParaEmpresa) {
+async async function abrirEmailModal(email, empresa, cargo, nombre, esParaEmpresa) {
   // Guardar empresa y cargo para usarlos al enviar
   window._lastJobEmpresa = empresa || '';
   window._lastJobCargo = cargo || '';
 
-  // Si no hay email real, NO sugerir uno falso
+  // PRIMERO buscar en BD verificada de empresas ecuatorianas
+  if (empresa) {
+    try {
+      const buscarRes = await apiCall('/api/auth/buscar-empresa', {
+        method: 'POST',
+        body: JSON.stringify({ empresa })
+      });
+      if (buscarRes && buscarRes.encontrada && buscarRes.empresa.email) {
+        // Tenemos email verificado en BD
+        email = buscarRes.empresa.email;
+        showToast('✓ Email verificado encontrado en nuestra base de datos');
+      }
+    } catch(e) {
+      console.warn('No se pudo buscar empresa en BD:', e.message);
+    }
+  }
+
+  // Si todavía no hay email, mostrar campo vacío con mensaje sutil
   if (!email || email === 'undefined' || email === '') {
     document.getElementById('modalTo').value = '';
-    showToast('⚠ No encontramos el email de la empresa. Búscalo en su web o LinkedIn y póntelo aquí.', true);
+    showToast('💡 Email no en nuestra BD. Búscalo en LinkedIn de la empresa.', false);
   } else {
     document.getElementById('modalTo').value = email;
   }
