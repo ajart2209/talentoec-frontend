@@ -296,6 +296,44 @@ if (window.pdfjsLib) {
 </script>
 </head>
 <body>
+<!-- BETA ACCESS GATE -->
+<div id="betaGate" style="position:fixed;inset:0;background:#0A0F0D;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px">
+  <div style="max-width:420px;width:100%;background:linear-gradient(135deg,rgba(0,196,140,0.08),rgba(245,230,66,0.04));border:1px solid rgba(0,196,140,0.3);border-radius:20px;padding:36px 28px;text-align:center">
+    <div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:#00C48C;margin-bottom:8px">TalentoEC</div>
+    <div style="font-size:10px;color:#666;letter-spacing:3px;margin-bottom:28px">BY PROYECTART</div>
+    <div style="background:rgba(245,193,66,0.12);border:1px solid rgba(245,193,66,0.3);border-radius:12px;padding:14px;margin-bottom:24px">
+      <div style="font-size:12px;color:#F5C142;font-weight:600;margin-bottom:4px">🔒 BETA PRIVADA</div>
+      <div style="font-size:11px;color:#999;line-height:1.5">Estamos en pruebas. Ingresa la clave de acceso para continuar.</div>
+    </div>
+    <input id="betaPass" type="password" placeholder="Clave de acceso" style="width:100%;background:#1a1a1a;border:1px solid #333;color:#fff;padding:14px;border-radius:10px;font-size:14px;font-family:inherit;margin-bottom:14px;box-sizing:border-box" onkeydown="if(event.key==='Enter')validarBeta()">
+    <div id="betaError" style="font-size:12px;color:#ff6b6b;margin-bottom:14px;display:none">Clave incorrecta</div>
+    <button onclick="validarBeta()" style="width:100%;background:linear-gradient(90deg,#00C48C,#F5C142);color:#000;border:none;padding:14px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Syne',sans-serif">Ingresar</button>
+    <div style="margin-top:20px;font-size:11px;color:#666;line-height:1.6">¿No tienes clave? Escríbenos:<br><a href="https://wa.me/593982238005?text=Hola%2C%20quiero%20acceso%20a%20TalentoEC" target="_blank" style="color:#00C48C;text-decoration:none">💬 WhatsApp +593 98 223 8005</a></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // Si ya tiene acceso, ocultar gate
+  if (localStorage.getItem('betaAccess') === 'granted') {
+    document.getElementById('betaGate').style.display = 'none';
+  }
+})();
+
+function validarBeta() {
+  const pass = document.getElementById('betaPass').value;
+  // CLAVE DE ACCESO BETA - cambiar cuando quieras
+  if (pass === 'Proyectart2026') {
+    localStorage.setItem('betaAccess', 'granted');
+    document.getElementById('betaGate').style.display = 'none';
+  } else {
+    document.getElementById('betaError').style.display = 'block';
+    document.getElementById('betaPass').value = '';
+    document.getElementById('betaPass').focus();
+  }
+}
+</script>
+
 
 <nav>
   <div class="logo" onclick="goHome()" style="flex-direction:column;align-items:flex-start;gap:0">
@@ -387,7 +425,7 @@ if (window.pdfjsLib) {
           <div style="font-size:11px;color:var(--texto-secundario);margin-top:4px">Ofertas/día (Plan Pro)</div>
         </div>
         <div style="text-align:center">
-          <div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--amarillo)">TalentoEC</div>
+          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--amarillo)">TalentoEC</div>
           <div style="font-size:11px;color:var(--texto-secundario);margin-top:4px">Cartas personalizadas</div>
         </div>
         <div style="text-align:center">
@@ -957,6 +995,13 @@ if (window.pdfjsLib) {
           <span>🎯 Correos en frío</span>
           <span style="font-size:11px;color:var(--texto-secundario);font-weight:400">El 40% de empleos en Ecuador nunca se publican</span>
         </div>
+        <div id="frioPlanLock" style="display:none;background:rgba(245,193,66,0.08);border:1px solid rgba(245,193,66,0.3);border-radius:10px;padding:14px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--amarillo);font-weight:600;margin-bottom:6px">
+            🔒 Disponible en plan Estándar o Pro
+          </div>
+          <div style="font-size:12px;color:var(--texto-secundario);line-height:1.6">Los correos en frío te permiten contactar empresas que NO publican vacantes. Actualiza tu plan para usar esta función.</div>
+          <button onclick="cambiarTab('planes')" style="margin-top:10px;background:var(--amarillo);color:#000;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:600;font-size:12px">Ver planes</button>
+        </div>
         <div style="background:rgba(245,230,66,0.06);border:1px solid rgba(245,230,66,0.2);border-radius:10px;padding:14px 16px;margin-bottom:18px;font-size:13px;color:var(--texto-secundario);line-height:1.6">
           Buscaremos empresas ecuatorianas de tu sector que <strong style="color:var(--texto-primario)">no tienen vacante publicada</strong> y les enviará correos presentando tu perfil directamente a RRHH.
         </div>
@@ -1334,7 +1379,8 @@ if (window.pdfjsLib) {
           <div class="tipo-label">Candidato</div>
           <div class="tipo-desc">Busco empleo</div>
         </div>
-        <div class="tipo-card" onclick="selectTipo('empleador',this)">
+        <div class="tipo-card" onclick="showToast('🚀 Cuentas para empresas próximamente. Contáctanos por WhatsApp para acceso anticipado.', false)" style="opacity:0.45;cursor:not-allowed;position:relative">
+          <div style="position:absolute;top:6px;right:8px;background:var(--amarillo);color:#000;padding:3px 8px;border-radius:10px;font-size:9px;font-weight:700;letter-spacing:1px;font-family:'Syne',sans-serif">PRÓXIMAMENTE</div>
           <div class="tipo-icon">🏢</div>
           <div class="tipo-label">Empleador</div>
           <div class="tipo-desc">Busco personal</div>
@@ -2203,7 +2249,23 @@ async function registrar() {
   }
 }
 
+function actualizarPlanLockFrio() {
+  if (!currentUser) return;
+  const plan = (currentUser.plan || 'basico').toLowerCase();
+  const lockDiv = document.getElementById('frioPlanLock');
+  if (lockDiv) {
+    if (plan === 'basico' || plan === 'básico') {
+      lockDiv.style.display = 'block';
+    } else {
+      lockDiv.style.display = 'none';
+    }
+  }
+}
+
 function setLoggedInUI() {
+  // Verificar bloqueo de correos en frío
+  setTimeout(actualizarPlanLockFrio, 200);
+
   // Autocompletar campos del CV con datos del usuario logueado
   if (currentUser) {
     const cvN = document.getElementById('cvNombre');
@@ -4140,6 +4202,20 @@ function mostrarLimiteAlcanzado(maxDiario) {
 
 async function ejecutarCorreosFrio() {
   if (!currentUser) { openAuth('register'); return; }
+
+  // VERIFICAR PLAN - Correos en frío solo Estándar y Pro
+  const plan = (currentUser.plan || 'basico').toLowerCase();
+  if (plan === 'basico' || plan === 'básico') {
+    showToast('🔒 Correos en frío disponibles solo en plan Estándar o Pro');
+    setTimeout(() => {
+      if (confirm('Los correos en frío están disponibles en planes Estándar ($19.99) y Pro ($34.99).\n\n¿Deseas actualizar tu plan?')) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        cambiarTab('planes');
+      }
+    }, 500);
+    return;
+  }
+
   const sector = document.getElementById('frioSector').value;
   const ciudad = document.getElementById('frioCiudad').value;
   const numero = document.getElementById('frioNumero').value;
