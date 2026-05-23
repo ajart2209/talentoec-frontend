@@ -2924,6 +2924,23 @@ async function buscarEmpleo() {
 
   await new Promise(r => setTimeout(r, 1500));
 
+  // PRIMERO intentar con Adzuna (URLs reales 100%)
+  let parsed = null;
+  try {
+    const adzunaRes = await apiCall('/api/auth/buscar-empleos-adzuna', {
+      method: 'POST',
+      body: JSON.stringify({ query, ciudad, modalidad })
+    });
+    if (adzunaRes && adzunaRes.jobs && adzunaRes.jobs.length > 0) {
+      parsed = { jobs: adzunaRes.jobs };
+      console.log('✓ Empleos encontrados en Adzuna:', adzunaRes.jobs.length);
+    }
+  } catch(e) {
+    console.warn('Adzuna no disponible, usando Claude:', e.message);
+  }
+
+  // Si Adzuna no devolvió nada, usar Claude como fallback
+  if (!parsed || !parsed.jobs || parsed.jobs.length === 0) {
   try {
     const res = await fetch(BACKEND_URL + '/api/claude/messages', {
       method:'POST', headers:{
@@ -2933,19 +2950,29 @@ async function buscarEmpleo() {
       body: JSON.stringify({
         model:'claude-sonnet-4-20250514', max_tokens:1000,
         tools:[{type:'web_search_20250305',name:'web_search'}],
-        messages:[{role:'user',content:`Busca ofertas de trabajo REALES y ACTUALES en Ecuador para: "${query}". Ciudad: ${ciudad}. Modalidad: ${modalidad}.\n\nIMPORTANTE - USA WEB SEARCH:\n- Busca en: LinkedIn, Multitrabajos, Indeed Ecuador, Computrabajo Ecuador, Bumeran, OLX empleos, Facebook Empleos\n- Cada empleo DEBE tener una URL REAL y verificable a donde el candidato pueda ir a postular\n- La URL debe ser el LINK DIRECTO a la oferta en el portal original (ej: linkedin.com/jobs/view/123456789)\n- Si NO encuentras la URL real, NO incluyas ese empleo\n- Sobre el campo "email": SOLO si está EXPLÍCITAMENTE publicado en la oferta. Si no, ponlo vacío ""\n- NUNCA inventes URLs ni emails\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa","cargo":"título puesto","ciudad":"ciudad","salario":"rango USD si está","fuente":"LinkedIn/Multitrabajos/etc","match":85,"email":"","descripcion":"descripción breve","url":"https://URL_REAL_DE_LA_OFERTA"}]}\n\nGenera 8-10 empleos con URLs REALES a portales reconocidos.`}]
+        messages:[{role:'user',content:`Busca ofertas de trabajo REALES y ACTUALES en Ecuador para: "${query}". Ciudad: ${ciudad}. Modalidad: ${modalidad}.\n\nCRÍTICO - USA WEB SEARCH OBLIGATORIAMENTE:\n- Busca en: LinkedIn Jobs, Multitrabajos, Indeed Ecuador, Computrabajo Ecuador, Bumeran, OLX empleos, Facebook Empleos\n- Cada empleo DEBE tener una URL ESPECÍFICA al detalle de la oferta\n- EJEMPLOS VÁLIDOS de URL:\n  * https://ec.computrabajo.com/ofertas-de-trabajo/oferta-de-trabajo-de-XXXXXX\n  * https://www.linkedin.com/jobs/view/123456789\n  * https://www.multitrabajos.com/empleos-busqueda/empleos-publicacion-XXXXXX\n  * https://ec.indeed.com/viewjob?jk=ABCDEF\n- EJEMPLOS INVÁLIDOS (NO USES):\n  * https://ec.computrabajo.com/ (es portal general, no oferta específica)\n  * https://linkedin.com/ (es portal general)\n  * https://multitrabajos.com/ (es portal general)\n- Si la URL no apunta a la OFERTA ESPECÍFICA, omite ese empleo\n- Sobre el campo "email": SOLO si está EXPLÍCITAMENTE publicado en la oferta. Si no, ponlo vacío ""\n- NUNCA inventes URLs ni emails\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa","cargo":"título puesto","ciudad":"ciudad","salario":"rango USD si está","fuente":"LinkedIn/Multitrabajos/etc","match":85,"email":"","descripcion":"descripción breve","url":"https://URL_REAL_DE_LA_OFERTA"}]}\n\nGenera 8-10 empleos con URLs REALES a portales reconocidos.`}]
       })
     });
     const data = await res.json();
     const text = (data.content||[]).map(i=>i.text||'').join('');
     const clean = text.replace(/```json|```/g,'').trim();
-    const parsed = JSON.parse(clean);
-    anim.classList.remove('visible');
+    parsed = JSON.parse(clean);
+  } catch(e) {
+    console.error('Claude fallback error:', e);
+  }
+  }  // Close the if (!parsed) block
+
+  // Procesar resultados (Adzuna o Claude)
+  anim.classList.remove('visible');
+  if (parsed && parsed.jobs && parsed.jobs.length > 0) {
     if (currentUser) { currentUser.stats = currentUser.stats||{}; currentUser.stats.busquedas = busquedasCount; await saveToStorage('talento_user', currentUser); }
     updateStats(parsed.jobs);
     renderJobCards(parsed.jobs);
-  } catch(e) {
-    anim.classList.remove('visible');
+    return;
+  }
+
+  // FALLBACK: modo demo si todo falla
+  try {
     // MODO DEMO trabajos
     const demoJobs = [
       {cargo:'Ingeniero de Software Senior', empresa:'Kruger Corp', ciudad:'Quito', salario:'$1,800-2,500', fuente:'LinkedIn', match:94, email:'rrhh@kruger.com.ec', descripcion:'Desarrollador backend con experiencia en Node.js y bases de datos relacionales.', url:'https://linkedin.com'},
@@ -2957,6 +2984,9 @@ async function buscarEmpleo() {
     updateStats(demoJobs);
     renderJobCards(demoJobs);
     showToast('Procesando — conecta API key para búsqueda real');
+  } catch(err) {
+    console.error('Error fallback:', err);
+    showToast('⚠ Error al buscar empleos', true);
   }
 }
 
