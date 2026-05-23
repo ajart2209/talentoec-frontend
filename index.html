@@ -3090,9 +3090,8 @@ function buscarOfertaReal(cargo, empresa, ciudad, portales) {
   const portalesFijos = [
     { nombre: '💼 LinkedIn Jobs', url: `https://www.linkedin.com/jobs/search/?keywords=${cargoEnc}&location=Ecuador`, color: '#0077b5' },
     { nombre: '💚 Indeed Ecuador', url: `https://ec.indeed.com/jobs?q=${cargoEnc}&l=${ciudadEnc}`, color: '#2557a7' },
-    { nombre: '🟠 Multitrabajos', url: `https://www.multitrabajos.com/empleos-busqueda?keyword=${cargoEnc}`, color: '#ff6b00' },
     { nombre: '🔵 Computrabajo', url: `https://ec.computrabajo.com/trabajo-de-${cargoSlug}`, color: '#0db0e0' },
-    { nombre: '🔍 Buscar en Google', url: `https://www.google.com/search?q=${cargoEmpresa}`, color: '#4285f4' }
+    { nombre: '🔍 Google Empleos', url: `https://www.google.com/search?q=${cargoEmpresa}&ibp=htl;jobs`, color: '#4285f4' }
   ];
 
   const botones = portalesFijos.map(p =>
