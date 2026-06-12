@@ -285,6 +285,173 @@ h1.hero-title span{color:var(--verde)}
   background:rgba(0,196,140,.1); color:var(--verde);
 }
 .search-select-empty { padding:10px 14px; font-size:13px; color:var(--texto-secundario); }
+
+/* ════════════ MEJORAS VISUALES v3 ════════════ */
+
+/* ---- LUZ DE SCROLL: barra de progreso superior ---- */
+#scrollGlowBar{position:fixed;top:0;left:0;height:3px;width:0%;z-index:500;pointer-events:none;
+  background:linear-gradient(90deg,var(--verde-dark),var(--verde),#7CFFD4);
+  box-shadow:0 0 10px rgba(0,196,140,.9),0 0 24px rgba(0,196,140,.55),0 2px 14px rgba(0,196,140,.4);
+  border-radius:0 4px 4px 0;transition:width .08s linear}
+#scrollGlowBar::after{content:'';position:absolute;right:-2px;top:50%;transform:translate(50%,-50%);
+  width:9px;height:9px;border-radius:50%;background:#9FFFE0;
+  box-shadow:0 0 8px 3px rgba(0,196,140,.95),0 0 22px 8px rgba(0,196,140,.45)}
+
+/* ---- LUZ DE SCROLL: cometa lateral ---- */
+#scrollRail{position:fixed;top:70px;bottom:20px;right:9px;width:2px;z-index:499;pointer-events:none;
+  background:linear-gradient(180deg,transparent,var(--gris-borde) 12%,var(--gris-borde) 88%,transparent);border-radius:2px}
+#scrollComet{position:absolute;left:50%;top:0;transform:translate(-50%,-50%);width:8px;height:8px;border-radius:50%;
+  background:radial-gradient(circle,#CFFFEF 0%,var(--verde) 45%,transparent 75%);
+  box-shadow:0 0 10px 3px rgba(0,196,140,.9),0 0 30px 10px rgba(0,196,140,.4);
+  transition:top .12s ease-out}
+#scrollComet::before{content:'';position:absolute;left:50%;bottom:50%;transform:translateX(-50%);
+  width:2px;height:46px;border-radius:2px;
+  background:linear-gradient(180deg,transparent,rgba(0,196,140,.75));filter:blur(.5px)}
+@media(max-width:768px){#scrollRail{display:none}}
+
+/* ---- LUZ AMBIENTAL que acompaña el scroll ---- */
+#luzAmbiente{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55;
+  background:radial-gradient(560px circle at var(--lx,80%) var(--ly,18%),rgba(0,196,140,.10),transparent 65%);
+  transition:opacity .4s}
+.page,nav,.modal-bg,.toast{position:relative;z-index:1}
+nav{z-index:100}.modal-bg{z-index:300}.toast{z-index:999}
+
+/* ---- BOTONES: brillo barrido + lift + halo ---- */
+.btn-primary,.btn-nav-cta,.btn-full,.btn-sm-green,.btn-search,.btn-pp-pay,.btn-send,.btn-plan{
+  position:relative;overflow:hidden;isolation:isolate;
+  transition:transform .22s cubic-bezier(.2,.9,.3,1.4),box-shadow .25s,background .2s}
+.btn-primary::before,.btn-nav-cta::before,.btn-full::before,.btn-sm-green::before,.btn-search::before,.btn-pp-pay::before,.btn-send::before,.btn-plan::before{
+  content:'';position:absolute;top:0;left:-80%;width:55%;height:100%;z-index:-1;
+  background:linear-gradient(105deg,transparent,rgba(255,255,255,.45),transparent);
+  transform:skewX(-22deg);transition:left .55s ease}
+.btn-primary:hover::before,.btn-nav-cta:hover::before,.btn-full:hover::before,.btn-sm-green:hover::before,.btn-search:hover::before,.btn-pp-pay:hover::before,.btn-send:hover::before,.btn-plan:hover::before{left:130%}
+.btn-primary:hover,.btn-full:hover,.btn-pp-pay:hover{transform:translateY(-2px) scale(1.015);
+  box-shadow:0 6px 22px rgba(0,196,140,.40),0 0 0 1px rgba(0,196,140,.35)}
+.btn-nav-cta:hover,.btn-sm-green:hover,.btn-search:hover,.btn-send:hover{transform:translateY(-1px);
+  box-shadow:0 4px 16px rgba(0,196,140,.35)}
+.btn-primary:active,.btn-full:active,.btn-sm-green:active,.btn-nav-cta:active,.btn-search:active,.btn-pp-pay:active{transform:translateY(0) scale(.97)}
+.btn-secondary,.btn-sm-outline,.btn-nav-login{position:relative;transition:transform .2s,box-shadow .25s,border-color .2s,color .2s}
+.btn-secondary:hover,.btn-sm-outline:hover,.btn-nav-login:hover{transform:translateY(-1px);
+  box-shadow:0 0 0 1px rgba(0,196,140,.4),0 4px 18px rgba(0,196,140,.18)}
+
+/* ripple al hacer clic */
+.ripple-ink{position:absolute;border-radius:50%;background:rgba(255,255,255,.5);transform:scale(0);
+  animation:rippleAnim .6s ease-out forwards;pointer-events:none;z-index:2}
+@keyframes rippleAnim{to{transform:scale(3.2);opacity:0}}
+
+/* ---- TARJETAS: glow que sigue al mouse (estilo dashboard) ---- */
+.step-card,.plan-card,.dash-card,.job-card,.candidate-card,.section-box,.filters-panel{
+  position:relative;overflow:hidden;
+  transition:transform .25s ease,box-shadow .3s ease,border-color .25s ease}
+.step-card::after,.plan-card::after,.dash-card::after,.job-card::after,.candidate-card::after{
+  content:'';position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;
+  background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),rgba(0,196,140,.13),transparent 62%)}
+.step-card:hover::after,.plan-card:hover::after,.dash-card:hover::after,.job-card:hover::after,.candidate-card:hover::after{opacity:1}
+.step-card:hover,.plan-card:hover,.job-card:hover,.candidate-card:hover{transform:translateY(-4px);
+  box-shadow:0 12px 32px rgba(0,0,0,.45),0 0 0 1px rgba(0,196,140,.28),0 0 28px rgba(0,196,140,.10)}
+.dash-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.4),0 0 0 1px rgba(0,196,140,.25)}
+.plan-card.destacado{box-shadow:0 0 28px rgba(0,196,140,.12)}
+.plan-card.destacado:hover{box-shadow:0 14px 40px rgba(0,0,0,.5),0 0 0 1px var(--verde),0 0 36px rgba(0,196,140,.22)}
+
+/* borde superior luminoso en dash-cards (acento tipo dashboard) */
+.dash-card::before{content:'';position:absolute;top:0;left:14px;right:14px;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,transparent,rgba(0,196,140,.55),transparent);
+  opacity:0;transform:scaleX(.4);transition:opacity .3s,transform .35s}
+.dash-card:hover::before{opacity:1;transform:scaleX(1)}
+
+/* ---- REVEAL AL HACER SCROLL ---- */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .65s ease,transform .65s cubic-bezier(.16,.84,.32,1);
+  transition-delay:var(--d,0ms)}
+.rv.in{opacity:1;transform:translateY(0)}
+
+/* shimmer del número grande al revelarse */
+@keyframes numPop{0%{transform:scale(.8);opacity:0}60%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+.rv.in .stat-num,.rv.in .dash-card-num{animation:numPop .6s cubic-bezier(.2,.9,.3,1.3) both}
+
+/* badge de match con pulso suave */
+.match-badge{animation:badgeGlow 2.6s ease-in-out infinite}
+@keyframes badgeGlow{0%,100%{box-shadow:0 0 0 0 rgba(0,196,140,0)}50%{box-shadow:0 0 12px 1px rgba(0,196,140,.30)}}
+
+/* chips con micro-bounce */
+.chip:hover{transform:translateY(-1px)}
+.chip{transition:all .2s,transform .18s}
+
+/* ---- KPI DASHBOARD (estilo tracker) ---- */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.kpi-wide{grid-column:1/-1}
+@media(max-width:720px){.kpi-grid{grid-template-columns:1fr}.kpi-wide{grid-column:auto}}
+.kpi-panel{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:14px;overflow:hidden;
+  position:relative;transition:transform .25s ease,box-shadow .3s ease,border-color .25s ease}
+.kpi-panel:hover{transform:translateY(-3px);border-color:rgba(0,196,140,.35);
+  box-shadow:0 10px 28px rgba(0,0,0,.45),0 0 24px rgba(0,196,140,.08)}
+.kpi-head{background:linear-gradient(135deg,var(--verde),var(--verde-dark));padding:9px 16px;
+  font-family:'Syne',sans-serif;font-size:11.5px;font-weight:800;letter-spacing:.12em;color:var(--negro);
+  display:flex;justify-content:space-between;align-items:center}
+.kpi-head-ico{font-size:13px}
+.kpi-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:14px 14px 8px}
+.kpi-stat{background:var(--negro);border:1px solid var(--gris-borde);border-radius:9px;padding:11px 5px;text-align:center;transition:border-color .2s;min-width:0}
+.kpi-stat:hover{border-color:rgba(0,196,140,.4)}
+.kpi-num{font-family:'Syne',sans-serif;font-size:clamp(13px,4vw,19px);font-weight:800;color:var(--verde);line-height:1.15;overflow-wrap:break-word}
+.kpi-lbl{font-size:9.5px;color:var(--texto-secundario);margin-top:4px;line-height:1.35;overflow-wrap:break-word}
+@media(max-width:480px){
+  .kpi-stats{gap:6px;padding:12px 10px 6px}
+  .kpi-stat{padding:9px 4px;border-radius:8px}
+  .kpi-lbl{font-size:8.5px}
+  .kpi-hrow{grid-template-columns:62px 1fr 56px;gap:7px}
+  .kpi-hlabel{font-size:10px}.kpi-hval{font-size:10.5px}
+  .kpi-bignum{padding:10px 12px}.kpi-bignum-val{font-size:26px}
+  .kpi-head{font-size:10.5px;letter-spacing:.08em}
+}
+.kpi-leg{display:flex;gap:14px;flex-wrap:wrap;font-size:10px;color:var(--texto-secundario);padding:6px 16px 0}
+.kpi-dot{width:9px;height:9px;border-radius:2.5px;display:inline-block;margin-right:5px;vertical-align:-1px}
+.kpi-chart{padding:8px 14px 14px}
+.kpi-foot{font-size:10px;color:var(--texto-secundario);text-align:center;margin-top:6px}
+/* barras verticales: crecen al revelarse */
+.kpi-bar{transform:scaleY(0);transform-origin:bottom;transform-box:fill-box;
+  transition:transform .8s cubic-bezier(.2,.8,.3,1.08);transition-delay:var(--bd,0ms)}
+.rv.in .kpi-bar{transform:scaleY(1)}
+/* barras horizontales comparativas */
+.kpi-hrow{display:grid;grid-template-columns:74px 1fr 64px;align-items:center;gap:10px;margin-bottom:14px}
+.kpi-hlabel{font-size:11px;color:var(--texto-secundario)}
+.kpi-hval{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;text-align:right}
+.kpi-htrack{background:var(--gris-medio);border-radius:6px;height:12px;overflow:hidden}
+.kpi-hfill{display:block;height:100%;width:0;border-radius:6px;transition:width 1s cubic-bezier(.2,.8,.3,1) .25s}
+.kpi-hfill.rojo{background:linear-gradient(90deg,#cc4040,var(--rojo))}
+.kpi-hfill.verde{background:linear-gradient(90deg,var(--verde-dark),var(--verde));box-shadow:0 0 12px rgba(0,196,140,.45)}
+.rv.in .kpi-hfill{width:var(--w)}
+.kpi-bignum{display:flex;justify-content:space-between;align-items:center;gap:14px;
+  background:var(--negro);border:1px solid var(--gris-borde);border-radius:10px;padding:12px 18px;margin-top:6px}
+.kpi-bignum-val{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--verde)}
+/* anillos / dona */
+.kpi-seg{stroke-dasharray:0 100;transition:stroke-dasharray 1s ease;transition-delay:var(--sd,0ms)}
+.rv.in .kpi-seg{stroke-dasharray:var(--arc) 100}
+/* panel ancho */
+.kpi-wide-body{display:grid;grid-template-columns:170px 1fr;gap:20px;padding:18px 18px 16px;align-items:center}
+@media(max-width:640px){.kpi-wide-body{grid-template-columns:1fr;justify-items:center}}
+.kpi-donut-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
+.kpi-donut-leg{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:10px;color:var(--texto-secundario)}
+.kpi-line-wrap{width:100%}
+.kpi-line-title{font-size:11.5px;color:var(--texto-primario);font-weight:500;margin-bottom:10px}
+.kpi-line-title span{color:var(--texto-secundario);font-weight:400}
+/* línea: se dibuja al revelarse */
+.kpi-line{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.5s ease .3s}
+.rv.in .kpi-line{stroke-dashoffset:0}
+.kpi-area{opacity:0;transition:opacity .9s ease .9s}
+.rv.in .kpi-area{opacity:1}
+.kpi-pt{opacity:0;transition:opacity .3s ease;transition-delay:var(--pd,.4s)}
+.rv.in .kpi-pt{opacity:1}
+
+/* accesibilidad: respetar reduced motion */
+@media (prefers-reduced-motion:reduce){
+  .rv{opacity:1;transform:none;transition:none}
+  #scrollComet,#scrollGlowBar{transition:none}
+  .btn-primary,.btn-full,.btn-sm-green,.btn-nav-cta,.btn-search,.btn-pp-pay,.btn-send,.btn-plan,
+  .step-card,.plan-card,.dash-card,.job-card,.candidate-card{transition:none;animation:none}
+  .rv.in .stat-num,.rv.in .dash-card-num,.match-badge{animation:none}
+  .kpi-bar,.kpi-hfill,.kpi-seg,.kpi-line,.kpi-area,.kpi-pt{transition:none}
+  .kpi-bar{transform:scaleY(1)}.kpi-hfill{width:var(--w)}.kpi-seg{stroke-dasharray:var(--arc) 100}
+  .kpi-line{stroke-dashoffset:0}.kpi-area,.kpi-pt{opacity:1}
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -357,7 +524,7 @@ function validarBeta() {
   <div class="hero">
     <div class="hero-tag">Tecnología · Solo Ecuador · Empleo en 30 días</div>
     <h1 class="hero-title">El talento ecuatoriano,<br><span>encontrado por nosotros</span></h1>
-    <p class="hero-sub">Sube tu CV, Lo analizamos con web search en tiempo real, busca en toda la internet ecuatoriana y envía correos automáticos por ti.</p>
+    <p class="hero-sub">Sube tu CV y nuestra IA lo analiza, busca ofertas reales en LinkedIn, Indeed, Computrabajo y toda la internet ecuatoriana, y te lleva directo a postular. Hasta 100 ofertas reales cada día.</p>
     <div class="hero-ctas">
       <button class="btn-primary" onclick="openAuth('register')">Crear cuenta gratis →</button>
       <button class="btn-secondary" onclick="openAuth('login')">Ya tengo cuenta</button>
@@ -366,76 +533,158 @@ function validarBeta() {
   </div>
 
   <!-- COMO FUNCIONA VISUAL -->
-  <div style="padding:20px 40px 60px;max-width:860px;margin:0 auto">
+  <div style="padding:20px clamp(14px,4.5vw,40px) 60px;max-width:860px;margin:0 auto">
     <!-- Sección de estadísticas con credibilidad -->
-    <div style="background:linear-gradient(135deg,rgba(0,196,140,0.06),rgba(245,230,66,0.04));border:1px solid rgba(0,196,140,0.2);border-radius:20px;padding:32px;margin-bottom:48px">
+    <div style="background:linear-gradient(135deg,rgba(0,196,140,0.06),rgba(245,230,66,0.04));border:1px solid rgba(0,196,140,0.2);border-radius:20px;padding:clamp(14px,3.5vw,32px);margin-bottom:48px">
       <div style="text-align:center;margin-bottom:28px">
-        <div style="font-family:'Syne',sans-serif;font-size:11px;color:var(--verde);letter-spacing:3px;font-weight:600;margin-bottom:8px">RESULTADOS REALES</div>
-        <h3 style="font-family:'Syne',sans-serif;font-size:28px;font-weight:700;margin:0">Resultados <span style="color:var(--verde)">comprobados</span></h3>
-        <p style="color:var(--texto-secundario);font-size:13px;margin-top:8px;max-width:500px;margin-left:auto;margin-right:auto">Comparación: Búsqueda manual vs. con TalentoEC</p>
+        <div style="font-family:'Syne',sans-serif;font-size:11px;color:var(--verde);letter-spacing:3px;font-weight:600;margin-bottom:8px">TU POTENCIAL</div>
+        <h3 style="font-family:'Syne',sans-serif;font-size:28px;font-weight:700;margin:0">Lo que puedes <span style="color:var(--verde)">lograr</span></h3>
+        <p style="color:var(--texto-secundario);font-size:13px;margin-top:8px;max-width:500px;margin-left:auto;margin-right:auto">Comparación estimada: búsqueda manual vs. con TalentoEC</p>
       </div>
 
-      <!-- GRÁFICA DE BARRAS PROFESIONAL -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:40px;padding:20px 10px">
+      <!-- ═══════ KPI DASHBOARD (estilo tracker) ═══════ -->
+      <div class="kpi-grid">
 
-        <!-- Gráfica 1: 5x más postulaciones -->
-        <div style="text-align:center">
-          <div style="font-family:'Syne',sans-serif;font-size:13px;color:var(--texto-secundario);margin-bottom:18px;font-weight:500">POSTULACIONES POR MES</div>
-          <div style="display:flex;justify-content:center;align-items:flex-end;gap:30px;height:200px;margin-bottom:14px">
-            <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
-              <div style="font-size:13px;color:var(--texto-secundario);font-weight:600">60</div>
-              <div style="width:40px;height:35px;background:linear-gradient(180deg,#4a4a4a,#2a2a2a);border-radius:4px 4px 0 0"></div>
-              <div style="font-size:11px;color:var(--texto-secundario)">Sin app</div>
+        <!-- Panel 1: Postulaciones -->
+        <div class="kpi-panel">
+          <div class="kpi-head"><span>OFERTAS DE EMPLEO</span><span class="kpi-head-ico">📈</span></div>
+          <div class="kpi-stats">
+            <div class="kpi-stat"><div class="kpi-num">25-100</div><div class="kpi-lbl">Ofertas reales / día</div></div>
+            <div class="kpi-stat"><div class="kpi-num">5x</div><div class="kpi-lbl">Más que manual</div></div>
+            <div class="kpi-stat"><div class="kpi-num">4+</div><div class="kpi-lbl">Portales a la vez</div></div>
+          </div>
+          <div class="kpi-leg">
+            <span><i class="kpi-dot" style="background:#3d4a44"></i>Buscando manual</span>
+            <span><i class="kpi-dot" style="background:var(--verde)"></i>Con TalentoEC</span>
+          </div>
+          <div class="kpi-chart">
+            <svg viewBox="0 0 320 145" width="100%" style="display:block">
+              <line x1="8" y1="120" x2="312" y2="120" stroke="var(--gris-borde)" stroke-width="1"/>
+              <line x1="8" y1="85" x2="312" y2="85" stroke="var(--gris-borde)" stroke-width=".5" stroke-dasharray="3 4" opacity=".5"/>
+              <line x1="8" y1="50" x2="312" y2="50" stroke="var(--gris-borde)" stroke-width=".5" stroke-dasharray="3 4" opacity=".5"/>
+              <line x1="8" y1="15" x2="312" y2="15" stroke="var(--gris-borde)" stroke-width=".5" stroke-dasharray="3 4" opacity=".5"/>
+              <!-- ENE -->
+              <rect class="kpi-bar" style="--bd:0ms"   x="14"  y="100.5" width="13" height="19.5" rx="2" fill="#3d4a44"/>
+              <rect class="kpi-bar" style="--bd:60ms"  x="30"  y="35" width="15" height="85" rx="2.5" fill="url(#kpiGrad)"/>
+              <!-- FEB -->
+              <rect class="kpi-bar" style="--bd:90ms"  x="65"  y="98" width="13" height="22" rx="2" fill="#3d4a44"/>
+              <rect class="kpi-bar" style="--bd:150ms" x="81"  y="26" width="15" height="94" rx="2.5" fill="url(#kpiGrad)"/>
+              <!-- MAR -->
+              <rect class="kpi-bar" style="--bd:180ms" x="116" y="99.4" width="13" height="20.6" rx="2" fill="#3d4a44"/>
+              <rect class="kpi-bar" style="--bd:240ms" x="132" y="20.7" width="15" height="99.3" rx="2.5" fill="url(#kpiGrad)"/>
+              <!-- ABR -->
+              <rect class="kpi-bar" style="--bd:270ms" x="167" y="98.7" width="13" height="21.3" rx="2" fill="#3d4a44"/>
+              <rect class="kpi-bar" style="--bd:330ms" x="183" y="15.4" width="15" height="104.6" rx="2.5" fill="url(#kpiGrad)"/>
+              <!-- MAY -->
+              <rect class="kpi-bar" style="--bd:360ms" x="218" y="99.8" width="13" height="20.2" rx="2" fill="#3d4a44"/>
+              <rect class="kpi-bar" style="--bd:420ms" x="234" y="17.8" width="15" height="102.2" rx="2.5" fill="url(#kpiGrad)"/>
+              <!-- JUN -->
+              <rect class="kpi-bar" style="--bd:450ms" x="269" y="97.6" width="13" height="22.4" rx="2" fill="#3d4a44"/>
+              <rect class="kpi-bar" style="--bd:510ms" x="285" y="11.8" width="15" height="108.2" rx="2.5" fill="url(#kpiGrad)"/>
+              <g font-family="DM Sans,sans-serif" font-size="9" fill="var(--texto-secundario)" text-anchor="middle">
+                <text x="29" y="135">ENE</text><text x="80" y="135">FEB</text><text x="131" y="135">MAR</text>
+                <text x="182" y="135">ABR</text><text x="233" y="135">MAY</text><text x="284" y="135">JUN</text>
+              </g>
+              <defs>
+                <linearGradient id="kpiGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#1FE0A8"/><stop offset="100%" stop-color="#00996E"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="kpi-foot">Ofertas reales que llegas a ver cada mes · hasta 3.000 con Plan Pro</div>
+          </div>
+        </div>
+
+        <!-- Panel 2: Tiempo de búsqueda -->
+        <div class="kpi-panel">
+          <div class="kpi-head"><span>TIEMPO DE BÚSQUEDA</span><span class="kpi-head-ico">⏱️</span></div>
+          <div class="kpi-stats">
+            <div class="kpi-stat"><div class="kpi-num" style="color:var(--rojo)">6 meses</div><div class="kpi-lbl">Buscando sin app</div></div>
+            <div class="kpi-stat"><div class="kpi-num">1-3 meses</div><div class="kpi-lbl">Con TalentoEC</div></div>
+            <div class="kpi-stat"><div class="kpi-num" style="color:var(--amarillo)">24/7</div><div class="kpi-lbl">Trabajando por ti</div></div>
+          </div>
+          <div class="kpi-chart" style="padding-top:18px">
+            <div class="kpi-hrow">
+              <div class="kpi-hlabel">Sin app</div>
+              <div class="kpi-htrack"><span class="kpi-hfill rojo" style="--w:100%"></span></div>
+              <div class="kpi-hval" style="color:var(--rojo)">6 meses</div>
             </div>
-            <div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--verde);align-self:center">→</div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
-              <div style="font-size:18px;color:var(--verde);font-weight:800;font-family:'Syne',sans-serif">300</div>
-              <div style="width:60px;height:170px;background:linear-gradient(180deg,#00C48C,#00a070);border-radius:6px 6px 0 0;box-shadow:0 0 20px rgba(0,196,140,0.4)"></div>
-              <div style="font-size:11px;color:var(--verde);font-weight:600">Con TalentoEC</div>
+            <div class="kpi-hrow">
+              <div class="kpi-hlabel" style="color:var(--verde)">TalentoEC</div>
+              <div class="kpi-htrack"><span class="kpi-hfill verde" style="--w:34%"></span></div>
+              <div class="kpi-hval" style="color:var(--verde)">1-3 meses</div>
+            </div>
+            <div class="kpi-bignum">
+              <div>
+                <div class="kpi-bignum-val">-70%</div>
+                <div class="kpi-lbl">menos tiempo de búsqueda</div>
+              </div>
+              <svg viewBox="0 0 100 100" width="78" height="78">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="var(--gris-medio)" stroke-width="11"/>
+                <circle class="kpi-seg" style="--arc:70;--sd:200ms" cx="50" cy="50" r="40" fill="none"
+                  stroke="url(#kpiGrad2)" stroke-width="11" stroke-linecap="round"
+                  pathLength="100" transform="rotate(-90 50 50)"/>
+                <text x="50" y="56" text-anchor="middle" font-family="Syne,sans-serif" font-weight="800" font-size="19" fill="var(--verde)">70%</text>
+                <defs>
+                  <linearGradient id="kpiGrad2" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#7CFFD4"/><stop offset="100%" stop-color="#00C48C"/>
+                  </linearGradient>
+                </defs>
+              </svg>
             </div>
           </div>
-          <div style="font-size:12px;color:var(--texto-secundario);margin-top:8px">5x más postulaciones al mes</div>
         </div>
 
-        <!-- Gráfica 2: 70% menos tiempo -->
-        <div style="text-align:center">
-          <div style="font-family:'Syne',sans-serif;font-size:13px;color:var(--texto-secundario);margin-bottom:18px;font-weight:500">TIEMPO DE BÚSQUEDA</div>
-          <div style="display:flex;justify-content:center;align-items:flex-end;gap:30px;height:200px;margin-bottom:14px">
-            <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
-              <div style="font-size:13px;color:var(--texto-secundario);font-weight:600">6 meses</div>
-              <div style="width:40px;height:170px;background:linear-gradient(180deg,#ff6b6b,#cc4040);border-radius:4px 4px 0 0"></div>
-              <div style="font-size:11px;color:var(--texto-secundario)">Sin app</div>
+        <!-- Panel 3 (ancho): Cobertura y progreso -->
+        <div class="kpi-panel kpi-wide">
+          <div class="kpi-head"><span>COBERTURA DE PORTALES &amp; TU PROGRESO</span><span class="kpi-head-ico">🌐</span></div>
+          <div class="kpi-wide-body">
+            <div class="kpi-donut-wrap">
+              <svg viewBox="0 0 120 120" width="118" height="118">
+                <circle class="kpi-seg" style="--arc:23;--sd:0ms"   cx="60" cy="60" r="46" fill="none" stroke="#00C48C" stroke-width="15" pathLength="100" stroke-dashoffset="0"   transform="rotate(-90 60 60)"/>
+                <circle class="kpi-seg" style="--arc:23;--sd:150ms" cx="60" cy="60" r="46" fill="none" stroke="#7CFFD4" stroke-width="15" pathLength="100" stroke-dashoffset="-25" transform="rotate(-90 60 60)"/>
+                <circle class="kpi-seg" style="--arc:23;--sd:300ms" cx="60" cy="60" r="46" fill="none" stroke="#3B82F6" stroke-width="15" pathLength="100" stroke-dashoffset="-50" transform="rotate(-90 60 60)"/>
+                <circle class="kpi-seg" style="--arc:23;--sd:450ms" cx="60" cy="60" r="46" fill="none" stroke="#F5E642" stroke-width="15" pathLength="100" stroke-dashoffset="-75" transform="rotate(-90 60 60)"/>
+                <text x="60" y="57" text-anchor="middle" font-family="Syne,sans-serif" font-weight="800" font-size="22" fill="var(--texto-primario)">4+</text>
+                <text x="60" y="72" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8.5" fill="var(--texto-secundario)">portales</text>
+              </svg>
+              <div class="kpi-donut-leg">
+                <span><i class="kpi-dot" style="background:#00C48C"></i>LinkedIn</span>
+                <span><i class="kpi-dot" style="background:#7CFFD4"></i>Indeed</span>
+                <span><i class="kpi-dot" style="background:#3B82F6"></i>Computrabajo</span>
+                <span><i class="kpi-dot" style="background:#F5E642"></i>Google Empleos</span>
+              </div>
             </div>
-            <div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--verde);align-self:center">→</div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
-              <div style="font-size:18px;color:var(--verde);font-weight:800;font-family:'Syne',sans-serif">1-3 meses</div>
-              <div style="width:60px;height:60px;background:linear-gradient(180deg,#00C48C,#00a070);border-radius:6px 6px 0 0;box-shadow:0 0 20px rgba(0,196,140,0.4)"></div>
-              <div style="font-size:11px;color:var(--verde);font-weight:600">Con TalentoEC</div>
+            <div class="kpi-line-wrap">
+              <div class="kpi-line-title">Postulaciones acumuladas en tu primer mes <span>(Plan Pro)</span></div>
+              <svg viewBox="0 0 300 130" width="100%" style="display:block">
+                <line x1="10" y1="115" x2="292" y2="115" stroke="var(--gris-borde)" stroke-width="1"/>
+                <line x1="10" y1="78" x2="292" y2="78" stroke="var(--gris-borde)" stroke-width=".5" stroke-dasharray="3 4" opacity=".5"/>
+                <line x1="10" y1="41" x2="292" y2="41" stroke="var(--gris-borde)" stroke-width=".5" stroke-dasharray="3 4" opacity=".5"/>
+                <path class="kpi-area" d="M20,115 L20,90 L110,65 L200,40 L280,15 L280,115 Z" fill="url(#kpiAreaGrad)"/>
+                <path class="kpi-line" d="M20,90 L110,65 L200,40 L280,15" fill="none" stroke="var(--verde)" stroke-width="2.5" stroke-linecap="round" pathLength="1"/>
+                <circle class="kpi-pt" style="--pd:.35s" cx="20" cy="90" r="4" fill="var(--negro)" stroke="var(--verde)" stroke-width="2.5"/>
+                <circle class="kpi-pt" style="--pd:.65s" cx="110" cy="65" r="4" fill="var(--negro)" stroke="var(--verde)" stroke-width="2.5"/>
+                <circle class="kpi-pt" style="--pd:.95s" cx="200" cy="40" r="4" fill="var(--negro)" stroke="var(--verde)" stroke-width="2.5"/>
+                <circle class="kpi-pt" style="--pd:1.25s" cx="280" cy="15" r="5" fill="var(--verde)" stroke="#9FFFE0" stroke-width="2"/>
+                <g font-family="DM Sans,sans-serif" font-size="9" fill="var(--texto-secundario)" text-anchor="middle">
+                  <text x="20" y="127">Sem 1</text><text x="110" y="127">Sem 2</text>
+                  <text x="200" y="127">Sem 3</text><text x="280" y="127">Sem 4</text>
+                </g>
+                <g font-family="Syne,sans-serif" font-size="9.5" font-weight="700" fill="var(--verde)" text-anchor="middle">
+                  <text x="20" y="82">75</text><text x="110" y="57">150</text>
+                  <text x="200" y="32">225</text><text x="280" y="8">300</text>
+                </g>
+                <defs>
+                  <linearGradient id="kpiAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="rgba(0,196,140,.30)"/><stop offset="100%" stop-color="rgba(0,196,140,0)"/>
+                  </linearGradient>
+                </defs>
+              </svg>
             </div>
           </div>
-          <div style="font-size:12px;color:var(--texto-secundario);margin-top:8px">70% menos tiempo de búsqueda</div>
         </div>
 
-      </div>
-
-      <!-- Estadísticas adicionales debajo -->
-      <div style="margin-top:32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.08)">
-        <div style="text-align:center">
-          <div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--verde)">100</div>
-          <div style="font-size:11px;color:var(--texto-secundario);margin-top:4px">Ofertas/día (Plan Pro)</div>
-        </div>
-        <div style="text-align:center">
-          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--amarillo)">TalentoEC</div>
-          <div style="font-size:11px;color:var(--texto-secundario);margin-top:4px">Cartas personalizadas</div>
-        </div>
-        <div style="text-align:center">
-          <div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--verde)">4+</div>
-          <div style="font-size:11px;color:var(--texto-secundario);margin-top:4px">Portales conectados</div>
-        </div>
-        <div style="text-align:center">
-          <div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--amarillo)">24/7</div>
-          <div style="font-size:11px;color:var(--texto-secundario);margin-top:4px">Trabajando por ti</div>
-        </div>
       </div>
 
       <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.05)">
@@ -539,21 +788,21 @@ function validarBeta() {
         <div class="plan-price">$9<span>.99 / mes</span></div>
         <div class="plan-desc">Para quien empieza su búsqueda</div>
         <div style="margin:14px 0 16px">
-          <div style="font-size:11px;color:var(--texto-secundario);margin-bottom:6px">Correos diarios</div>
+          <div style="font-size:11px;color:var(--texto-secundario);margin-bottom:6px">Ofertas reales por día</div>
           <div style="display:flex;align-items:center;gap:10px">
             <div style="flex:1;height:5px;background:var(--gris-medio);border-radius:3px;overflow:hidden">
-              <div style="width:33%;height:100%;background:var(--verde);border-radius:3px"></div>
+              <div style="width:25%;height:100%;background:var(--verde);border-radius:3px"></div>
             </div>
-            <span style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--verde)">10–20</span>
+            <span style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--verde)">25</span>
           </div>
-          <div style="font-size:11px;color:var(--texto-secundario);margin-top:5px">Mínimo 10 · máximo 20 por día · ~300/mes</div>
+          <div style="font-size:11px;color:var(--texto-secundario);margin-top:5px">5 búsquedas diarias · ~750 ofertas al mes</div>
         </div>
         <ul class="plan-features">
-          <li>Análisis completo de CV </li>
-          <li>5 búsquedas/día = 25 ofertas de trabajo</li>
-          <li>Correos automáticos personalizados por nosotros</li>
-          <li>LinkedIn, Indeed, Computrabajo y más</li>
-          <li>Historial de correos enviados</li>
+          <li>5 búsquedas inteligentes al día = 25 ofertas reales</li>
+          <li>Análisis completo de CV con IA</li>
+          <li>Postula directo en LinkedIn, Indeed, Computrabajo y más</li>
+          <li>12 correos de postulación al día</li>
+          <li>Historial de postulaciones</li>
         </ul>
         <button class="btn-plan" onclick="abrirPago('Básico','9.99')">Contratar con PayPhone</button>
       </div>
@@ -565,21 +814,21 @@ function validarBeta() {
         <div class="plan-price">$19<span>.99 / mes</span></div>
         <div class="plan-desc">Para búsqueda activa e intensa</div>
         <div style="margin:14px 0 16px">
-          <div style="font-size:11px;color:var(--texto-secundario);margin-bottom:6px">Correos diarios</div>
+          <div style="font-size:11px;color:var(--texto-secundario);margin-bottom:6px">Ofertas reales por día</div>
           <div style="display:flex;align-items:center;gap:10px">
             <div style="flex:1;height:5px;background:var(--gris-medio);border-radius:3px;overflow:hidden">
-              <div style="width:66%;height:100%;background:var(--azul);border-radius:3px"></div>
+              <div style="width:50%;height:100%;background:var(--azul);border-radius:3px"></div>
             </div>
-            <span style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--azul)">20–40</span>
+            <span style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--azul)">50</span>
           </div>
-          <div style="font-size:11px;color:var(--texto-secundario);margin-top:5px">Mínimo 20 · máximo 40 por día · ~600/mes</div>
+          <div style="font-size:11px;color:var(--texto-secundario);margin-top:5px">10 búsquedas diarias · ~1.500 ofertas al mes</div>
         </div>
         <ul class="plan-features">
           <li>Todo del plan Básico</li>
-          <li>10 búsquedas/día = 50 ofertas de trabajo</li>
+          <li>10 búsquedas al día = 50 ofertas reales</li>
+          <li>Correos en frío: contacta empresas antes de que publiquen la vacante (10/día)</li>
+          <li>25 correos de postulación al día</li>
           <li>Carta de presentación realizada por nuestro equipo</li>
-          <li>LinkedIn, Indeed, Computrabajo y más</li>
-          <li>Perfil destacado para empleadores</li>
           <li>Seguimiento de respuestas</li>
         </ul>
         <button class="btn-plan" onclick="abrirPago('Estándar','19.99')">Contratar con PayPhone</button>
@@ -591,21 +840,21 @@ function validarBeta() {
         <div class="plan-price">$34<span>.99 / mes</span></div>
         <div class="plan-desc">Para quien no se rinde hasta conseguirlo</div>
         <div style="margin:14px 0 16px">
-          <div style="font-size:11px;color:var(--texto-secundario);margin-bottom:6px">Correos diarios</div>
+          <div style="font-size:11px;color:var(--texto-secundario);margin-bottom:6px">Ofertas reales por día</div>
           <div style="display:flex;align-items:center;gap:10px">
             <div style="flex:1;height:5px;background:var(--gris-medio);border-radius:3px;overflow:hidden">
               <div style="width:100%;height:100%;background:var(--amarillo);border-radius:3px"></div>
             </div>
-            <span style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--amarillo)">30–60</span>
+            <span style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--amarillo)">100</span>
           </div>
-          <div style="font-size:11px;color:var(--texto-secundario);margin-top:5px">Mínimo 30 · máximo 60 por día · ~900/mes</div>
+          <div style="font-size:11px;color:var(--texto-secundario);margin-top:5px">20 búsquedas diarias · ~3.000 ofertas al mes</div>
         </div>
         <ul class="plan-features">
           <li>Todo del plan Estándar</li>
-          <li>20 búsquedas/día = 100 ofertas de trabajo</li>
-          <li>LinkedIn, Indeed, Computrabajo y más</li>
+          <li>20 búsquedas al día = 100 ofertas reales</li>
+          <li>20 correos en frío al día para adelantarte a todos</li>
+          <li>35 correos de postulación al día</li>
           <li>Perfil destacado prioritario</li>
-          <li>Carta de presentación </li>
           <li>Reporte de aperturas de correo</li>
           <li>Soporte prioritario WhatsApp</li>
         </ul>
@@ -1697,6 +1946,19 @@ async function apiCall(endpoint, options = {}) {
     throw err;
   }
 }
+// Escape de HTML para datos externos (anti-XSS en render de empleos)
+function escHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  })[c]);
+}
+// Solo permite URLs http(s) seguras para usar en atributos
+function urlSegura(u) {
+  u = String(u || '').trim();
+  if (!/^https?:\/\//i.test(u)) return '';
+  return u.replace(/["'<>\\]/g, '');
+}
+
 const SUPABASE_URL = 'https://mgxokvsbxzuvscbibmus.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_fo6XXSuS6ujoBIGcWfPa5Q_X4YB_07Hup14kZk1luV1T';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -3061,13 +3323,25 @@ async function buscarEmpleo() {
   localStorage.setItem(totalKey, String(totalActual + 1));
   busquedasCount = totalActual + 1;
 
-  // Registrar búsqueda en backend (auditoría)
+  // Registrar búsqueda en backend — el SERVIDOR valida el límite del plan.
+  // Si responde 429, abortamos ANTES de gastar en la búsqueda con Claude.
   const queryLog = document.getElementById('busquedaQuery').value.trim();
   const ciudadLog = document.getElementById('busquedaCiudad').value;
-  apiCall('/api/auth/registrar-busqueda', {
-    method: 'POST',
-    body: JSON.stringify({ query: queryLog, ciudad: ciudadLog })
-  }).catch(e => {});
+  try {
+    await apiCall('/api/auth/registrar-busqueda', {
+      method: 'POST',
+      body: JSON.stringify({ query: queryLog, ciudad: ciudadLog })
+    });
+  } catch(e) {
+    // Revertir el contador local que ya incrementamos
+    localStorage.setItem(diaKey, String(usadasHoy));
+    if (String(e.message || '').includes('límite') || String(e.message || '').includes('Alcanzaste')) {
+      mostrarLimiteAlcanzado(maxDiario);
+    } else {
+      showToast('⚠ ' + (e.message || 'No se pudo validar tu búsqueda. Intenta de nuevo.'), true);
+    }
+    return;
+  }
 
   const query = document.getElementById('busquedaQuery').value.trim();
   if (!query) { showToast('⚠ Describe qué trabajo buscas', true); return; }
@@ -3196,19 +3470,22 @@ function renderJobCards(jobs) {
         🔍 Nueva búsqueda
       </button>
     </div>` +
-    jobs.map((j,i)=>`
+    jobs.map((j,i)=>{
+      const urlOk = urlSegura(j.url);
+      const tieneUrl = urlOk && !urlOk.includes('404') && urlOk.length > 50;
+      return `
     <div class="job-card" style="animation:fadeIn .4s ease ${i*.08}s forwards;opacity:0">
       <div class="job-card-top">
-        <div><div class="job-title">${j.cargo}</div><div class="job-company">${j.empresa} · ${j.ciudad}</div></div>
-        <div class="match-badge">${j.match}%</div>
+        <div><div class="job-title">${escHtml(j.cargo)}</div><div class="job-company">${escHtml(j.empresa)} · ${escHtml(j.ciudad)}</div></div>
+        <div class="match-badge">${parseInt(j.match)||0}%</div>
       </div>
-      <div class="tags-row"><span class="tag">${j.fuente}</span><span class="tag">${j.salario}</span><span class="tag">${j.ciudad}</span></div>
-      <div style="font-size:12px;color:var(--texto-secundario)">${j.descripcion}</div>
+      <div class="tags-row"><span class="tag">${escHtml(j.fuente)}</span><span class="tag">${escHtml(j.salario)}</span><span class="tag">${escHtml(j.ciudad)}</span></div>
+      <div style="font-size:12px;color:var(--texto-secundario)">${escHtml(j.descripcion)}</div>
       <div class="card-actions">
-        ${j.url && j.url.startsWith('http') && !j.url.includes('404') && j.url.length > 50 ? `<button class="btn-sm-green" onclick="window.open('${j.url}','_blank')">🔗 Postular en oferta</button>` : `<button class="btn-sm-green" onclick='buscarOfertaReal(${JSON.stringify(j.cargo)}, ${JSON.stringify(j.empresa)}, ${JSON.stringify(j.ciudad)}, ${JSON.stringify(j.portales||[])})'>🔍 Buscar esta oferta</button>`}
-        ${j.email && j.email!=='' && j.email!=='undefined' ? `<button class="btn-sm-outline" onclick="abrirEmailModal('${j.email}','${j.empresa}','${j.cargo}','${currentUser?.nombre||'Candidato'}',true)">✉ Correo automático</button>` : ''}
+        ${tieneUrl ? `<button class="btn-sm-green" onclick="window.open(${escHtml(JSON.stringify(urlOk))},'_blank')">🔗 Postular en oferta</button>` : `<button class="btn-sm-green" onclick='buscarOfertaReal(${escHtml(JSON.stringify(String(j.cargo||'')))}, ${escHtml(JSON.stringify(String(j.empresa||'')))}, ${escHtml(JSON.stringify(String(j.ciudad||'')))}, ${escHtml(JSON.stringify(j.portales||[]))})'>🔍 Buscar esta oferta</button>`}
+        ${j.email && j.email!=='' && j.email!=='undefined' ? `<button class="btn-sm-outline" onclick='abrirEmailModal(${escHtml(JSON.stringify(String(j.email)))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))},${escHtml(JSON.stringify(currentUser?.nombre||'Candidato'))},true)'>✉ Correo automático</button>` : ''}
       </div>
-    </div>`).join('');
+    </div>`;}).join('');
 }
 
 // Buscar oferta - 4 portales con formatos correctos
@@ -4983,6 +5260,127 @@ function cerrarBannerInstalar() {
   if (banner) banner.remove();
   sessionStorage.setItem('install_dismissed', '1');
 }
+
+/* ════════════ EFECTOS VISUALES v3 ════════════ */
+(function(){
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // --- Crear elementos de luz ---
+  const bar = document.createElement('div'); bar.id = 'scrollGlowBar';
+  const rail = document.createElement('div'); rail.id = 'scrollRail';
+  const comet = document.createElement('div'); comet.id = 'scrollComet';
+  rail.appendChild(comet);
+  const luz = document.createElement('div'); luz.id = 'luzAmbiente';
+  document.body.prepend(luz);
+  document.body.appendChild(bar);
+  document.body.appendChild(rail);
+
+  // --- Luz que sigue el scroll ---
+  let ticking = false;
+  function updateLuz(){
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    const p = max > 0 ? (h.scrollTop / max) : 0;
+    bar.style.width = (p * 100) + '%';
+    comet.style.top = (p * 100) + '%';
+    // la luz ambiental baja suavemente con el scroll
+    luz.style.setProperty('--ly', (12 + p * 76) + '%');
+    ticking = false;
+  }
+  window.addEventListener('scroll', function(){
+    if (!ticking){ requestAnimationFrame(updateLuz); ticking = true; }
+  }, { passive: true });
+  updateLuz();
+
+  // la luz ambiental también reacciona levemente al mouse (horizontal)
+  if (!reduceMotion){
+    window.addEventListener('mousemove', function(e){
+      luz.style.setProperty('--lx', (e.clientX / window.innerWidth * 100) + '%');
+    }, { passive: true });
+  }
+
+  // --- Glow que sigue al mouse en tarjetas ---
+  const GLOW_SEL = '.step-card,.plan-card,.dash-card,.job-card,.candidate-card';
+  document.addEventListener('mousemove', function(e){
+    const card = e.target.closest && e.target.closest(GLOW_SEL);
+    if (!card) return;
+    const r = card.getBoundingClientRect();
+    card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+    card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+  }, { passive: true });
+
+  // --- Ripple en botones ---
+  const RIPPLE_SEL = '.btn-primary,.btn-nav-cta,.btn-full,.btn-sm-green,.btn-search,.btn-pp-pay,.btn-send,.btn-plan';
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest && e.target.closest(RIPPLE_SEL);
+    if (!btn || reduceMotion) return;
+    const r = btn.getBoundingClientRect();
+    const ink = document.createElement('span');
+    ink.className = 'ripple-ink';
+    const size = Math.max(r.width, r.height);
+    ink.style.width = ink.style.height = size + 'px';
+    ink.style.left = (e.clientX - r.left - size / 2) + 'px';
+    ink.style.top = (e.clientY - r.top - size / 2) + 'px';
+    btn.appendChild(ink);
+    setTimeout(function(){ ink.remove(); }, 650);
+  });
+
+  // --- Reveal al hacer scroll (con stagger) ---
+  const RV_SEL = '.kpi-panel,.step-card,.plan-card,.dash-card,.job-card,.candidate-card,.section-box,.filters-panel,.stats-row,.section-title,.hero-tag,.hero-title,.hero-sub,.hero-ctas';
+  const io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+
+  function tagReveal(root){
+    const els = (root || document).querySelectorAll(RV_SEL);
+    let i = 0;
+    els.forEach(function(el){
+      if (el.classList.contains('rv')) return;
+      el.classList.add('rv');
+      el.style.setProperty('--d', ((i % 6) * 70) + 'ms');
+      i++;
+      io.observe(el);
+    });
+  }
+  tagReveal(document);
+
+  // tarjetas creadas dinámicamente (resultados de búsqueda, etc.)
+  const mo = new MutationObserver(function(muts){
+    muts.forEach(function(m){
+      m.addedNodes.forEach(function(n){
+        if (n.nodeType !== 1) return;
+        if (n.matches && n.matches(RV_SEL)) tagReveal(n.parentElement || document);
+        else if (n.querySelector && n.querySelector(RV_SEL)) tagReveal(n);
+      });
+    });
+  });
+  mo.observe(document.body, { childList: true, subtree: true });
+
+  // --- Contadores animados (stats del landing y dashboard) ---
+  function animateNum(el){
+    const txt = el.textContent.trim();
+    const m = txt.match(/^(\d+)(\+?)$/);
+    if (!m || reduceMotion) return;
+    const target = parseInt(m[1], 10), suffix = m[2];
+    if (target <= 1) return;
+    const dur = 900, t0 = performance.now();
+    function frame(t){
+      const p = Math.min((t - t0) / dur, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased) + suffix;
+      if (p < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+  const ioNum = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (en.isIntersecting){ animateNum(en.target); ioNum.unobserve(en.target); }
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('.stat-num,.dash-card-num,.kpi-num').forEach(function(el){ ioNum.observe(el); });
+})();
 </script>
 </body>
 </html>
