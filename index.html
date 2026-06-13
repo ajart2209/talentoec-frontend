@@ -2183,6 +2183,17 @@ function escHtml(s) {
 }
 // Extrae el primer objeto JSON válido de un texto, aunque venga rodeado
 // de explicaciones de la IA (causa de búsquedas "sin resultados" intermitentes)
+// Extrae solo los bloques de texto de la respuesta de Claude.
+// Con web search, content[] mezcla bloques tool_use/tool_result/text;
+// concatenamos únicamente los .text con tipo correcto y un separador.
+function textoDeRespuesta(data) {
+  if (!data || !Array.isArray(data.content)) return '';
+  return data.content
+    .filter(b => b && (b.type === 'text' || typeof b.text === 'string'))
+    .map(b => b.text || '')
+    .join('\n');
+}
+
 function extraerJSON(texto) {
   const t = String(texto || '').replace(/```json|```/g, '').trim();
   try { return JSON.parse(t); } catch(e) {}
@@ -4029,9 +4040,9 @@ async function buscarEmpleo() {
         'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
       },
       body: JSON.stringify({
-        model:'claude-haiku-4-5-20251001', max_tokens:4000,
-        tools:[{type:'web_search_20250305',name:'web_search'}],
-        messages:[{role:'user',content:`Busca ofertas de trabajo REALES y ACTUALES en Ecuador para: "${query}". Ciudad: ${ciudad}. Modalidad: ${modalidad}.\n\nINSTRUCCIONES SOBRE SALARIOS:\n- Solo incluye salario si está EXPLÍCITAMENTE publicado en la oferta real\n- Si NO hay salario, usa "A convenir"\n- NUNCA inventes salarios. En Ecuador típicos: $482 (salario básico 2026) hasta $1.500\n\nBusca empleos REALES y ACTUALES en Ecuador.\n\nUsa web search para buscar en:\n- Multitrabajos.com, Computrabajo Ecuador, LinkedIn Jobs, Indeed Ecuador, Bumeran, Porfinempleo\n- Grupos de Facebook: Empleos Quito, Empleos Guayaquil, Trabajos Ecuador\n\nDevuelve EXACTAMENTE 5 empleos relevantes.\n\nPara el campo "url": incluye SOLO si tienes URL específica al detalle de la oferta. Si solo tienes URL al portal general, deja "url" vacío como "".\n\nPara "email": solo si la oferta lo publica explícitamente, si no, "" vacío.\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa","cargo":"título puesto","ciudad":"ciudad","salario":"rango USD si está","fuente":"LinkedIn/Multitrabajos/etc","match":85,"email":"","descripcion":"descripción breve","url":"","portales":["multitrabajos","computrabajo","linkedin","indeed","facebook"]}]}\n\nDevuelve EXACTAMENTE 5 empleos VERIFICADOS con URLs reales que tengan resultados. Es preferible menos empleos pero todos reales.`}]
+        model:'claude-haiku-4-5-20251001', max_tokens:3500,
+        tools:[{type:'web_search_20250305',name:'web_search',max_uses:3}],
+        messages:[{role:'user',content:`Busca ofertas de trabajo REALES y ACTUALES en Ecuador para: "${query}". Ciudad: ${ciudad}. Modalidad: ${modalidad}.\n\nINSTRUCCIONES SOBRE SALARIOS:\n- Solo incluye salario si está EXPLÍCITAMENTE publicado en la oferta real\n- Si NO hay salario, usa "A convenir"\n- NUNCA inventes salarios. En Ecuador típicos: $482 (salario básico 2026) hasta $1.500\n\nBusca empleos REALES y ACTUALES en Ecuador.\n\nUsa web search para buscar en:\n- Multitrabajos.com, Computrabajo Ecuador, LinkedIn Jobs, Indeed Ecuador, Bumeran, Porfinempleo\n- Grupos de Facebook: Empleos Quito, Empleos Guayaquil, Trabajos Ecuador\n\nDevuelve EXACTAMENTE 5 empleos relevantes.\n\nPara el campo "url": incluye SOLO si tienes URL específica al detalle de la oferta. Si solo tienes URL al portal general, deja "url" vacío como "".\n\nPara "email": solo si la oferta lo publica explícitamente, si no, "" vacío.\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa","cargo":"título puesto","ciudad":"ciudad","salario":"rango USD si está","fuente":"LinkedIn/Multitrabajos/etc","match":85,"email":"","descripcion":"descripción breve","url":"","portales":["multitrabajos","computrabajo","linkedin","indeed","facebook"]}]}\n\nIMPORTANTE: Después de buscar, tu ÚLTIMA respuesta debe ser ÚNICAMENTE el objeto JSON con los empleos, empezando con { y terminando con }. No agregues texto explicativo antes ni después del JSON. Devuelve entre 3 y 5 empleos reales.`}]
       })
     });
     const data = await res.json();
@@ -4040,7 +4051,8 @@ async function buscarEmpleo() {
       err.limite = !!(data && data.limite);
       throw err;
     }
-    const text = (data.content||[]).map(i=>i.text||'').join('');
+    const text = textoDeRespuesta(data);
+    console.log('[BÚSQUEDA] Texto recibido (primeros 300):', text.slice(0,300));
     parsed = extraerJSON(text);
     if (!parsed) throw new Error('La IA respondió en un formato inesperado. Intenta de nuevo.');
   } catch(e) {
@@ -5141,7 +5153,7 @@ Responde SOLO JSON:
       err.limite = !!(data && data.limite);
       throw err;
     }
-    const text = (data.content||[]).map(b=>b.text||'').join('');
+    const text = textoDeRespuesta(data);
     const parsed = extraerJSON(text);
     if (!parsed || !parsed.empresas || !parsed.empresas.length) throw new Error('No se encontraron empresas verificables. Intenta con otro sector o ciudad.');
     anim.classList.remove('visible');
