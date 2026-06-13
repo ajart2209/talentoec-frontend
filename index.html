@@ -1952,6 +1952,19 @@ function escHtml(s) {
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   })[c]);
 }
+// Extrae el primer objeto JSON válido de un texto, aunque venga rodeado
+// de explicaciones de la IA (causa de búsquedas "sin resultados" intermitentes)
+function extraerJSON(texto) {
+  const t = String(texto || '').replace(/```json|```/g, '').trim();
+  try { return JSON.parse(t); } catch(e) {}
+  const ini = t.indexOf('{');
+  const fin = t.lastIndexOf('}');
+  if (ini !== -1 && fin > ini) {
+    try { return JSON.parse(t.substring(ini, fin + 1)); } catch(e) {}
+  }
+  return null;
+}
+
 // Solo permite URLs http(s) seguras para usar en atributos
 function urlSegura(u) {
   u = String(u || '').trim();
@@ -2374,9 +2387,55 @@ window.addEventListener('load', async () => {
     userTipo = saved.tipo;
     setLoggedInUI();
     if (saved.cvData) { cvData = saved.cvData; mostrarCVGuardado(); }
-    if (saved.stats) { busquedasCount = saved.stats.busquedas||0; correosCount = saved.stats.correos||0; updateStats(); }
+    if (saved.stats) {
+      busquedasCount = saved.stats.busquedas||0;
+      // Solo restaurar correos de hoy si la fecha guardada ES de hoy
+      correosCount = (saved.stats.fecha === fechaEcuador()) ? (saved.stats.correos||0) : 0;
+      updateStats();
+    }
+    // El servidor manda: trae los contadores reales (reseteados por fecha)
+    sincronizarStatsBackend();
   }
 });
+
+// ======= SYNC DE ESTADÍSTICAS (el backend es la fuente de verdad) =======
+// Corrige el bug de contadores "fantasma": el servidor resetea por fecha Ecuador,
+// así que sus valores siempre mandan sobre lo guardado en localStorage.
+async function sincronizarStatsBackend() {
+  if (!currentUser || !localStorage.getItem('talento_token')) return;
+  try {
+    const s = await apiCall('/api/auth/mis-stats');
+    const userKey = currentUser.email || 'guest';
+
+    // Correos de HOY: directo del servidor (ya viene reseteado por fecha)
+    correosCount = s.correos_hoy || 0;
+
+    // Búsquedas de HOY: alinear el contador local con el servidor
+    const hoy = fechaEcuador();
+    localStorage.setItem('busquedas_fecha_' + userKey, hoy);
+    localStorage.setItem('busquedas_dia_' + userKey, String(s.busquedas_hoy || 0));
+
+    // Total acumulado: el mayor entre local y servidor
+    const totalKey = 'busquedas_total_' + userKey;
+    const totalLocal = parseInt(localStorage.getItem(totalKey) || '0');
+    if ((s.busquedas_totales || 0) > totalLocal) {
+      localStorage.setItem(totalKey, String(s.busquedas_totales));
+    }
+
+    // Persistir con fecha para que el fallback local también sepa resetear
+    if (currentUser) {
+      currentUser.stats = currentUser.stats || {};
+      currentUser.stats.correos = correosCount;
+      currentUser.stats.fecha = hoy;
+      await saveToStorage('talento_user', currentUser);
+    }
+    updateStats();
+    if (typeof updateLimitBar === 'function') updateLimitBar();
+    console.log('✓ Stats sincronizadas con servidor:', s.busquedas_hoy, 'búsquedas /', s.correos_hoy, 'correos hoy');
+  } catch(e) {
+    console.warn('No se pudo sincronizar stats con servidor (¿offline?):', e.message);
+  }
+}
 
 // ======= AUTH =======
 function openAuth(mode) { document.getElementById('authModal').classList.add('open'); switchAuth(mode); }
@@ -2694,7 +2753,8 @@ async function iniciarSesion() {
   };
   userTipo = currentUser.tipo;
   busquedasCount = currentUser.stats.busquedas || 0;
-  correosCount = currentUser.stats.correos || 0;
+  correosCount = (currentUser.stats.fecha === fechaEcuador()) ? (currentUser.stats.correos || 0) : 0;
+  sincronizarStatsBackend();
   // Cargar correos enviados del usuario DESDE LA NUBE (Supabase)
   if (currentUser && currentUser.email) {
     try {
@@ -3385,8 +3445,8 @@ async function buscarEmpleo() {
     });
     const data = await res.json();
     const text = (data.content||[]).map(i=>i.text||'').join('');
-    const clean = text.replace(/```json|```/g,'').trim();
-    parsed = JSON.parse(clean);
+    parsed = extraerJSON(text);
+    if (!parsed) throw new Error('Respuesta sin JSON válido');
   } catch(e) {
     console.error('Claude fallback error:', e);
   }
@@ -3506,11 +3566,26 @@ function buscarOfertaReal(cargo, empresa, ciudad, portales) {
   const ciudadEnc = encodeURIComponent(ciudad);
   const cargoEmpresa = encodeURIComponent(cargoLimpio + ' ' + empresa + ' Ecuador');
 
+  // Mapa ciudad → provincia para el patrón canónico de Computrabajo
+  // (verificado: /trabajo-de-{cargo}-en-{provincia}-en-{ciudad})
+  const PROVINCIAS = {
+    'quito':'pichincha', 'guayaquil':'guayas', 'cuenca':'azuay',
+    'ambato':'tungurahua', 'machala':'el-oro', 'manta':'manabi',
+    'portoviejo':'manabi', 'loja':'loja', 'riobamba':'chimborazo',
+    'ibarra':'imbabura', 'esmeraldas':'esmeraldas', 'santo domingo':'santo-domingo-de-los-tsachilas',
+    'duran':'guayas', 'durán':'guayas', 'quevedo':'los-rios', 'latacunga':'cotopaxi'
+  };
+  const ciudadSlug = (ciudad || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+  const provincia = PROVINCIAS[ciudadSlug];
+  const urlComputrabajo = provincia
+    ? `https://ec.computrabajo.com/trabajo-de-${cargoSlug}-en-${provincia}-en-${ciudadSlug.replace(/\s+/g,'-')}`
+    : `https://ec.computrabajo.com/trabajo-de-${cargoSlug}`;
+
   const portalesFijos = [
     { nombre: '💼 LinkedIn Jobs', url: `https://www.linkedin.com/jobs/search/?keywords=${cargoEnc}&location=Ecuador`, color: '#0077b5' },
     { nombre: '💚 Indeed Ecuador', url: `https://ec.indeed.com/jobs?q=${cargoEnc}&l=${ciudadEnc}`, color: '#2557a7' },
-    { nombre: '🔵 Computrabajo', url: `https://ec.computrabajo.com/trabajo-de-${cargoSlug}`, color: '#0db0e0' },
-    { nombre: '🔍 Google Empleos', url: `https://www.google.com/search?q=${cargoEmpresa}&ibp=htl;jobs`, color: '#4285f4' }
+    { nombre: '🔵 Computrabajo', url: urlComputrabajo, color: '#0db0e0' },
+    { nombre: '🔍 Google Empleos', url: `https://www.google.com/search?q=${cargoEmpresa}&ibp=htl%3Bjobs`, color: '#4285f4' }
   ];
 
   const botones = portalesFijos.map(p =>
@@ -3607,8 +3682,8 @@ async function buscarCandidatos() {
     });
     const data = await res.json();
     const text = (data.content||[]).map(i=>i.text||'').join('');
-    const clean = text.replace(/```json|```/g,'').trim();
-    const parsed = JSON.parse(clean);
+    const parsed = extraerJSON(text);
+    if (!parsed) throw new Error('Respuesta sin JSON válido');
     candidatosData = parsed.candidatos;
     anim.classList.remove('visible');
     document.getElementById('empResultsHeader').style.display='flex';
@@ -3863,6 +3938,7 @@ async function enviarEmail() {
   if (currentUser) {
     currentUser.stats = currentUser.stats||{};
     currentUser.stats.correos = correosCount;
+    currentUser.stats.fecha = fechaEcuador();
     await saveToStorage('talento_user', currentUser);
   }
   updateStats();
@@ -4528,7 +4604,8 @@ async function ejecutarCorreosFrio() {
     });
     const data = await res.json();
     const text = (data.content||[]).map(b=>b.text||'').join('');
-    const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
+    const parsed = extraerJSON(text);
+    if (!parsed) throw new Error('Respuesta sin JSON válido');
     anim.classList.remove('visible');
     renderEmpresasFrio(parsed.empresas, nombre, area);
   } catch(e) {
