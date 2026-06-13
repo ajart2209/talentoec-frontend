@@ -560,7 +560,7 @@ function validarBeta() {
   </div>
   <div class="nav-center" id="navCenter">
     <button class="ntab active" onclick="showPage('landing')" id="ntab-landing">Inicio</button>
-    <button class="ntab" onclick="irBuscarEmpleo()" id="ntab-buscar" style="color:var(--verde);font-weight:600">🔍 Buscar empleo</button>
+    <button class="ntab" onclick="irBuscarEmpleo()" id="ntab-bolsa" style="color:var(--verde);font-weight:600">🔍 Buscar empleo</button>
     <button class="ntab" onclick="requireAuth('candidato')" id="ntab-candidato">Mi panel</button>
     <button class="ntab" onclick="irEmpleadores()" id="ntab-empleador">Empleadores <span style="font-size:9px;color:var(--verde);margin-left:4px">GRATIS</span></button>
     <button class="ntab" onclick="requireAuth('admin')" id="ntab-admin" style="display:none;color:var(--amarillo)">⚙ Admin</button>
@@ -1059,6 +1059,45 @@ function validarBeta() {
 </div>
 
 <!-- ===== CANDIDATO ===== -->
+<!-- ===== BOLSA DE EMPLEO (vacantes de empleadores, pública) ===== -->
+<div id="page-bolsa" class="page">
+  <div class="dashboard">
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-family:'Syne',sans-serif;font-size:30px;font-weight:800;margin-bottom:6px">Empleos en <span style="color:var(--verde)">TalentoEC</span></div>
+      <div style="font-size:13.5px;color:var(--texto-secundario)">Vacantes publicadas directamente por empresas ecuatorianas · postula con un clic</div>
+    </div>
+
+    <!-- Buscador -->
+    <div class="section-box" style="margin-bottom:20px">
+      <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:10px;align-items:end">
+        <div class="field" style="margin:0">
+          <label style="font-size:11px">Buscar cargo o empresa</label>
+          <input type="text" id="bolsaQuery" placeholder="Ej: diseñador, contador, vendedor..." onkeydown="if(event.key==='Enter')cargarBolsa()" style="font-size:14px">
+        </div>
+        <div class="field" style="margin:0">
+          <label style="font-size:11px">Ciudad</label>
+          <select id="bolsaCiudad" onchange="cargarBolsa()">
+            <option>Todas</option><option>Quito</option><option>Guayaquil</option><option>Cuenca</option>
+            <option>Ambato</option><option>Machala</option><option>Manta</option><option>Portoviejo</option>
+            <option>Loja</option><option>Riobamba</option><option>Ibarra</option><option>Santo Domingo</option>
+            <option>Durán</option><option>Quevedo</option><option>Latacunga</option>
+          </select>
+        </div>
+        <div class="field" style="margin:0">
+          <label style="font-size:11px">Modalidad</label>
+          <select id="bolsaModalidad" onchange="cargarBolsa()">
+            <option value="">Todas</option><option>Presencial</option><option>Remoto</option><option>Híbrido</option>
+          </select>
+        </div>
+        <button class="btn-sm-green" style="height:44px;padding:0 22px" onclick="cargarBolsa()">🔍 Buscar</button>
+      </div>
+    </div>
+
+    <div id="bolsaCount" style="font-size:12.5px;color:var(--texto-secundario);margin-bottom:14px"></div>
+    <div id="bolsaList"><div class="empty-state">Cargando empleos...</div></div>
+  </div>
+</div>
+
 <div id="page-candidato" class="page">
   <div class="dashboard" id="candidatoDash">
     <div class="dash-header">
@@ -2112,6 +2151,12 @@ function validarBeta() {
 // ======= CONFIG =======
 const BACKEND_URL = 'https://talentoec-backend-production.up.railway.app';
 
+// ⚙️ INTERRUPTOR: Bolsa de empleo pública.
+// Ponlo en true cuando tengas ~50 vacantes publicadas para que la
+// bolsa no se vea vacía. Mientras esté en false, la pestaña "Buscar
+// empleo" queda oculta y dirige a registrarse.
+const BOLSA_ACTIVA = false;
+
 // Helper para llamar al backend con manejo de errores
 async function apiCall(endpoint, options = {}) {
   try {
@@ -2555,6 +2600,11 @@ async function getFromStorage(key) {
 
 // ======= INIT =======
 window.addEventListener('load', async () => {
+  // Ocultar pestaña "Buscar empleo" hasta que la bolsa tenga masa crítica
+  if (!BOLSA_ACTIVA) {
+    const tabBolsa = document.getElementById('ntab-bolsa');
+    if (tabBolsa) tabBolsa.style.display = 'none';
+  }
   // ── Detectar sesion de Google via Supabase ───────────────
   try {
     // Supabase maneja el token automaticamente del hash o codigo
@@ -3278,24 +3328,103 @@ function requireAuth(page) {
   else { openAuth('register'); }
 }
 function irBuscarEmpleo() {
-  if (currentUser && currentUser.tipo === 'empleador') {
-    showToast('Tu cuenta es de empleador. Para buscar empleo crea una cuenta de candidato.');
+  if (!BOLSA_ACTIVA) {
+    // Aún sin masa crítica de vacantes: dirigir al flujo de búsqueda con IA o registro
+    if (currentUser && currentUser.tipo === 'candidato') {
+      showPage('candidato');
+      setTimeout(() => { if (typeof candTab === 'function') candTab('busqueda'); }, 120);
+    } else {
+      openAuth('register');
+      showToast('Crea tu cuenta gratis y empieza a buscar empleo 🔍');
+    }
     return;
   }
-  if (currentUser) {
-    showPage('candidato');
-    setTimeout(() => {
-      if (typeof candTab === 'function') candTab('busqueda');
-      // Llevar el scroll a la zona de búsqueda
-      const sec = document.getElementById('cand-tab-busqueda');
-      if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      // Foco en el campo de búsqueda
-      setTimeout(() => { const q = document.getElementById('busquedaQuery'); if (q) q.focus(); }, 350);
-    }, 120);
-  } else {
-    openAuth('register');
-    showToast('Crea tu cuenta gratis y empieza a buscar empleo 🔍');
+  // La bolsa es PÚBLICA: cualquiera ve los empleos de empleadores sin registrarse
+  showPage('bolsa');
+  cargarBolsa();
+}
+
+// ── Cargar la bolsa de empleo (solo vacantes de empleadores, sin IA, sin costo) ──
+async function cargarBolsa() {
+  const cont = document.getElementById('bolsaList');
+  const count = document.getElementById('bolsaCount');
+  cont.innerHTML = '<div class="empty-state">Cargando empleos...</div>';
+  count.textContent = '';
+  try {
+    const q = document.getElementById('bolsaQuery').value.trim();
+    const ciudad = document.getElementById('bolsaCiudad').value;
+    const modalidad = document.getElementById('bolsaModalidad').value;
+    const params = new URLSearchParams();
+    if (q) params.set('q', q);
+    if (ciudad && ciudad !== 'Todas') params.set('ciudad', ciudad);
+    if (modalidad) params.set('modalidad', modalidad);
+    const res = await fetch(BACKEND_URL + '/api/auth/bolsa?' + params.toString());
+    const data = await res.json();
+    const vacs = data.vacantes || [];
+    if (!vacs.length) {
+      count.textContent = '';
+      cont.innerHTML = `
+        <div style="text-align:center;padding:60px 20px">
+          <div style="font-size:48px;margin-bottom:14px">📭</div>
+          <h3 style="font-family:'Syne',sans-serif;font-size:19px;margin-bottom:8px">Aún no hay vacantes${q || (ciudad && ciudad!=='Todas') ? ' con estos filtros' : ''}</h3>
+          <p style="color:var(--texto-secundario);font-size:13px;max-width:420px;margin:0 auto 18px">Las empresas están empezando a publicar. Vuelve pronto o ${currentUser && currentUser.tipo==='candidato' ? 'usa la búsqueda inteligente en tu panel para buscar en toda la web.' : 'crea tu cuenta para recibir avisos.'}</p>
+          ${q || (ciudad && ciudad!=='Todas') || modalidad ? '<button class="btn-sm-outline" onclick="limpiarFiltrosBolsa()">Ver todos los empleos</button>' : ''}
+        </div>`;
+      return;
+    }
+    count.textContent = `${vacs.length} ${vacs.length === 1 ? 'empleo disponible' : 'empleos disponibles'}`;
+    cont.innerHTML = vacs.map((v,i) => `
+      <div class="job-card job-exclusiva" style="margin-bottom:14px;animation:fadeIn .4s ease ${Math.min(i,8)*.05}s forwards;opacity:0">
+        <div class="exclusiva-badge">⭐ EXCLUSIVO TALENTOEC</div>
+        <div class="job-card-top">
+          <div>
+            <div class="job-title">${escHtml(v.cargo)}</div>
+            <div class="job-company">${escHtml(v.empresa)} · ${escHtml(v.ciudad)}</div>
+          </div>
+        </div>
+        <div class="tags-row">
+          <span class="tag">${escHtml(v.modalidad)}</span>
+          <span class="tag">${escHtml(v.salario)}</span>
+          <span class="tag">📅 ${tiempoRelativo(v.creado_en)}</span>
+        </div>
+        <div style="font-size:12.5px;color:var(--texto-secundario);white-space:pre-line;max-height:120px;overflow:hidden;line-height:1.6">${escHtml(v.descripcion)}</div>
+        <div class="card-actions">
+          <button class="btn-sm-green" onclick='postularBolsa(${escHtml(JSON.stringify(String(v.id)))},${escHtml(JSON.stringify(String(v.empresa||"")))},${escHtml(JSON.stringify(String(v.cargo||"")))})'>⭐ Postular ahora (1 clic)</button>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    cont.innerHTML = '<div class="empty-state">⚠ No se pudieron cargar los empleos. Intenta de nuevo.</div>';
   }
+}
+
+function limpiarFiltrosBolsa() {
+  document.getElementById('bolsaQuery').value = '';
+  document.getElementById('bolsaCiudad').value = 'Todas';
+  document.getElementById('bolsaModalidad').value = '';
+  cargarBolsa();
+}
+
+function tiempoRelativo(fecha) {
+  const dias = Math.floor((Date.now() - new Date(fecha)) / 86400000);
+  if (dias <= 0) return 'Hoy';
+  if (dias === 1) return 'Ayer';
+  if (dias < 7) return 'Hace ' + dias + ' días';
+  if (dias < 30) return 'Hace ' + Math.floor(dias/7) + ' sem';
+  return 'Hace ' + Math.floor(dias/30) + ' mes(es)';
+}
+
+// Postular desde la bolsa (pide login solo en este momento)
+async function postularBolsa(id, empresa, cargo) {
+  if (!currentUser) {
+    openAuth('register');
+    showToast('Crea tu cuenta gratis para postular a ' + cargo + ' 🎉');
+    return;
+  }
+  if (currentUser.tipo === 'empleador') {
+    showToast('Las cuentas de empleador no pueden postular.', true);
+    return;
+  }
+  await postularVacante(id, empresa, cargo);
 }
 function goHome() { showPage('landing'); }
 
