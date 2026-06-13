@@ -376,6 +376,15 @@ nav{z-index:100}
 .chip:hover{transform:translateY(-1px)}
 .chip{transition:all .2s,transform .18s}
 
+/* ---- VACANTES EXCLUSIVAS ---- */
+.job-exclusiva{border-color:rgba(0,196,140,.5)!important;background:linear-gradient(135deg,rgba(0,196,140,.07),var(--gris-oscuro))}
+.exclusiva-badge{display:inline-block;background:linear-gradient(90deg,var(--verde),var(--verde-dark));color:var(--negro);
+  font-family:'Syne',sans-serif;font-size:9.5px;font-weight:800;letter-spacing:.08em;
+  padding:4px 10px;border-radius:6px;margin-bottom:10px}
+.admvac-filtro{background:transparent;border:1px solid var(--gris-borde);color:var(--texto-secundario);
+  padding:6px 14px;border-radius:20px;font-size:12px;cursor:pointer;transition:all .2s}
+.admvac-filtro.on{background:var(--verde);color:var(--negro);border-color:var(--verde);font-weight:700}
+
 /* ---- KPI DASHBOARD (estilo tracker) ---- */
 .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .kpi-wide{grid-column:1/-1}
@@ -510,7 +519,7 @@ function validarBeta() {
   <div class="nav-center" id="navCenter">
     <button class="ntab active" onclick="showPage('landing')" id="ntab-landing">Inicio</button>
     <button class="ntab" onclick="requireAuth('candidato')" id="ntab-candidato">Candidatos</button>
-    <button class="ntab" onclick="showToast('Empleadores próximamente', false)" id="ntab-empleador" style="opacity:0.5">Empleadores <span style="font-size:9px;color:var(--amarillo);margin-left:4px">Próximamente</span></button>
+    <button class="ntab" onclick="irEmpleadores()" id="ntab-empleador">Empleadores <span style="font-size:9px;color:var(--verde);margin-left:4px">GRATIS</span></button>
     <button class="ntab" onclick="requireAuth('admin')" id="ntab-admin" style="display:none;color:var(--amarillo)">⚙ Admin</button>
   </div>
   <div class="nav-right" id="navRight">
@@ -1339,18 +1348,72 @@ function validarBeta() {
     <div class="emp-header">
       <div>
         <div class="dash-welcome" id="empWelcome">Panel de Empleador</div>
-        <div class="dash-sub">Busca candidatos en todo Ecuador </div>
+        <div class="dash-sub">Publica vacantes gratis y recibe postulantes directo a tu correo</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
-        <span id="empPlanPill" class="badge-emp">PLAN PRO</span>
-        <button class="btn-sm-green" onclick="abrirPago('Pro','149')">Renovar</button>
+        <span id="empPlanPill" class="badge-emp" style="background:rgba(0,196,140,.15);color:var(--verde);border:1px solid rgba(0,196,140,.4)">🎉 CUENTA GRATIS</span>
       </div>
     </div>
 
     <div class="tab-row">
-      <button class="tab-btn active" onclick="empTab('buscar')">Buscar candidatos</button>
+      <button class="tab-btn active" onclick="empTab('vacantes')">📢 Mis vacantes</button>
+      <button class="tab-btn" onclick="empTab('buscar')">Buscar candidatos</button>
       <button class="tab-btn" onclick="empTab('guardados')">Guardados</button>
       <button class="tab-btn" onclick="empTab('correos')">Correos enviados</button>
+    </div>
+
+    <!-- TAB: MIS VACANTES (publicación GRATIS) -->
+    <div id="emp-tab-vacantes">
+      <div style="background:linear-gradient(135deg,rgba(0,196,140,0.08),rgba(0,196,140,0.02));border:1px solid rgba(0,196,140,0.25);border-radius:14px;padding:18px 20px;margin-bottom:18px">
+        <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px">Publica tu vacante <span style="color:var(--verde)">GRATIS</span></div>
+        <div style="font-size:12px;color:var(--texto-secundario)">Tu oferta aparecerá destacada en las búsquedas de miles de candidatos. Pasa por una revisión rápida (menos de 24h) antes de publicarse.</div>
+      </div>
+
+      <div class="section-box" style="margin-bottom:20px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            <label class="form-label">Cargo / puesto *</label>
+            <input class="form-input" id="vacCargo" placeholder="Ej: Diseñador Gráfico" maxlength="120">
+          </div>
+          <div>
+            <label class="form-label">Empresa</label>
+            <input class="form-input" id="vacEmpresa" placeholder="Nombre de tu empresa" maxlength="100">
+          </div>
+          <div>
+            <label class="form-label">Ciudad *</label>
+            <select class="form-input" id="vacCiudad">
+              <option>Quito</option><option>Guayaquil</option><option>Cuenca</option>
+              <option>Ambato</option><option>Machala</option><option>Manta</option>
+              <option>Portoviejo</option><option>Loja</option><option>Riobamba</option>
+              <option>Ibarra</option><option>Esmeraldas</option><option>Santo Domingo</option>
+              <option>Otra</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Modalidad *</label>
+            <select class="form-input" id="vacModalidad">
+              <option>Presencial</option><option>Remoto</option><option>Híbrido</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Salario (opcional)</label>
+            <input class="form-input" id="vacSalario" placeholder="Ej: $600 - $850" maxlength="60">
+          </div>
+          <div>
+            <label class="form-label">Email para recibir postulantes *</label>
+            <input class="form-input" id="vacEmail" type="email" placeholder="rrhh@tuempresa.com">
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <label class="form-label">Descripción del puesto * <span style="color:var(--texto-secundario);font-weight:400">(mín. 20 caracteres)</span></label>
+          <textarea class="form-input" id="vacDescripcion" rows="4" maxlength="2000" placeholder="Describe responsabilidades, requisitos y lo que ofreces..."></textarea>
+        </div>
+        <button class="btn-full" style="margin-top:14px" onclick="publicarVacante()">📢 Publicar vacante gratis</button>
+        <div id="vacMsg" style="font-size:12px;margin-top:10px;text-align:center"></div>
+      </div>
+
+      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:12px">Tus vacantes publicadas</div>
+      <div id="misVacantesList"><div class="empty-state">Aún no has publicado vacantes</div></div>
     </div>
 
     <!-- TAB: BUSCAR -->
@@ -1773,6 +1836,20 @@ function validarBeta() {
       </div>
       <div class="dash-card">
         <div class="dash-card-num" id="adminIngresos" style="color:var(--verde)">$0</div>
+
+    <!-- MODERACIÓN DE VACANTES -->
+    <div class="section-box" style="margin-top:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+        <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700">📢 Moderación de vacantes</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="admvac-filtro on" data-e="pendiente" onclick="cargarVacantesAdmin('pendiente')">⏳ Pendientes</button>
+          <button class="admvac-filtro" data-e="aprobada" onclick="cargarVacantesAdmin('aprobada')">✅ Aprobadas</button>
+          <button class="admvac-filtro" data-e="rechazada" onclick="cargarVacantesAdmin('rechazada')">❌ Rechazadas</button>
+        </div>
+      </div>
+      <div id="adminVacantesList"><div class="empty-state">Cargando...</div></div>
+    </div>
+
         <div class="dash-card-label">Ingresos del mes</div>
       </div>
     </div>
@@ -2428,6 +2505,172 @@ window.addEventListener('load', async () => {
   }
 });
 
+// ======= VACANTES (bolsa de empleo propia) =======
+function irEmpleadores() {
+  if (currentUser && (currentUser.tipo === 'empleador' || currentUser.rol === 'admin')) {
+    showPage('empleador'); empTab('vacantes');
+  } else if (currentUser) {
+    showToast('Tu cuenta es de candidato. Crea una cuenta de empleador para publicar vacantes gratis.');
+  } else {
+    openAuth('register');
+    showToast('Regístrate como EMPLEADOR — publicar vacantes es gratis 🎉');
+  }
+}
+
+async function publicarVacante() {
+  const msg = document.getElementById('vacMsg');
+  const datos = {
+    cargo: document.getElementById('vacCargo').value.trim(),
+    empresa: document.getElementById('vacEmpresa').value.trim(),
+    ciudad: document.getElementById('vacCiudad').value,
+    modalidad: document.getElementById('vacModalidad').value,
+    salario: document.getElementById('vacSalario').value.trim(),
+    email_contacto: document.getElementById('vacEmail').value.trim(),
+    descripcion: document.getElementById('vacDescripcion').value.trim()
+  };
+  if (!datos.cargo || datos.cargo.length < 3) { msg.style.color='var(--rojo)'; msg.textContent='Escribe el cargo (mínimo 3 caracteres)'; return; }
+  if (!datos.descripcion || datos.descripcion.length < 20) { msg.style.color='var(--rojo)'; msg.textContent='La descripción debe tener al menos 20 caracteres'; return; }
+  if (!datos.email_contacto || !datos.email_contacto.includes('@')) { msg.style.color='var(--rojo)'; msg.textContent='Ingresa un email válido para recibir postulantes'; return; }
+  msg.style.color='var(--texto-secundario)'; msg.textContent='⟳ Publicando...';
+  try {
+    const r = await apiCall('/api/auth/vacantes', { method:'POST', body: JSON.stringify(datos) });
+    msg.style.color='var(--verde)'; msg.textContent='✅ ' + (r.mensaje || 'Vacante creada');
+    ['vacCargo','vacSalario','vacDescripcion'].forEach(id => document.getElementById(id).value='');
+    cargarMisVacantes();
+    showToast('✅ Vacante enviada a revisión');
+  } catch(e) {
+    msg.style.color='var(--rojo)'; msg.textContent='⚠ ' + e.message;
+  }
+}
+
+const ESTADO_VAC = {
+  pendiente: { txt:'⏳ En revisión', color:'var(--amarillo)' },
+  aprobada:  { txt:'✅ Publicada',   color:'var(--verde)' },
+  rechazada: { txt:'❌ Rechazada',   color:'var(--rojo)' },
+  cerrada:   { txt:'🔒 Cerrada',     color:'var(--texto-secundario)' }
+};
+
+async function cargarMisVacantes() {
+  const cont = document.getElementById('misVacantesList');
+  if (!cont) return;
+  try {
+    const r = await apiCall('/api/auth/vacantes/mias');
+    const vacs = r.vacantes || [];
+    if (!vacs.length) { cont.innerHTML = '<div class="empty-state">Aún no has publicado vacantes</div>'; return; }
+    cont.innerHTML = vacs.map(v => {
+      const st = ESTADO_VAC[v.estado] || ESTADO_VAC.pendiente;
+      return `
+      <div class="job-card" style="margin-bottom:12px">
+        <div class="job-card-top">
+          <div>
+            <div class="job-title">${escHtml(v.cargo)}</div>
+            <div class="job-company">${escHtml(v.empresa)} · ${escHtml(v.ciudad)} · ${escHtml(v.modalidad)}</div>
+          </div>
+          <span style="font-size:11px;font-weight:700;color:${st.color}">${st.txt}</span>
+        </div>
+        <div class="tags-row">
+          <span class="tag">${escHtml(v.salario)}</span>
+          <span class="tag" style="color:var(--verde);border-color:rgba(0,196,140,.4)">👥 ${v.postulantes||0} postulante(s)</span>
+        </div>
+        <div class="card-actions">
+          ${(v.postulantes||0) > 0 ? `<button class="btn-sm-green" onclick='verPostulantes(${escHtml(JSON.stringify(String(v.id)))})'>Ver postulantes</button>` : ''}
+          ${v.estado !== 'cerrada' ? `<button class="btn-sm-outline" onclick='cerrarVacante(${escHtml(JSON.stringify(String(v.id)))})'>Cerrar vacante</button>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    cont.innerHTML = '<div class="empty-state">⚠ ' + escHtml(e.message) + '</div>';
+  }
+}
+
+async function cerrarVacante(id) {
+  try {
+    await apiCall('/api/auth/vacantes/' + id + '/cerrar', { method:'POST' });
+    showToast('Vacante cerrada');
+    cargarMisVacantes();
+  } catch(e) { showToast('⚠ ' + e.message, true); }
+}
+
+async function verPostulantes(id) {
+  try {
+    const r = await apiCall('/api/auth/vacantes/' + id + '/postulantes');
+    const lista = (r.postulantes || []).map(p => {
+      const c = p.candidato || {};
+      return `<div style="background:var(--negro);border:1px solid var(--gris-borde);border-radius:8px;padding:12px;margin-bottom:8px">
+        <div style="font-weight:600;font-size:14px">${escHtml(c.nombre||'Candidato')}</div>
+        <div style="font-size:12px;color:var(--texto-secundario)">📧 ${escHtml(c.email||'')} ${c.telefono ? '· 📱 ' + escHtml(c.telefono) : ''} ${c.ciudad ? '· 📍 ' + escHtml(c.ciudad) : ''}</div>
+        ${p.mensaje ? '<div style="font-size:12px;margin-top:6px;white-space:pre-line;border-left:2px solid var(--verde);padding-left:8px">' + escHtml(p.mensaje) + '</div>' : ''}
+        <div style="font-size:10px;color:var(--texto-secundario);margin-top:6px">${new Date(p.creado_en).toLocaleString('es-EC')}</div>
+      </div>`;
+    }).join('') || '<div class="empty-state">Sin postulantes aún</div>';
+    const cont = document.getElementById('misVacantesList');
+    cont.insertAdjacentHTML('afterbegin', `
+      <div class="section-box" id="postulantesBox" style="margin-bottom:14px;border-color:rgba(0,196,140,.4)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-family:'Syne',sans-serif;font-weight:700">Postulantes — ${escHtml(r.cargo||'')}</div>
+          <button class="btn-sm-outline" onclick="document.getElementById('postulantesBox').remove()">✕ Cerrar</button>
+        </div>
+        ${lista}
+        <div style="font-size:11px;color:var(--texto-secundario);margin-top:8px">💡 También recibiste estos datos por correo. Responde directamente al candidato.</div>
+      </div>`);
+  } catch(e) { showToast('⚠ ' + e.message, true); }
+}
+
+// ── CANDIDATO: postular a vacante exclusiva ──
+async function postularVacante(id, empresa, cargo) {
+  try {
+    showToast('⟳ Enviando postulación...');
+    const r = await apiCall('/api/auth/vacantes/' + id + '/postular', {
+      method:'POST',
+      body: JSON.stringify({ mensaje: 'Hola, estoy interesado/a en la vacante de ' + cargo + '. Quedo atento/a a una entrevista. (Postulación vía TalentoEC)' })
+    });
+    showToast('✅ ' + (r.mensaje || 'Postulación enviada'));
+    correosEnviados.push({ to:'', subject:cargo, empresa:empresa, cargo:cargo, fecha:new Date().toLocaleString('es-EC'), estado:'Postulado' });
+    guardarCorreosEnviados();
+  } catch(e) {
+    showToast(e.message.includes('Ya postulaste') ? 'ℹ Ya habías postulado a esta vacante' : '⚠ ' + e.message, !e.message.includes('Ya postulaste'));
+  }
+}
+
+// ── ADMIN: moderación de vacantes ──
+async function cargarVacantesAdmin(estado) {
+  const cont = document.getElementById('adminVacantesList');
+  if (!cont) return;
+  cont.innerHTML = '<div class="empty-state">Cargando...</div>';
+  try {
+    const r = await apiCall('/api/auth/admin/vacantes?estado=' + (estado || 'pendiente'));
+    const vacs = r.vacantes || [];
+    document.querySelectorAll('.admvac-filtro').forEach(b => b.classList.toggle('on', b.dataset.e === (estado||'pendiente')));
+    if (!vacs.length) { cont.innerHTML = '<div class="empty-state">Sin vacantes en este estado</div>'; return; }
+    cont.innerHTML = vacs.map(v => `
+      <div class="job-card" style="margin-bottom:12px">
+        <div class="job-card-top">
+          <div>
+            <div class="job-title">${escHtml(v.cargo)}</div>
+            <div class="job-company">${escHtml(v.empresa)} · ${escHtml(v.ciudad)} · ${escHtml(v.modalidad)} · ${escHtml(v.salario)}</div>
+          </div>
+          <span style="font-size:10px;color:var(--texto-secundario)">${new Date(v.creado_en).toLocaleDateString('es-EC')}</span>
+        </div>
+        <div style="font-size:12px;color:var(--texto-secundario);white-space:pre-line;margin-bottom:8px">${escHtml(v.descripcion)}</div>
+        <div style="font-size:11px;color:var(--texto-secundario);margin-bottom:10px">📧 Contacto: ${escHtml(v.email_contacto)}</div>
+        <div class="card-actions">
+          ${v.estado !== 'aprobada' ? `<button class="btn-sm-green" onclick='moderarVacante(${escHtml(JSON.stringify(String(v.id)))},"aprobada","${escHtml(v.estado)}")'>✅ Aprobar</button>` : ''}
+          ${v.estado !== 'rechazada' ? `<button class="btn-sm-outline" style="border-color:var(--rojo);color:var(--rojo)" onclick='moderarVacante(${escHtml(JSON.stringify(String(v.id)))},"rechazada","${escHtml(v.estado)}")'>❌ Rechazar</button>` : ''}
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    cont.innerHTML = '<div class="empty-state">⚠ ' + escHtml(e.message) + '</div>';
+  }
+}
+
+async function moderarVacante(id, estado, estadoActual) {
+  try {
+    await apiCall('/api/auth/admin/vacantes/' + id + '/estado', { method:'POST', body: JSON.stringify({ estado }) });
+    showToast(estado === 'aprobada' ? '✅ Vacante aprobada y publicada' : '❌ Vacante rechazada');
+    cargarVacantesAdmin(estadoActual || 'pendiente');
+  } catch(e) { showToast('⚠ ' + e.message, true); }
+}
+
 // ======= SYNC DE ESTADÍSTICAS (el backend es la fuente de verdad) =======
 // Corrige el bug de contadores "fantasma": el servidor resetea por fecha Ecuador,
 // así que sus valores siempre mandan sobre lo guardado en localStorage.
@@ -2868,6 +3111,7 @@ function goHome() { showPage('landing'); }
 
 // ======= PAGES =======
 function showPage(page) {
+  if (page === 'admin') setTimeout(() => { if (typeof cargarVacantesAdmin === 'function') cargarVacantesAdmin('pendiente'); }, 400);
   // Protección de páginas - requieren login
   const paginasProtegidas = ['candidato', 'empleador', 'perfil', 'admin'];
   if (paginasProtegidas.includes(page) && !currentUser) {
@@ -3021,12 +3265,14 @@ function candTab(tab) {
   }
 }
 function empTab(tab) {
-  ['buscar','guardados','correos'].forEach(t => {
-    document.getElementById('emp-tab-'+t).style.display = t===tab?'block':'none';
+  ['vacantes','buscar','guardados','correos'].forEach(t => {
+    const el = document.getElementById('emp-tab-'+t);
+    if (el) el.style.display = t===tab?'block':'none';
   });
   document.querySelectorAll('#page-empleador .tab-btn').forEach((b,i) => {
-    b.classList.toggle('active', ['buscar','guardados','correos'][i]===tab);
+    b.classList.toggle('active', ['vacantes','buscar','guardados','correos'][i]===tab);
   });
+  if (tab === 'vacantes') cargarMisVacantes();
   if (tab==='correos') renderCorreos();
   if (tab==='guardados') renderGuardados();
 }
@@ -3458,6 +3704,17 @@ async function buscarEmpleo() {
 
   await new Promise(r => setTimeout(r, 1500));
 
+  // ⭐ Vacantes EXCLUSIVAS de la bolsa propia (en paralelo, no consumen cupo)
+  let vacantesExclusivas = [];
+  const promVacantes = apiCall('/api/auth/vacantes/publicas?q=' + encodeURIComponent(query) + '&ciudad=' + encodeURIComponent(ciudad || ''))
+    .then(r => { vacantesExclusivas = (r.vacantes || []).map(v => ({
+      cargo: v.cargo, empresa: v.empresa, ciudad: v.ciudad,
+      salario: v.salario, fuente: 'TalentoEC', match: 95,
+      email: '', descripcion: (v.modalidad ? v.modalidad + ' · ' : '') + v.descripcion,
+      url: '', portales: [], exclusiva: true, vacante_id: v.id
+    })); })
+    .catch(e => {});
+
   // Buscar empleos con Claude + web search
   let parsed = null;
   {
@@ -3488,8 +3745,13 @@ async function buscarEmpleo() {
   }
   }  // Close the if (!parsed) block
 
-  // Procesar resultados (Adzuna o Claude)
+  // Procesar resultados: exclusivas de TalentoEC primero + web después
+  await promVacantes;
   anim.classList.remove('visible');
+  if (vacantesExclusivas.length) {
+    parsed = parsed || { jobs: [] };
+    parsed.jobs = [...vacantesExclusivas, ...(parsed.jobs || [])];
+  }
   if (parsed && parsed.jobs && parsed.jobs.length > 0) {
     if (currentUser) { currentUser.stats = currentUser.stats||{}; currentUser.stats.busquedas = busquedasCount; await saveToStorage('talento_user', currentUser); }
     updateStats(parsed.jobs);
@@ -3563,8 +3825,10 @@ function renderJobCards(jobs) {
     jobs.map((j,i)=>{
       const urlOk = urlSegura(j.url);
       const tieneUrl = urlOk && !urlOk.includes('404') && urlOk.length > 50;
+      const exclusiva = !!j.exclusiva;
       return `
-    <div class="job-card" style="animation:fadeIn .4s ease ${i*.08}s forwards;opacity:0">
+    <div class="job-card${exclusiva ? ' job-exclusiva' : ''}" style="animation:fadeIn .4s ease ${i*.08}s forwards;opacity:0">
+      ${exclusiva ? '<div class="exclusiva-badge">⭐ EXCLUSIVO TALENTOEC · Postulación directa</div>' : ''}
       <div class="job-card-top">
         <div><div class="job-title">${escHtml(j.cargo)}</div><div class="job-company">${escHtml(j.empresa)} · ${escHtml(j.ciudad)}</div></div>
         <div class="match-badge">${parseInt(j.match)||0}%</div>
@@ -3572,8 +3836,10 @@ function renderJobCards(jobs) {
       <div class="tags-row"><span class="tag">${escHtml(j.fuente)}</span><span class="tag">${escHtml(j.salario)}</span><span class="tag">${escHtml(j.ciudad)}</span></div>
       <div style="font-size:12px;color:var(--texto-secundario)">${escHtml(j.descripcion)}</div>
       <div class="card-actions">
-        ${tieneUrl ? `<button class="btn-sm-green" onclick="window.open(${escHtml(JSON.stringify(urlOk))},'_blank')">🔗 Postular en oferta</button>` : `<button class="btn-sm-green" onclick='buscarOfertaReal(${escHtml(JSON.stringify(String(j.cargo||'')))}, ${escHtml(JSON.stringify(String(j.empresa||'')))}, ${escHtml(JSON.stringify(String(j.ciudad||'')))}, ${escHtml(JSON.stringify(j.portales||[]))})'>🔍 Buscar esta oferta</button>`}
-        ${j.email && j.email!=='' && j.email!=='undefined' ? `<button class="btn-sm-outline" onclick='abrirEmailModal(${escHtml(JSON.stringify(String(j.email)))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))},${escHtml(JSON.stringify(currentUser?.nombre||'Candidato'))},true)'>✉ Correo automático</button>` : ''}
+        ${exclusiva
+          ? `<button class="btn-sm-green" onclick='postularVacante(${escHtml(JSON.stringify(String(j.vacante_id)))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))})'>⭐ Postular ahora (1 clic)</button>`
+          : tieneUrl ? `<button class="btn-sm-green" onclick="window.open(${escHtml(JSON.stringify(urlOk))},'_blank')">🔗 Postular en oferta</button>` : `<button class="btn-sm-green" onclick='buscarOfertaReal(${escHtml(JSON.stringify(String(j.cargo||'')))}, ${escHtml(JSON.stringify(String(j.empresa||'')))}, ${escHtml(JSON.stringify(String(j.ciudad||'')))}, ${escHtml(JSON.stringify(j.portales||[]))})'>🔍 Buscar esta oferta</button>`}
+        ${!exclusiva && j.email && j.email!=='' && j.email!=='undefined' ? `<button class="btn-sm-outline" onclick='abrirEmailModal(${escHtml(JSON.stringify(String(j.email)))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))},${escHtml(JSON.stringify(currentUser?.nombre||'Candidato'))},true)'>✉ Correo automático</button>` : ''}
       </div>
     </div>`;}).join('');
 }
