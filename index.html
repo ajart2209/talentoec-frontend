@@ -1962,6 +1962,36 @@ function extraerJSON(texto) {
   if (ini !== -1 && fin > ini) {
     try { return JSON.parse(t.substring(ini, fin + 1)); } catch(e) {}
   }
+  // Rescate de JSON TRUNCADO (respuesta cortada por max_tokens):
+  // recupera los objetos completos del array aunque el final esté roto
+  for (const clave of ['jobs', 'candidatos', 'empresas']) {
+    const k = t.indexOf('"' + clave + '"');
+    if (k === -1) continue;
+    const arrIni = t.indexOf('[', k);
+    if (arrIni === -1) continue;
+    const objetos = [];
+    let depth = 0, inStr = false, esc = false, objIni = -1;
+    for (let i = arrIni + 1; i < t.length; i++) {
+      const c = t[i];
+      if (inStr) {
+        if (esc) esc = false;
+        else if (c === '\\') esc = true;
+        else if (c === '"') inStr = false;
+        continue;
+      }
+      if (c === '"') { inStr = true; continue; }
+      if (c === '{') { if (depth === 0) objIni = i; depth++; }
+      else if (c === '}') {
+        depth--;
+        if (depth === 0 && objIni !== -1) {
+          try { objetos.push(JSON.parse(t.substring(objIni, i + 1))); } catch(e) {}
+          objIni = -1;
+        }
+      }
+      else if (c === ']' && depth === 0) break;
+    }
+    if (objetos.length) { const r = {}; r[clave] = objetos; return r; }
+  }
   return null;
 }
 
@@ -3438,17 +3468,23 @@ async function buscarEmpleo() {
         'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
       },
       body: JSON.stringify({
-        model:'claude-sonnet-4-20250514', max_tokens:2500,
+        model:'claude-sonnet-4-20250514', max_tokens:4000,
         tools:[{type:'web_search_20250305',name:'web_search'}],
         messages:[{role:'user',content:`Busca ofertas de trabajo REALES y ACTUALES en Ecuador para: "${query}". Ciudad: ${ciudad}. Modalidad: ${modalidad}.\n\nINSTRUCCIONES SOBRE SALARIOS:\n- Solo incluye salario si está EXPLÍCITAMENTE publicado en la oferta real\n- Si NO hay salario, usa "A convenir"\n- NUNCA inventes salarios. En Ecuador típicos: $470-$1500\n\nBusca empleos REALES y ACTUALES en Ecuador.\n\nUsa web search para buscar en:\n- Multitrabajos.com, Computrabajo Ecuador, LinkedIn Jobs, Indeed Ecuador, Bumeran, Porfinempleo\n- Grupos de Facebook: Empleos Quito, Empleos Guayaquil, Trabajos Ecuador\n\nDevuelve EXACTAMENTE 5 empleos relevantes.\n\nPara el campo "url": incluye SOLO si tienes URL específica al detalle de la oferta. Si solo tienes URL al portal general, deja "url" vacío como "".\n\nPara "email": solo si la oferta lo publica explícitamente, si no, "" vacío.\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa","cargo":"título puesto","ciudad":"ciudad","salario":"rango USD si está","fuente":"LinkedIn/Multitrabajos/etc","match":85,"email":"","descripcion":"descripción breve","url":"","portales":["multitrabajos","computrabajo","linkedin","indeed","facebook"]}]}\n\nDevuelve EXACTAMENTE 5 empleos VERIFICADOS con URLs reales que tengan resultados. Es preferible menos empleos pero todos reales.`}]
       })
     });
     const data = await res.json();
+    if (!res.ok) {
+      const err = new Error((data && data.error) || ('Error del servidor (' + res.status + ')'));
+      err.limite = !!(data && data.limite);
+      throw err;
+    }
     const text = (data.content||[]).map(i=>i.text||'').join('');
     parsed = extraerJSON(text);
-    if (!parsed) throw new Error('Respuesta sin JSON válido');
+    if (!parsed) throw new Error('La IA respondió en un formato inesperado. Intenta de nuevo.');
   } catch(e) {
-    console.error('Claude fallback error:', e);
+    console.error('Error en búsqueda:', e);
+    window.__errBusqueda = e;
   }
   }  // Close the if (!parsed) block
 
@@ -3461,23 +3497,17 @@ async function buscarEmpleo() {
     return;
   }
 
-  // FALLBACK: modo demo si todo falla
-  try {
-    // MODO DEMO trabajos
-    const demoJobs = [
-      {cargo:'Ingeniero de Software Senior', empresa:'Kruger Corp', ciudad:'Quito', salario:'$1,800-2,500', fuente:'LinkedIn', match:94, email:'rrhh@kruger.com.ec', descripcion:'Desarrollador backend con experiencia en Node.js y bases de datos relacionales.', url:'https://linkedin.com'},
-      {cargo:'Desarrollador Full Stack', empresa:'Novatech Ecuador', ciudad:'Quito', salario:'$1,500-2,000', fuente:'Multitrabajos', match:89, email:'talento@novatech.ec', descripcion:'Posición para desarrollo de aplicaciones empresariales con React y Node.js.', url:'https://multitrabajos.com'},
-      {cargo:'Tech Lead', empresa:'Tata Consultancy Ecuador', ciudad:'Guayaquil', salario:'$2,000-3,000', fuente:'Indeed', match:85, email:'careers@tcs.com', descripcion:'Liderar equipo de desarrollo de 6 personas en proyecto bancario.', url:'https://indeed.com'},
-      {cargo:'Desarrollador Backend', empresa:'Banco Pichincha', ciudad:'Quito', salario:'$1,600-2,200', fuente:'Computrabajo', match:82, email:'rrhh@pichincha.com', descripcion:'Desarrollo y mantenimiento de microservicios para plataforma digital del banco.', url:'https://computrabajo.com.ec'},
-      {cargo:'Analista Programador', empresa:'CNT Ecuador', ciudad:'Quito', salario:'$1,400-1,800', fuente:'OLX Ecuador', match:78, email:'empleo@cnt.gob.ec', descripcion:'Desarrollar soluciones tecnológicas para telecomunicaciones.', url:'https://olx.com.ec'}
-    ];
-    updateStats(demoJobs);
-    renderJobCards(demoJobs);
-    showToast('Procesando — conecta API key para búsqueda real');
-  } catch(err) {
-    console.error('Error fallback:', err);
-    showToast('⚠ Error al buscar empleos', true);
-  }
+  // Si la búsqueda falló, mostrar el error REAL (nunca empleos falsos)
+  const eb = window.__errBusqueda;
+  const esLimite = eb && (eb.limite || String(eb.message||'').includes('límite') || String(eb.message||'').includes('Alcanzaste'));
+  document.getElementById('candResultados').innerHTML = `
+    <div style="text-align:center;padding:60px 20px">
+      <div style="font-size:48px;margin-bottom:14px">${esLimite ? '⏳' : '⚠️'}</div>
+      <h3 style="font-family:'Syne',sans-serif;font-size:20px;margin-bottom:10px">${esLimite ? 'Límite diario alcanzado' : 'No pudimos completar la búsqueda'}</h3>
+      <p style="color:var(--texto-secundario);font-size:13px;max-width:400px;margin:0 auto 18px">${escHtml(eb ? eb.message : 'Ocurrió un error inesperado.')}</p>
+      ${esLimite ? '<button class="btn-sm-outline" onclick="showPage(\'landing\');setTimeout(()=>document.querySelector(\'.plan-card\')?.scrollIntoView({behavior:\'smooth\'}),300)">Ver planes</button>' : '<button class="btn-sm-green" onclick="buscarEmpleo()">🔄 Reintentar búsqueda</button>'}
+    </div>`;
+  window.__errBusqueda = null;
 }
 
 function renderJobCards(jobs) {
@@ -3681,9 +3711,10 @@ async function buscarCandidatos() {
       })
     });
     const data = await res.json();
+    if (!res.ok) throw new Error((data && data.error) || ('Error del servidor (' + res.status + ')'));
     const text = (data.content||[]).map(i=>i.text||'').join('');
     const parsed = extraerJSON(text);
-    if (!parsed) throw new Error('Respuesta sin JSON válido');
+    if (!parsed || !parsed.candidatos) throw new Error('La IA respondió en un formato inesperado. Intenta de nuevo.');
     candidatosData = parsed.candidatos;
     anim.classList.remove('visible');
     document.getElementById('empResultsHeader').style.display='flex';
@@ -3691,20 +3722,14 @@ async function buscarCandidatos() {
     renderCandidatos(candidatosData);
   } catch(e) {
     anim.classList.remove('visible');
-    // MODO DEMO candidatos
-    const demoCandidatos = [
-      {nombre:'Carlos Andrade Mora', cargo_actual:'Desarrollador Full Stack', empresa_actual:'Kruger Corp', ciudad:'Quito', experiencia:'5 años', habilidades:['React','Node.js','PostgreSQL','Docker'], match:96, email:'carlos.andrade@gmail.com', fuente:'LinkedIn', disponibilidad:'Inmediata', salario_esperado:'$2,000-2,500/mes', nivel:'Senior'},
-      {nombre:'María Fernández Valle', cargo_actual:'Ingeniería de Software', empresa_actual:'Novatech Ecuador', ciudad:'Guayaquil', experiencia:'4 años', habilidades:['Python','Django','AWS','MongoDB'], match:91, email:'mfernandez@hotmail.com', fuente:'Multitrabajos', disponibilidad:'2 semanas', salario_esperado:'$1,800-2,200/mes', nivel:'Senior'},
-      {nombre:'Diego Salazar Ríos', cargo_actual:'Tech Lead', empresa_actual:'Banco Pichincha', ciudad:'Quito', experiencia:'7 años', habilidades:['Java','Spring Boot','Kubernetes','Azure'], match:88, email:'dsalazar@outlook.com', fuente:'Indeed', disponibilidad:'1 mes', salario_esperado:'$2,500-3,500/mes', nivel:'Gerencial'},
-      {nombre:'Ana Lucía Torres', cargo_actual:'Desarrolladora Frontend', empresa_actual:'CNT Ecuador', ciudad:'Cuenca', experiencia:'3 años', habilidades:['Vue.js','TypeScript','Figma','REST APIs'], match:84, email:'aitorres@gmail.com', fuente:'Computrabajo', disponibilidad:'Inmediata', salario_esperado:'$1,400-1,800/mes', nivel:'Junior'},
-      {nombre:'Roberto Vélez Paz', cargo_actual:'DevOps Engineer', empresa_actual:'Tata Consultancy', ciudad:'Quito', experiencia:'6 años', habilidades:['Docker','Kubernetes','CI/CD','Linux'], match:80, email:'rvelez@gmail.com', fuente:'LinkedIn', disponibilidad:'2 semanas', salario_esperado:'$2,200-3,000/mes', nivel:'Senior'},
-      {nombre:'Sofía Cabrera Luna', cargo_actual:'Data Engineer', empresa_actual:'Telefónica Ecuador', ciudad:'Guayaquil', experiencia:'4 años', habilidades:['Python','Spark','SQL','Power BI'], match:77, email:'scabrera@yahoo.com', fuente:'Facebook', disponibilidad:'1 mes', salario_esperado:'$1,800-2,400/mes', nivel:'Senior'}
-    ];
-    candidatosData = demoCandidatos;
-    document.getElementById('empResultsHeader').style.display='flex';
-    document.getElementById('empResultsCount').textContent = demoCandidatos.length + ' candidatos encontrados (demo)';
-    renderCandidatos(demoCandidatos);
-    showToast('Procesando — conecta API key para búsqueda real');
+    console.error('Error búsqueda candidatos:', e);
+    document.getElementById('empResults').innerHTML = `
+      <div style="text-align:center;padding:50px 20px">
+        <div style="font-size:44px;margin-bottom:12px">⚠️</div>
+        <h3 style="font-family:'Syne',sans-serif;font-size:18px;margin-bottom:8px">No pudimos completar la búsqueda</h3>
+        <p style="color:var(--texto-secundario);font-size:13px;max-width:380px;margin:0 auto 16px">${escHtml(e ? e.message : 'Error inesperado')}</p>
+        <button class="btn-sm-green" onclick="buscarCandidatos()">🔄 Reintentar</button>
+      </div>`;
   }
 }
 
@@ -4597,34 +4622,42 @@ async function ejecutarCorreosFrio() {
         'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
       },
       body: JSON.stringify({
-        model:'claude-sonnet-4-20250514', max_tokens:1000,
-        messages:[{role:'user',content:`Genera ${numero} empresas ecuatorianas reales del sector ${sector} en ${ciudad} que probablemente NO tienen vacantes publicadas pero podrían necesitar personal de ${area}. Responde SOLO JSON:
-{"empresas":[{"nombre":"empresa real ecuatoriana","ciudad":"ciudad EC","sector":"${sector}","email_rrhh":"rrhh@empresa.com.ec","descripcion":"qué hace la empresa en 1 línea","empleados":"rango empleados","razon":"por qué podrían necesitar este perfil"}]}`}]
+        model:'claude-sonnet-4-20250514', max_tokens:3000,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        messages:[{role:'user',content:`Usa web search para encontrar ${numero} empresas ecuatorianas REALES del sector ${sector} en ${ciudad} que podrían necesitar personal de ${area}.
+
+REGLA CRÍTICA SOBRE EMAILS:
+- El campo "email_rrhh" SOLO puede contener un email que encuentres PUBLICADO en la web (sitio oficial de la empresa, LinkedIn, directorios verificables)
+- Si NO encuentras un email publicado, deja "email_rrhh" como "" vacío. NUNCA lo inventes ni lo deduzcas del dominio
+- Incluye "web" con el sitio oficial de la empresa si lo encuentras, o "" si no
+
+Responde SOLO JSON:
+{"empresas":[{"nombre":"empresa real verificada","ciudad":"ciudad EC","sector":"${sector}","email_rrhh":"","web":"","descripcion":"qué hace la empresa en 1 línea","empleados":"rango empleados","razon":"por qué podrían necesitar este perfil"}]}`}]
       })
     });
     const data = await res.json();
+    if (!res.ok) {
+      const err = new Error((data && data.error) || ('Error del servidor (' + res.status + ')'));
+      err.limite = !!(data && data.limite);
+      throw err;
+    }
     const text = (data.content||[]).map(b=>b.text||'').join('');
     const parsed = extraerJSON(text);
-    if (!parsed) throw new Error('Respuesta sin JSON válido');
+    if (!parsed || !parsed.empresas || !parsed.empresas.length) throw new Error('No se encontraron empresas verificables. Intenta con otro sector o ciudad.');
     anim.classList.remove('visible');
     renderEmpresasFrio(parsed.empresas, nombre, area);
   } catch(e) {
     anim.classList.remove('visible');
-    // DEMO MODE
-    const demoEmpresas = [
-      {nombre:'Corporación El Rosado', ciudad:'Guayaquil', sector:'Retail', email_rrhh:'rrhh@elrosado.com', descripcion:'Cadena de supermercados e hipermercados más grande del Ecuador', empleados:'5,000+', razon:'Expansión digital requiere perfiles técnicos'},
-      {nombre:'Industrias Ales C.A.', ciudad:'Quito', sector:'Manufactura', email_rrhh:'talento@ales.com.ec', descripcion:'Empresa líder en aceites y grasas comestibles en Ecuador', empleados:'1,200+', razon:'Transformación tecnológica en procesos'},
-      {nombre:'Grupo Difare', ciudad:'Guayaquil', sector:'Salud', email_rrhh:'rrhh@difare.com.ec', descripcion:'Red de farmacias más grande del Ecuador con más de 1,500 locales', empleados:'8,000+', razon:'Desarrollo de plataforma digital de salud'},
-      {nombre:'Automotores y Anexos AYASA', ciudad:'Quito', sector:'Automotriz', email_rrhh:'empleo@ayasa.com.ec', descripcion:'Concesionario oficial Chevrolet con presencia nacional', empleados:'800+', razon:'Modernización de sistemas de gestión'},
-      {nombre:'Constructora Uribe & Schwarzkopf', ciudad:'Quito', sector:'Construcción', email_rrhh:'rrhh@ubs.com.ec', descripcion:'Empresa inmobiliaria líder en proyectos residenciales en Ecuador', empleados:'600+', razon:'Digitalización de procesos administrativos'},
-      {nombre:'Holdingdine Corp.', ciudad:'Quito', sector:'Defensa/Industrial', email_rrhh:'talento@holdingdine.com.ec', descripcion:'Corporación industrial del ejército ecuatoriano', empleados:'2,000+', razon:'Modernización tecnológica institucional'},
-      {nombre:'Ferrero Ecuador', ciudad:'Guayaquil', sector:'Alimentos', email_rrhh:'hr.ecuador@ferrero.com', descripcion:'Multinacional italiana de confitería con fuerte presencia en Ecuador', empleados:'400+', razon:'Expansión de operaciones locales'},
-      {nombre:'Banco del Pacífico', ciudad:'Guayaquil', sector:'Banca', email_rrhh:'rrhh@bancopacífico.com', descripcion:'Banco estatal ecuatoriano con red nacional', empleados:'3,000+', razon:'Transformación digital bancaria'},
-      {nombre:'Cámara de Industrias de Guayaquil', ciudad:'Guayaquil', sector:'Industria', email_rrhh:'info@cig.org.ec', descripcion:'Gremio empresarial que representa a las industrias de Guayaquil', empleados:'200+', razon:'Modernización de sistemas gremiales'},
-      {nombre:'Supermaxi / Corporación La Favorita', ciudad:'Quito', sector:'Retail', email_rrhh:'talento@lafavorita.com', descripcion:'Mayor cadena de supermercados del Ecuador con más de 200 locales', empleados:'15,000+', razon:'Expansión e-commerce y logística digital'}
-    ].slice(0, parseInt(numero));
-    renderEmpresasFrio(demoEmpresas, nombre, area);
-    showToast('Procesando — conecta API key para búsqueda real');
+    // Mostrar error REAL (nunca empresas con emails inventados)
+    console.error('Error búsqueda frío:', e);
+    const esLimite = e && (e.limite || String(e.message||'').includes('límite') || String(e.message||'').includes('Alcanzaste'));
+    document.getElementById('frioResultados').innerHTML = `
+      <div style="text-align:center;padding:50px 20px">
+        <div style="font-size:44px;margin-bottom:12px">${esLimite ? '⏳' : '⚠️'}</div>
+        <h3 style="font-family:'Syne',sans-serif;font-size:18px;margin-bottom:8px">${esLimite ? 'Límite diario alcanzado' : 'No pudimos completar la búsqueda'}</h3>
+        <p style="color:var(--texto-secundario);font-size:13px;max-width:380px;margin:0 auto 16px">${escHtml(e ? e.message : 'Error inesperado')}</p>
+        ${esLimite ? '' : '<button class="btn-sm-green" onclick="ejecutarCorreosFrio()">🔄 Reintentar</button>'}
+      </div>`;
   }
 }
 
@@ -4650,8 +4683,9 @@ function renderEmpresasFrio(empresas, nombre, area) {
         💡 ${e.razon}
       </div>
       <div class="card-actions">
-        <button class="btn-sm-green" onclick="abrirEmailFrio('${e.email_rrhh}','${e.nombre}','${area}','${nombre}')">Enviar correo en frío</button>
-        <button class="btn-sm-outline" onclick="window.open('https://google.com/search?q=${encodeURIComponent(e.nombre + ' Ecuador empleos')}')">Investigar empresa</button>
+        ${e.email_rrhh && e.email_rrhh.includes('@') ? `<button class="btn-sm-green" onclick='abrirEmailFrio(${escHtml(JSON.stringify(String(e.email_rrhh)))},${escHtml(JSON.stringify(String(e.nombre||'')))},${escHtml(JSON.stringify(String(area||'')))},${escHtml(JSON.stringify(String(nombre||'')))})'>✉ Correo en frío (email verificado)</button>` : ''}
+        ${urlSegura(e.web) ? `<button class="btn-sm-outline" onclick="window.open(${escHtml(JSON.stringify(urlSegura(e.web)))},'_blank')">🌐 Sitio oficial</button>` : ''}
+        <button class="btn-sm-outline" onclick="window.open('https://google.com/search?q=${encodeURIComponent(e.nombre + ' Ecuador contacto rrhh')}')">🔎 Investigar contacto</button>
       </div>
     </div>`).join('');
 }
