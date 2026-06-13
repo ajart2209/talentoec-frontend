@@ -1018,7 +1018,7 @@ function validarBeta() {
     <div class="dash-cards">
       <div class="dash-card">
         <div class="dash-card-num" id="statBusquedas">0</div>
-        <div class="dash-card-label">Búsquedas realizadas</div>
+        <div class="dash-card-label">Búsquedas totales (histórico)</div>
         <div id="busquedasDia" style="font-size:10px;margin-top:4px;font-weight:600;color:var(--verde)"></div>
       </div>
       <div class="dash-card"><div class="dash-card-num" id="statCorreos">0</div><div class="dash-card-label">Correos enviados hoy</div></div>
@@ -1566,7 +1566,7 @@ function validarBeta() {
     <div class="section-box" style="margin-top:16px">
       <div class="section-box-title">📊 Tus estadísticas</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
-        <div class="dash-card"><div class="dash-card-num" id="perfilBusquedas">0</div><div class="dash-card-label">Búsquedas realizadas</div></div>
+        <div class="dash-card"><div class="dash-card-num" id="perfilBusquedas">0</div><div class="dash-card-label">Búsquedas totales (histórico)</div></div>
         <div class="dash-card"><div class="dash-card-num" id="perfilCorreos">0</div><div class="dash-card-label">Correos enviados</div></div>
         <div class="dash-card"><div class="dash-card-num" id="perfilAbiertos" style="color:var(--azul)">0</div><div class="dash-card-label">Correos abiertos</div></div>
         <div class="dash-card"><div class="dash-card-num" id="perfilRespondidos" style="color:var(--amarillo)">0</div><div class="dash-card-label">Respuestas recibidas</div></div>
@@ -4844,7 +4844,7 @@ function updateStats(jobs) {
       el.textContent = '⚠ ' + restantes + ' restantes hoy';
       el.style.color = 'var(--amarillo)';
     } else {
-      el.textContent = usadas + ' / ' + maxDiario + ' búsquedas hoy (' + (usadas * 5) + ' ofertas vistas)';
+      el.textContent = 'HOY: ' + usadas + ' de ' + maxDiario + ' búsquedas · ' + (usadas * 5) + ' ofertas vistas';
       el.style.color = 'var(--verde)';
     }
   }
