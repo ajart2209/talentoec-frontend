@@ -1203,18 +1203,23 @@ function validarBeta() {
     </div>
         <!-- TAB: BUSQUEDA -->
     <div id="cand-tab-busqueda" style="display:none">
-      <div class="section-box">
-        <div class="section-box-title">Buscar oportunidades en Ecuador</div>
-        <div id="cvDetectadoBanner" style="display:none;background:rgba(0,196,140,0.08);border:1px solid rgba(0,196,140,0.2);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--verde)">
+      <div class="section-box" style="background:linear-gradient(135deg,rgba(0,196,140,0.06),var(--gris-oscuro));border-color:rgba(0,196,140,0.25)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <span style="font-size:22px">🔍</span>
+          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700">Encuentra tu próximo empleo</div>
+        </div>
+        <div style="font-size:12.5px;color:var(--texto-secundario);margin-bottom:16px">Buscamos en LinkedIn, Computrabajo, Multitrabajos, Indeed y más — en tiempo real. Cada búsqueda te trae hasta 5 ofertas reales con su link directo para postular.</div>
+        <div id="cvDetectadoBanner" style="display:none;background:rgba(0,196,140,0.1);border:1px solid rgba(0,196,140,0.3);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--verde)">
           ✦ Búsqueda autocompletada con tu CV guardado — puedes editarla
         </div>
         <div class="field" style="position:relative">
-          <label>¿Qué tipo de trabajo buscas?</label>
+          <label style="font-size:12px;font-weight:600">¿Qué tipo de trabajo buscas?</label>
           <input type="text" id="busquedaQuery"
-            placeholder="Ej: Ingeniero, Contador, Desarrollador..."
+            placeholder="Ej: Ingeniero, Contador, Desarrollador, Vendedor..."
             oninput="mostrarSugerenciasCand(this.value)"
             onblur="setTimeout(cerrarSugerenciasCand,200)"
-            autocomplete="off">
+            autocomplete="off"
+            style="font-size:15px;padding:13px 15px">
           <div id="busquedaSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--gris-oscuro);border:1px solid var(--verde);border-radius:0 0 10px 10px;z-index:50;max-height:280px;overflow-y:auto"></div>
         </div>
         <div class="form-row">
@@ -1272,7 +1277,8 @@ function validarBeta() {
             <span class="chip" onclick="toggleChip(this)">Universidades EC</span>
           </div>
         </div>
-        <button class="btn-full" onclick="buscarEmpleo()">Buscar ahora →</button>
+        <button class="btn-full" onclick="buscarEmpleo()" style="font-size:15px;padding:14px">🔍 Buscar empleos ahora</button>
+        <div style="text-align:center;font-size:11px;color:var(--texto-secundario);margin-top:8px" id="busqCupoInfo">Cada búsqueda usa 1 de tus búsquedas diarias</div>
       </div>
 
       <div class="searching-anim" id="candSearchAnim">
@@ -3278,7 +3284,14 @@ function irBuscarEmpleo() {
   }
   if (currentUser) {
     showPage('candidato');
-    setTimeout(() => { if (typeof candTab === 'function') candTab('buscar'); }, 100);
+    setTimeout(() => {
+      if (typeof candTab === 'function') candTab('busqueda');
+      // Llevar el scroll a la zona de búsqueda
+      const sec = document.getElementById('cand-tab-busqueda');
+      if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Foco en el campo de búsqueda
+      setTimeout(() => { const q = document.getElementById('busquedaQuery'); if (q) q.focus(); }, 350);
+    }, 120);
   } else {
     openAuth('register');
     showToast('Crea tu cuenta gratis y empieza a buscar empleo 🔍');
