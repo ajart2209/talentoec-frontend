@@ -2306,6 +2306,8 @@ let selectedTipo = 'candidato';
 let cvData = {};
 let candidatosData = [];
 let correosEnviados = [];
+let ultimosResultados = [];
+let empleosVistos = [];  // empleos abiertos pero no confirmados como postulados
 // Cargar correos enviados del usuario actual
 function cargarCorreosEnviados() {
   if (currentUser && currentUser.email) {
@@ -3466,6 +3468,8 @@ function candTab(tab) {
   ['cv','busqueda','resultados','frio'].forEach(t => {
     document.getElementById('cand-tab-'+t).style.display = t===tab?'block':'none';
   });
+  // Restaurar última búsqueda guardada si entra a Resultados y está vacío
+  if (tab === 'resultados') restaurarResultados();
   document.querySelectorAll('#page-candidato .tab-btn').forEach((b,i) => {
     b.classList.toggle('active', ['cv','busqueda','resultados','frio'][i]===tab);
   });
@@ -4070,6 +4074,9 @@ async function buscarEmpleo() {
   }
   if (parsed && parsed.jobs && parsed.jobs.length > 0) {
     if (currentUser) { currentUser.stats = currentUser.stats||{}; currentUser.stats.busquedas = busquedasCount; await saveToStorage('talento_user', currentUser); }
+    // Guardar resultados para que NO se pierdan si el usuario sale y vuelve
+    ultimosResultados = parsed.jobs;
+    await saveToStorage('talento_ultimos_resultados_' + (currentUser?.email||'guest'), { jobs: parsed.jobs, fecha: Date.now() });
     updateStats(parsed.jobs);
     renderJobCards(parsed.jobs);
     return;
@@ -4086,6 +4093,24 @@ async function buscarEmpleo() {
       ${esLimite ? '<button class="btn-sm-outline" onclick="showPage(\'landing\');setTimeout(()=>document.querySelector(\'.plan-card\')?.scrollIntoView({behavior:\'smooth\'}),300)">Ver planes</button>' : '<button class="btn-sm-green" onclick="buscarEmpleo()">🔄 Reintentar búsqueda</button>'}
     </div>`;
   window.__errBusqueda = null;
+}
+
+async function restaurarResultados() {
+  const cont = document.getElementById('candResultados');
+  if (!cont) return;
+  // Si ya hay tarjetas mostradas, no tocar
+  if (cont.querySelector('.job-card')) return;
+  if (ultimosResultados && ultimosResultados.length) { renderJobCards(ultimosResultados); return; }
+  try {
+    const guardado = await getFromStorage('talento_ultimos_resultados_' + (currentUser?.email||'guest'));
+    if (guardado && guardado.jobs && guardado.jobs.length) {
+      // Resultados válidos por 24h
+      if (Date.now() - (guardado.fecha||0) < 24*3600*1000) {
+        ultimosResultados = guardado.jobs;
+        renderJobCards(guardado.jobs);
+      }
+    }
+  } catch(e) {}
 }
 
 function renderJobCards(jobs) {
@@ -4154,10 +4179,49 @@ function renderJobCards(jobs) {
       <div class="card-actions">
         ${exclusiva
           ? `<button class="btn-sm-green" onclick='postularVacante(${escHtml(JSON.stringify(String(j.vacante_id)))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))})'>⭐ Postular ahora (1 clic)</button>`
-          : tieneUrl ? `<button class="btn-sm-green" onclick="window.open(${escHtml(JSON.stringify(urlOk))},'_blank')">🔗 Postular en oferta</button>` : `<button class="btn-sm-green" onclick='buscarOfertaReal(${escHtml(JSON.stringify(String(j.cargo||'')))}, ${escHtml(JSON.stringify(String(j.empresa||'')))}, ${escHtml(JSON.stringify(String(j.ciudad||'')))}, ${escHtml(JSON.stringify(j.portales||[]))})'>🔍 Buscar esta oferta</button>`}
+          : tieneUrl ? `<button class="btn-sm-green" onclick='abrirOferta(${escHtml(JSON.stringify(urlOk))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))},this)'>🔗 Postular en oferta</button>` : `<button class="btn-sm-green" onclick='buscarOfertaReal(${escHtml(JSON.stringify(String(j.cargo||'')))}, ${escHtml(JSON.stringify(String(j.empresa||'')))}, ${escHtml(JSON.stringify(String(j.ciudad||'')))}, ${escHtml(JSON.stringify(j.portales||[]))})'>🔍 Buscar esta oferta</button>`}
         ${!exclusiva && j.email && j.email!=='' && j.email!=='undefined' ? `<button class="btn-sm-outline" onclick='abrirEmailModal(${escHtml(JSON.stringify(String(j.email)))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))},${escHtml(JSON.stringify(currentUser?.nombre||'Candidato'))},true)'>✉ Correo automático</button>` : ''}
       </div>
     </div>`;}).join('');
+}
+
+// Abrir oferta externa: la marca como VISTA (atenuada) pero NO la borra.
+// Solo desaparece cuando el usuario confirma que postuló.
+function abrirOferta(url, empresa, cargo, btn) {
+  window.open(url, '_blank');
+  const key = (empresa||'') + '|' + (cargo||'');
+  if (!empleosVistos.includes(key)) empleosVistos.push(key);
+  // Transformar la tarjeta: atenuar + ofrecer confirmar postulación
+  const card = btn.closest('.job-card');
+  if (card) {
+    card.style.opacity = '0.6';
+    const acciones = card.querySelector('.card-actions');
+    if (acciones) {
+      acciones.innerHTML = `
+        <button class="btn-sm-green" onclick='confirmarPostulacion(${escHtml(JSON.stringify(String(empresa||'')))},${escHtml(JSON.stringify(String(cargo||'')))},this)'>✅ Ya postulé aquí</button>
+        <button class="btn-sm-outline" onclick='reabrirOferta(${escHtml(JSON.stringify(String(url)))},this)'>🔗 Abrir de nuevo</button>`;
+    }
+  }
+}
+function reabrirOferta(url, btn) { window.open(url, '_blank'); }
+
+// Confirmar postulación: AHORA sí se registra y desaparece en futuras búsquedas
+async function confirmarPostulacion(empresa, cargo, btn) {
+  correosEnviados.push({ to:'', subject:cargo, empresa:empresa, cargo:cargo, fecha:new Date().toLocaleString('es-EC'), estado:'Postulado' });
+  if (typeof guardarCorreosEnviados === 'function') await guardarCorreosEnviados();
+  const card = btn.closest('.job-card');
+  if (card) {
+    card.style.transition = 'all .4s';
+    card.style.opacity = '0';
+    card.style.maxHeight = card.offsetHeight + 'px';
+    setTimeout(() => {
+      card.style.maxHeight = '0';
+      card.style.margin = '0';
+      card.style.padding = '0';
+      card.style.overflow = 'hidden';
+    }, 50);
+  }
+  showToast('✅ ¡Postulación registrada! Mucha suerte 🍀');
 }
 
 // Buscar oferta - 4 portales con formatos correctos
