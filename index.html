@@ -1443,14 +1443,20 @@ function validarBeta() {
               </select>
             </div>
             <div class="vform-field">
-              <label class="vform-label">💵 Salario <span class="vform-hint">(opcional, atrae 3x más postulantes)</span></label>
-              <input class="vform-input" id="vacSalario" list="salarioSugs" placeholder="Ej: $600 - $850" maxlength="60" oninput="vacPreview()">
-              <datalist id="salarioSugs">
-                <option value="$470 (SBU)"></option><option value="$470 - $600"></option>
-                <option value="$600 - $850"></option><option value="$850 - $1.200"></option>
-                <option value="$1.200 - $1.800"></option><option value="$1.800 - $2.500"></option>
-                <option value="A convenir"></option>
-              </datalist>
+              <label class="vform-label">💵 Salario <span class="vform-hint">(publicarlo atrae 3x más postulantes)</span></label>
+              <select class="vform-select" id="vacSalarioSel" onchange="cambioSalario()">
+                <option value="A convenir">A convenir</option>
+                <option value="$482 (Salario Básico 2026)">$482 — Salario Básico 2026</option>
+                <option value="$482 - $600">$482 - $600</option>
+                <option value="$600 - $850">$600 - $850</option>
+                <option value="$850 - $1.200">$850 - $1.200</option>
+                <option value="$1.200 - $1.800">$1.200 - $1.800</option>
+                <option value="$1.800 - $2.500">$1.800 - $2.500</option>
+                <option value="$2.500 o más">$2.500 o más</option>
+                <option value="__otro__">✏️ Otro monto (escribir)...</option>
+              </select>
+              <input class="vform-input" id="vacSalarioOtro" style="display:none;margin-top:8px" placeholder="Escribe el salario, ej: $720 + comisiones" maxlength="60" oninput="cambioSalario()">
+              <input type="hidden" id="vacSalario" value="A convenir">
             </div>
             <div class="vform-field">
               <label class="vform-label">📧 Email para postulantes <span class="req">*</span></label>
@@ -1497,7 +1503,7 @@ function validarBeta() {
           </div>
           <div class="vform-tips">
             <strong>💡 Tips para recibir más postulantes:</strong><br>
-            • Publica el <strong>salario</strong>: las vacantes con rango salarial reciben hasta 3x más postulaciones<br>
+            • Publica el <strong>salario</strong> (SBU 2026: $482): las vacantes con rango salarial reciben hasta 3x más postulaciones<br>
             • Usa viñetas en responsabilidades y requisitos<br>
             • Menciona horario y beneficios (IESS, bonos, crecimiento)<br>
             • Evita pedir "experiencia de 5 años" para cargos junior
@@ -2283,37 +2289,8 @@ async function generarCartaPersonalizada() {
   document.getElementById('descargarBtn').style.display = 'none';
   document.getElementById('cvMejoradoPanel').scrollIntoView({ behavior: 'smooth' });
 
+  // Carta con PLANTILLA local (sin costo de API)
   let carta = '';
-  try {
-    const res = await fetch(BACKEND_URL + '/api/claude/messages', {
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
-      },
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:800,
-        messages:[{role:'user', content:`Eres un experto en recursos humanos del Ecuador. Genera una CARTA DE PRESENTACIÓN profesional, breve y personalizada basada en este CV del candidato.
-
-INSTRUCCIONES:
-- Máximo 250 palabras
-- Tono profesional pero cercano
-- Destacar 2-3 fortalezas principales del candidato según su CV
-- Mostrar interés por integrar un equipo profesional
-- Lenguaje ecuatoriano (no español de España)
-- NO usar markdown ni asteriscos, solo texto plano
-
-CV DEL CANDIDATO:
-${cvData.texto}
-
-Genera SOLO la carta sin explicaciones adicionales.`}]
-      })
-    });
-    const data = await res.json();
-    carta = data.content?.[0]?.text || '';
-  } catch(e) {}
-
   if (!carta) {
     carta = `Estimados señores,
 
@@ -2642,6 +2619,21 @@ function sugerirCargos(txt) {
 function elegirCargo(nombre) {
   document.getElementById('vacCargo').value = nombre;
   document.getElementById('cargoSugs').classList.remove('open');
+  vacPreview();
+}
+
+function cambioSalario() {
+  const sel = document.getElementById('vacSalarioSel');
+  const otro = document.getElementById('vacSalarioOtro');
+  const hidden = document.getElementById('vacSalario');
+  if (sel.value === '__otro__') {
+    otro.style.display = 'block';
+    hidden.value = otro.value.trim() || 'A convenir';
+    if (document.activeElement === sel) otro.focus();
+  } else {
+    otro.style.display = 'none';
+    hidden.value = sel.value;
+  }
   vacPreview();
 }
 
@@ -3629,7 +3621,7 @@ async function guardarYAnalizar() {
         'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
       },
       body: JSON.stringify({
-        model:'claude-sonnet-4-20250514', max_tokens:1200,
+        model:'claude-haiku-4-5-20251001', max_tokens:1200,
         messages:[{role:'user',content:`Analiza este CV para el mercado laboral de Ecuador. Responde en español con emojis:
 
 1. 📋 RESUMEN DEL PERFIL (2-3 líneas)
@@ -3732,23 +3724,8 @@ ${area}, Ecuador, ${ciudad}, profesional, experiencia, tiempo completo, empresas
   cvData.analysis = analysis;
   cvData.areasDetectadas = areasDetectadas;
 
-  // Generar carta de presentación automáticamente
+  // Carta de presentación con PLANTILLA local (sin costo de API)
   let carta = '';
-  try {
-    const resCarta = await fetch(BACKEND_URL + '/api/claude/messages', {
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
-      },
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514', max_tokens:600,
-        messages:[{role:'user',content:'Redacta una carta de presentación profesional en español para Ecuador para este CV. 3 párrafos: presentación, experiencia clave y cierre. Tono profesional ecuatoriano, máximo 300 palabras. Sin nombre de empresa específica.\n\nCV:\n' + texto}]
-      })
-    });
-    const dataCarta = await resCarta.json();
-    carta = dataCarta.content?.[0]?.text || '';
-  } catch(e) {}
 
   // Carta demo si no hay API
   if (!carta) {
@@ -3895,9 +3872,9 @@ async function buscarEmpleo() {
         'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
       },
       body: JSON.stringify({
-        model:'claude-sonnet-4-20250514', max_tokens:4000,
+        model:'claude-haiku-4-5-20251001', max_tokens:4000,
         tools:[{type:'web_search_20250305',name:'web_search'}],
-        messages:[{role:'user',content:`Busca ofertas de trabajo REALES y ACTUALES en Ecuador para: "${query}". Ciudad: ${ciudad}. Modalidad: ${modalidad}.\n\nINSTRUCCIONES SOBRE SALARIOS:\n- Solo incluye salario si está EXPLÍCITAMENTE publicado en la oferta real\n- Si NO hay salario, usa "A convenir"\n- NUNCA inventes salarios. En Ecuador típicos: $470-$1500\n\nBusca empleos REALES y ACTUALES en Ecuador.\n\nUsa web search para buscar en:\n- Multitrabajos.com, Computrabajo Ecuador, LinkedIn Jobs, Indeed Ecuador, Bumeran, Porfinempleo\n- Grupos de Facebook: Empleos Quito, Empleos Guayaquil, Trabajos Ecuador\n\nDevuelve EXACTAMENTE 5 empleos relevantes.\n\nPara el campo "url": incluye SOLO si tienes URL específica al detalle de la oferta. Si solo tienes URL al portal general, deja "url" vacío como "".\n\nPara "email": solo si la oferta lo publica explícitamente, si no, "" vacío.\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa","cargo":"título puesto","ciudad":"ciudad","salario":"rango USD si está","fuente":"LinkedIn/Multitrabajos/etc","match":85,"email":"","descripcion":"descripción breve","url":"","portales":["multitrabajos","computrabajo","linkedin","indeed","facebook"]}]}\n\nDevuelve EXACTAMENTE 5 empleos VERIFICADOS con URLs reales que tengan resultados. Es preferible menos empleos pero todos reales.`}]
+        messages:[{role:'user',content:`Busca ofertas de trabajo REALES y ACTUALES en Ecuador para: "${query}". Ciudad: ${ciudad}. Modalidad: ${modalidad}.\n\nINSTRUCCIONES SOBRE SALARIOS:\n- Solo incluye salario si está EXPLÍCITAMENTE publicado en la oferta real\n- Si NO hay salario, usa "A convenir"\n- NUNCA inventes salarios. En Ecuador típicos: $482 (salario básico 2026) hasta $1.500\n\nBusca empleos REALES y ACTUALES en Ecuador.\n\nUsa web search para buscar en:\n- Multitrabajos.com, Computrabajo Ecuador, LinkedIn Jobs, Indeed Ecuador, Bumeran, Porfinempleo\n- Grupos de Facebook: Empleos Quito, Empleos Guayaquil, Trabajos Ecuador\n\nDevuelve EXACTAMENTE 5 empleos relevantes.\n\nPara el campo "url": incluye SOLO si tienes URL específica al detalle de la oferta. Si solo tienes URL al portal general, deja "url" vacío como "".\n\nPara "email": solo si la oferta lo publica explícitamente, si no, "" vacío.\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa","cargo":"título puesto","ciudad":"ciudad","salario":"rango USD si está","fuente":"LinkedIn/Multitrabajos/etc","match":85,"email":"","descripcion":"descripción breve","url":"","portales":["multitrabajos","computrabajo","linkedin","indeed","facebook"]}]}\n\nDevuelve EXACTAMENTE 5 empleos VERIFICADOS con URLs reales que tengan resultados. Es preferible menos empleos pero todos reales.`}]
       })
     });
     const data = await res.json();
@@ -4115,60 +4092,24 @@ function buscarOfertaReal(cargo, empresa, ciudad, portales) {
 
 // ======= EMPLEADOR BUSQUEDA =======
 async function buscarCandidatos() {
-  if (!currentUser) { openAuth('register'); return; }
-  const query = document.getElementById('empSearchInput').value.trim();
-  if (!query) { showToast('⚠ Describe el perfil que necesitas', true); return; }
-  const ciudad = document.getElementById('fCiudad').value;
-  const area = document.getElementById('fArea').value;
-  const exp = document.getElementById('fExp').value;
-  const modalidad = document.getElementById('fModalidad').value;
-
-  document.getElementById('empResults').innerHTML='';
-  document.getElementById('empResultsHeader').style.display='none';
-  const anim = document.getElementById('empSearchAnim'); anim.classList.add('visible');
-  const srcs = document.getElementById('empSearchSrcs'); srcs.innerHTML='';
-  ['LinkedIn','Multitrabajos','Indeed EC','OLX','Computrabajo','Facebook','Twitter/X','Universidades'].forEach((f,i)=>
-    setTimeout(()=>{ const el=document.createElement('div');el.className='src-item';el.textContent=f;srcs.appendChild(el); },i*300)
-  );
-
-  await new Promise(r=>setTimeout(r,2800));
-
-  try {
-    const filtros = [ciudad&&`ciudad: ${ciudad}`,area&&`área: ${area}`,exp&&`experiencia mínima: ${exp}`,modalidad&&`modalidad: ${modalidad}`].filter(Boolean).join(', ');
-    const res = await fetch(BACKEND_URL + '/api/claude/messages', {
-      method:'POST', headers:{
-        'Content-Type':'application/json',
-        'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
-      },
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514', max_tokens:1000,
-        tools:[{type:'web_search_20250305',name:'web_search'}],
-        messages:[{role:'user',content:`Busca candidatos en Ecuador para: "${query}". Filtros: ${filtros||'ninguno'}.\n\nResponde SOLO con JSON válido:\n{"candidatos":[{"nombre":"nombre ecuatoriano","cargo_actual":"título","empresa_actual":"empresa EC","ciudad":"ciudad EC","experiencia":"X años","habilidades":["skill1","skill2","skill3","skill4"],"match":92,"email":"email@ejemplo.com","fuente":"LinkedIn/etc","disponibilidad":"Inmediata/2 semanas/1 mes","salario_esperado":"$X-Y/mes","nivel":"Junior/Senior/Gerencial"}]}\n\nGenera 6 candidatos con nombres y datos ecuatorianos. Varía perfiles y ciudades.`}]
-      })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error((data && data.error) || ('Error del servidor (' + res.status + ')'));
-    const text = (data.content||[]).map(i=>i.text||'').join('');
-    const parsed = extraerJSON(text);
-    if (!parsed || !parsed.candidatos) throw new Error('La IA respondió en un formato inesperado. Intenta de nuevo.');
-    candidatosData = parsed.candidatos;
-    anim.classList.remove('visible');
-    document.getElementById('empResultsHeader').style.display='flex';
-    document.getElementById('empResultsCount').textContent = `${candidatosData.length} candidatos encontrados en Ecuador`;
-    renderCandidatos(candidatosData);
-  } catch(e) {
-    anim.classList.remove('visible');
-    console.error('Error búsqueda candidatos:', e);
-    document.getElementById('empResults').innerHTML = `
-      <div style="text-align:center;padding:50px 20px">
-        <div style="font-size:44px;margin-bottom:12px">⚠️</div>
-        <h3 style="font-family:'Syne',sans-serif;font-size:18px;margin-bottom:8px">No pudimos completar la búsqueda</h3>
-        <p style="color:var(--texto-secundario);font-size:13px;max-width:380px;margin:0 auto 16px">${escHtml(e ? e.message : 'Error inesperado')}</p>
-        <button class="btn-sm-green" onclick="buscarCandidatos()">🔄 Reintentar</button>
-      </div>`;
-  }
+  // Sin costo de API: los candidatos llegan publicando vacantes (gratis)
+  const anim = document.getElementById('empSearchAnim');
+  if (anim) anim.classList.remove('visible');
+  const header = document.getElementById('empResultsHeader');
+  if (header) header.style.display = 'none';
+  document.getElementById('empResults').innerHTML = `
+    <div style="text-align:center;padding:60px 20px">
+      <div style="font-size:52px;margin-bottom:16px">📢</div>
+      <h3 style="font-family:'Syne',sans-serif;font-size:20px;margin-bottom:10px">Los mejores candidatos llegan a ti</h3>
+      <p style="color:var(--texto-secundario);font-size:13.5px;max-width:440px;margin:0 auto 8px;line-height:1.7">
+        En vez de buscar perfiles uno por uno, <strong style="color:var(--verde)">publica tu vacante gratis</strong>:
+        aparecerá destacada ante todos los candidatos que buscan empleo en TalentoEC y recibirás
+        sus datos directo a tu correo cuando postulen.
+      </p>
+      <p style="color:var(--texto-secundario);font-size:12px;margin:0 auto 20px">Publicas en 2 minutos · sin costo · postulantes con un clic</p>
+      <button class="btn-sm-green" style="padding:12px 24px;font-size:14px" onclick="empTab('vacantes')">📢 Publicar mi vacante gratis</button>
+    </div>`;
 }
-
 function renderCandidatos(list) {
   document.getElementById('empResults').innerHTML = list.map((c,i)=>`
     <div class="candidate-card" style="animation:fadeIn .4s ease ${i*.08}s forwards;opacity:0">
@@ -4273,52 +4214,33 @@ async function abrirEmailModal(email, empresa, cargo, nombre, esParaEmpresa) {
   } else {
     document.getElementById('modalTo').value = email;
   }
-  document.getElementById('modalSubject').value = 'Oportunidad laboral — ' + cargo;
-  document.getElementById('modalBody').value = '⟳ Generando con TalentoEC...';
+  document.getElementById('modalSubject').value = 'Postulación — ' + cargo + (currentUser?.nombre ? ' — ' + currentUser.nombre : '');
   document.getElementById('emailModal').classList.add('open');
 
-  const prompt = esParaEmpresa
-    ? `Redacta un correo profesional en español para enviar al RRHH de "${empresa}" presentando al candidato "${nombre}" para el puesto de "${cargo}". Formal, 3-4 párrafos, solicita entrevista. Tono profesional ecuatoriano. Sin asunto, solo el cuerpo del correo.`
-    : `Redacta un correo profesional en español para contactar a "${nombre}", actualmente como "${cargo}". Cordial, 3 párrafos, informa que encontramos su perfil y hay una oportunidad interesante. Sin revelar empresa. Tono respetuoso. Sin asunto, solo el cuerpo.`;
+  // Correo generado con PLANTILLA local (instantáneo y sin costo de API)
+  const nombreRemitente = (currentUser && currentUser.nombre) || nombre || 'Candidato';
+  const areaCV = (typeof cvData !== 'undefined' && cvData && cvData.area) ? cvData.area : '';
+  const cuerpo = esParaEmpresa
+    ? `Estimado equipo de Recursos Humanos de ${empresa || 'la empresa'},
 
-  try {
-    const res = await fetch(BACKEND_URL + '/api/claude/messages', {
-      method:'POST', headers:{
-        'Content-Type':'application/json',
-        'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
-      },
-      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:500, messages:[{role:'user',content:prompt}] })
-    });
-    const data = await res.json();
-    document.getElementById('modalBody').value = data.content?.[0]?.text || '';
-  } catch(e) {
-    // MODO DEMO email
-    const demoEmail = esParaEmpresa
-      ? `Estimado equipo de Recursos Humanos de ${empresa || 'la empresa'},
+Me dirijo a ustedes para presentar mi candidatura al puesto de ${cargo} que tienen disponible en su organización.
 
-Me dirijo a ustedes con el fin de presentar mi candidatura para el puesto de ${cargo} que tienen disponible en su organización.
+Soy ${nombreRemitente}${areaCV ? ', profesional en ' + areaCV + ',' : ','} con experiencia en el área, y considero que mi perfil se ajusta a los requerimientos de esta posición. A lo largo de mi trayectoria he desarrollado competencias que me permitirían aportar valor a su equipo desde el primer día.
 
-Soy ${nombreRemitente}, profesional con experiencia en el área, y considero que mi perfil se ajusta muy bien a los requerimientos de esta posición. A lo largo de mi carrera he desarrollado competencias clave que me permitirían aportar valor significativo a su equipo.
-
-Adjunto mi currículum vitae para su consideración y quedo a su disposición para una entrevista en el momento que estimen conveniente.
-
-Muchas gracias por su tiempo y atención.
+Adjunto mi currículum para su consideración y quedo a su disposición para una entrevista cuando lo estimen conveniente.
 
 Atentamente,
 ${nombreRemitente}`
-      : `Estimado/a ${para},
+    : `Estimado/a ${nombre || 'profesional'},
 
-Me pongo en contacto con usted porque hemos encontrado su perfil profesional y creemos que existe una oportunidad laboral que podría ser de su interés.
+Me pongo en contacto porque encontramos su perfil profesional y creemos que existe una oportunidad laboral que podría interesarle.
 
-Su experiencia como ${cargo} llama mucho nuestra atención. Tenemos una posición disponible en una empresa ecuatoriana que podría encajar perfectamente con sus habilidades y expectativas de carrera.
+Su experiencia como ${cargo} llama nuestra atención. Tenemos una posición disponible que podría encajar con sus habilidades y expectativas de carrera.
 
-Si está interesado/a en conocer más detalles sobre esta oportunidad, con gusto podemos coordinar una conversación.
-
-Quedamos atentos a su respuesta.
+Si desea conocer más detalles, con gusto coordinamos una conversación.
 
 Saludos cordiales`;
-    document.getElementById('modalBody').value = demoEmail;
-  }
+  document.getElementById('modalBody').value = cuerpo;
 }
 
 function cerrarEmail() { document.getElementById('emailModal').classList.remove('open'); }
@@ -4440,7 +4362,7 @@ async function mejorarCV() {
         'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
       },
       body: JSON.stringify({
-        model:'claude-sonnet-4-20250514', max_tokens:1500,
+        model:'claude-haiku-4-5-20251001', max_tokens:1500,
         messages:[{role:'user',content:`Eres un experto en recursos humanos de Ecuador. Mejora profesionalmente el siguiente CV para el mercado laboral ecuatoriano. 
 
 INSTRUCCIONES:
@@ -4541,23 +4463,8 @@ async function generarCarta() {
   document.getElementById('cvMejoradoContent').innerHTML = '<div style="color:var(--amarillo)">⟳ Redactando carta profesional...</div>';
   document.getElementById('cvMejoradoPanel').scrollIntoView({ behavior: 'smooth' });
 
+  // Carta con PLANTILLA local (sin costo de API)
   let carta = '';
-  try {
-    const res = await fetch(BACKEND_URL + '/api/claude/messages', {
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
-      },
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514', max_tokens:800,
-        messages:[{role:'user',content:'Redacta una carta de presentación profesional en español para Ecuador para el siguiente CV. La carta debe ser personalizable (sin nombre de empresa específica), 3 párrafos: presentación, experiencia clave y cierre. Tono profesional ecuatoriano, máximo 350 palabras.\n\nCV:\n' + cvData.texto}]
-      })
-    });
-    const data = await res.json();
-    carta = data.content?.[0]?.text || '';
-  } catch(e) {}
-
   if (!carta) {
     const nombre = cvData.nombre || 'Profesional';
     const area = cvData.area || 'mi área';
@@ -5058,7 +4965,7 @@ async function ejecutarCorreosFrio() {
         'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
       },
       body: JSON.stringify({
-        model:'claude-sonnet-4-20250514', max_tokens:3000,
+        model:'claude-haiku-4-5-20251001', max_tokens:3000,
         tools:[{type:'web_search_20250305',name:'web_search'}],
         messages:[{role:'user',content:`Usa web search para encontrar ${numero} empresas ecuatorianas REALES del sector ${sector} en ${ciudad} que podrían necesitar personal de ${area}.
 
@@ -5129,26 +5036,9 @@ function renderEmpresasFrio(empresas, nombre, area) {
 async function abrirEmailFrio(email, empresa, area, nombre) {
   document.getElementById('modalTo').value = email;
   document.getElementById('modalSubject').value = `Presentación profesional — ${area} — ${nombre}`;
-  document.getElementById('modalBody').value = '⟳ Generando correo en frío con TalentoEC...';
   document.getElementById('emailModal').classList.add('open');
-
-  try {
-    const res = await fetch(BACKEND_URL + '/api/claude/messages', {
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
-      },
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514', max_tokens:500,
-        messages:[{role:'user',content:`Redacta un correo en frío profesional en español para enviar al área de RRHH de "${empresa}" presentando al candidato "${nombre}" que busca trabajo en ${area}. La empresa NO tiene vacante publicada. El correo debe ser: breve (3 párrafos máx), directo, destacar valor que puede aportar, solicitar consideración para futuras oportunidades. Tono profesional ecuatoriano. Solo el cuerpo del correo.`}]
-      })
-    });
-    const data = await res.json();
-    document.getElementById('modalBody').value = data.content?.[0]?.text || generarEmailFrioDemo(empresa, area, nombre);
-  } catch(e) {
-    document.getElementById('modalBody').value = generarEmailFrioDemo(empresa, area, nombre);
-  }
+  // Correo en frío con PLANTILLA local (sin costo de API)
+  document.getElementById('modalBody').value = generarEmailFrioDemo(empresa, area, nombre);
 }
 
 function generarEmailFrioDemo(empresa, area, nombre) {
