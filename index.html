@@ -560,7 +560,8 @@ function validarBeta() {
   </div>
   <div class="nav-center" id="navCenter">
     <button class="ntab active" onclick="showPage('landing')" id="ntab-landing">Inicio</button>
-    <button class="ntab" onclick="requireAuth('candidato')" id="ntab-candidato">Candidatos</button>
+    <button class="ntab" onclick="irBuscarEmpleo()" id="ntab-buscar" style="color:var(--verde);font-weight:600">🔍 Buscar empleo</button>
+    <button class="ntab" onclick="requireAuth('candidato')" id="ntab-candidato">Mi panel</button>
     <button class="ntab" onclick="irEmpleadores()" id="ntab-empleador">Empleadores <span style="font-size:9px;color:var(--verde);margin-left:4px">GRATIS</span></button>
     <button class="ntab" onclick="requireAuth('admin')" id="ntab-admin" style="display:none;color:var(--amarillo)">⚙ Admin</button>
   </div>
@@ -850,9 +851,10 @@ function validarBeta() {
         </div>
         <ul class="plan-features">
           <li>5 búsquedas inteligentes al día = 25 ofertas reales</li>
-          <li>Análisis completo de CV con IA</li>
+          <li>Análisis completo de tu CV con IA</li>
           <li>Postula directo en LinkedIn, Indeed, Computrabajo y más</li>
-          <li>12 correos de postulación al día</li>
+          <li>⭐ Acceso a vacantes exclusivas de TalentoEC</li>
+          <li>12 postulaciones por correo al día</li>
           <li>Historial de postulaciones</li>
         </ul>
         <button class="btn-plan" onclick="abrirPago('Básico','9.99')">Contratar con PayPhone</button>
@@ -877,10 +879,10 @@ function validarBeta() {
         <ul class="plan-features">
           <li>Todo del plan Básico</li>
           <li>10 búsquedas al día = 50 ofertas reales</li>
-          <li>Correos en frío: contacta empresas antes de que publiquen la vacante (10/día)</li>
-          <li>25 correos de postulación al día</li>
-          <li>Carta de presentación realizada por nuestro equipo</li>
-          <li>Seguimiento de respuestas</li>
+          <li>🔥 Correos en frío: contacta empresas antes de que publiquen la vacante (10/día)</li>
+          <li>25 postulaciones por correo al día</li>
+          <li>Plantillas de carta de presentación profesional</li>
+          <li>Seguimiento de tus postulaciones</li>
         </ul>
         <button class="btn-plan" onclick="abrirPago('Estándar','19.99')">Contratar con PayPhone</button>
       </div>
@@ -903,11 +905,11 @@ function validarBeta() {
         <ul class="plan-features">
           <li>Todo del plan Estándar</li>
           <li>20 búsquedas al día = 100 ofertas reales</li>
-          <li>20 correos en frío al día para adelantarte a todos</li>
-          <li>35 correos de postulación al día</li>
-          <li>Perfil destacado prioritario</li>
-          <li>Reporte de aperturas de correo</li>
-          <li>Soporte prioritario WhatsApp</li>
+          <li>🔥 20 correos en frío al día para adelantarte a todos</li>
+          <li>35 postulaciones por correo al día</li>
+          <li>⭐ Acceso prioritario a vacantes exclusivas</li>
+          <li>Resultados más rápidos (búsqueda prioritaria)</li>
+          <li>Soporte prioritario por WhatsApp</li>
         </ul>
         <button class="btn-plan" onclick="abrirPago('Pro','34.99')">Contratar con PayPhone</button>
       </div>
@@ -3268,6 +3270,19 @@ async function cerrarSesionDuplicado_unused() {
 function requireAuth(page) {
   if (currentUser) { showPage(page); }
   else { openAuth('register'); }
+}
+function irBuscarEmpleo() {
+  if (currentUser && currentUser.tipo === 'empleador') {
+    showToast('Tu cuenta es de empleador. Para buscar empleo crea una cuenta de candidato.');
+    return;
+  }
+  if (currentUser) {
+    showPage('candidato');
+    setTimeout(() => { if (typeof candTab === 'function') candTab('buscar'); }, 100);
+  } else {
+    openAuth('register');
+    showToast('Crea tu cuenta gratis y empieza a buscar empleo 🔍');
+  }
 }
 function goHome() { showPage('landing'); }
 
