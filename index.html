@@ -1615,181 +1615,6 @@ function validarBeta() {
       </div>
     </div>
 
-    <!-- TAB: BUSCAR -->
-    <div id="emp-tab-buscar">
-      <div style="position:relative;margin-bottom:20px">
-        <div class="search-bar-wrap" style="margin-bottom:0">
-          <input type="text" id="empSearchInput"
-            placeholder="Ej: Ingeniero, Contador, Desarrollador..."
-            onkeydown="if(event.key==='Enter'){cerrarSugerencias();buscarCandidatos();}"
-            oninput="mostrarSugerencias(this.value)"
-            onblur="setTimeout(cerrarSugerencias,200)"
-            autocomplete="off">
-          <button class="btn-search" onclick="buscarCandidatos()">Buscar →</button>
-        </div>
-        <div id="searchSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--gris-oscuro);border:1px solid var(--verde);border-radius:0 0 10px 10px;z-index:50;max-height:280px;overflow-y:auto"></div>
-      </div>
-
-      <div class="filters-panel">
-        <div class="filters-title">Filtros avanzados</div>
-        <div class="filters-grid">
-          <div class="filter-group">
-            <label>Ciudad</label>
-            <select id="fCiudad">
-              <option value="">Todo Ecuador</option>
-              <option>Quito</option>
-              <option>Guayaquil</option>
-              <option>Cuenca</option>
-              <option>Ambato</option>
-              <option>Manta</option>
-              <option>Loja</option>
-              <option>Ibarra</option>
-              <option>Riobamba</option>
-              <option>Esmeraldas</option>
-              <option>Portoviejo</option>
-              <option>Santo Domingo</option>
-              <option>Machala</option>
-              <option>Durán</option>
-              <option>Quevedo</option>
-              <option>Milagro</option>
-              <option>Latacunga</option>
-              <option>Babahoyo</option>
-              <option>Sangolquí</option>
-              <option>Tulcán</option>
-              <option>Lago Agrio</option>
-              <option>Orellana</option>
-              <option>Tena</option>
-              <option>Puyo</option>
-              <option>Macas</option>
-              <option>Zamora</option>
-              <option>Guaranda</option>
-              <option>Azogues</option>
-              <option>Santa Rosa</option>
-              <option>Pasaje</option>
-              <option>Huaquillas</option>
-              <option>Toda la república</option><option>Loja</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label>Área</label>
-            <select id="fArea">
-              <option>Tecnología / Sistemas</option>
-              <option>Desarrollo de Software</option>
-              <option>Diseño Web / UX</option>
-              <option>Ciberseguridad</option>
-              <option>Data Science / BI</option>
-              <option>Administración de Empresas</option>
-              <option>Recursos Humanos</option>
-              <option>Contabilidad / Auditoría</option>
-              <option>Finanzas / Banca</option>
-              <option>Economía</option>
-              <option>Marketing Digital</option>
-              <option>Ventas / Comercial</option>
-              <option>Publicidad / Comunicación</option>
-              <option>Atención al Cliente</option>
-              <option>Ingeniería Civil</option>
-              <option>Ingeniería Industrial</option>
-              <option>Ingeniería Eléctrica</option>
-              <option>Ingeniería Mecánica</option>
-              <option>Ingeniería Química</option>
-              <option>Arquitectura</option>
-              <option>Medicina / Salud</option>
-              <option>Enfermería</option>
-              <option>Odontología</option>
-              <option>Farmacia</option>
-              <option>Psicología</option>
-              <option>Educación / Docencia</option>
-              <option>Derecho / Legal</option>
-              <option>Logística / Supply Chain</option>
-              <option>Comercio Exterior</option>
-              <option>Turismo / Hotelería</option>
-              <option>Gastronomía</option>
-              <option>Agronomía / Agropecuario</option>
-              <option>Petróleo / Minería</option>
-              <option>Medio Ambiente</option>
-              <option>Diseño Gráfico</option>
-              <option>Fotografía / Video</option>
-              <option>Periodismo</option>
-              <option>Trabajo Social</option>
-              <option>Seguridad / Vigilancia</option>
-              <option>Construcción / Obras</option>
-              <option>Manufactura / Producción</option>
-              <option>Electricidad / Electrónica</option>
-              <option>Mecánica Automotriz</option>
-              <option>Otro</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label>Experiencia mínima</label>
-            <select id="fExp">
-              <option value="">Sin filtro</option>
-              <option value="1">1+ años</option>
-              <option value="3">3+ años</option>
-              <option value="5">5+ años</option>
-              <option value="10">10+ años</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label>Modalidad</label>
-            <select id="fModalidad">
-              <option value="">Cualquiera</option>
-              <option>Presencial</option><option>Remoto</option><option>Híbrido</option>
-            </select>
-          </div>
-        </div>
-        <div class="chips-row">
-          <span style="font-size:11px;color:var(--texto-secundario);margin-right:4px">Disponibilidad:</span>
-          <span class="chip on" onclick="toggleChip(this)">Inmediata</span>
-          <span class="chip on" onclick="toggleChip(this)">2 semanas</span>
-          <span class="chip" onclick="toggleChip(this)">1 mes</span>
-          <span style="font-size:11px;color:var(--texto-secundario);margin-left:10px;margin-right:4px">Nivel:</span>
-          <span class="chip on" onclick="toggleChip(this)">Junior</span>
-          <span class="chip on" onclick="toggleChip(this)">Senior</span>
-          <span class="chip" onclick="toggleChip(this)">Gerencial</span>
-        </div>
-      </div>
-
-      <div class="sources-bar">
-        <div class="source-pill"><span class="source-dot" style="background:#0077B5"></span>LinkedIn</div>
-        <div class="source-pill"><span class="source-dot" style="background:#E63946"></span>Multitrabajos</div>
-        <div class="source-pill"><span class="source-dot" style="background:#FF6B35"></span>Indeed</div>
-        <div class="source-pill"><span class="source-dot" style="background:#4CAF50"></span>OLX EC</div>
-        <div class="source-pill"><span class="source-dot" style="background:#9B59B6"></span>Computrabajo</div>
-        <div class="source-pill"><span class="source-dot" style="background:#F39C12"></span>Facebook</div>
-        <div class="source-pill"><span class="source-dot" style="background:#3498DB"></span>+30 más</div>
-      </div>
-
-      <div class="searching-anim" id="empSearchAnim">
-        <div class="spin"></div>
-        <div style="font-size:13px;color:var(--texto-secundario);margin-bottom:10px">Con web search real buscando candidatos...</div>
-        <div id="empSearchSrcs" style="max-width:500px;margin:0 auto"></div>
-      </div>
-
-      <div id="empResultsHeader" style="display:none" class="results-header">
-        <div class="results-count" id="empResultsCount"></div>
-        <select class="sort-select" onchange="sortResults(this.value)">
-          <option value="match">Ordenar: % Match</option>
-          <option value="exp">Ordenar: Experiencia</option>
-          <option value="disp">Ordenar: Disponibilidad</option>
-        </select>
-      </div>
-
-      <div id="empResults">
-        <div class="empty-state"><div>👥</div><p>Escribe el perfil que necesitas y Buscaremos en toda la web ecuatoriana</p></div>
-      </div>
-    </div>
-
-    <!-- TAB: GUARDADOS -->
-    <div id="emp-tab-guardados" style="display:none">
-      <div id="guardadosList">
-        <div class="empty-state"><div>🔖</div><p>Guarda candidatos durante la búsqueda para verlos aquí</p></div>
-      </div>
-    </div>
-
-    <!-- TAB: CORREOS -->
-    <div id="emp-tab-correos" style="display:none">
-      <div id="correosList"><div class="empty-state"><div>📧</div><p>Los correos enviados aparecerán aquí</p></div></div>
-    </div>
   </div>
 </div>
 
@@ -4776,14 +4601,16 @@ async function guardarCandidato(nombre, cargo, ciudad, email, fuente) {
   } else {
     showToast('Ya tienes a ' + nombre + ' guardado');
   }
-  if (document.getElementById('emp-tab-guardados').style.display !== 'none') {
+  const tg = document.getElementById('emp-tab-guardados');
+  if (tg && tg.style.display !== 'none') {
     renderGuardados();
   }
 }
 
 function renderGuardados() {
-  const guardados = JSON.parse(localStorage.getItem('candidatos_guardados') || '[]');
   const el = document.getElementById('guardadosList');
+  if (!el) return;  // pestaña eliminada
+  const guardados = JSON.parse(localStorage.getItem('candidatos_guardados') || '[]');
   if (!guardados.length) {
     el.innerHTML = '<div class="empty-state"><div>🔖</div><p>Aún no has guardado candidatos</p></div>';
     return;
@@ -5693,7 +5520,8 @@ function toggleAreaChip(el, area) {
 
 function renderCorreos() {
   if (!correosEnviados.length) return;
-  document.getElementById('correosList').innerHTML = correosEnviados.map(c=>`
+  const _cl = document.getElementById('correosList'); if(!_cl) return;
+  _cl.innerHTML = correosEnviados.map(c=>`
     <div class="job-card">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div><div style="font-size:14px;font-weight:500">${c.to}</div><div style="font-size:12px;color:var(--texto-secundario);margin-top:3px">${c.subject}</div></div>
