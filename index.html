@@ -1773,7 +1773,7 @@ function validarBeta() {
       <div class="pp-body">
         <div class="pp-plan-summary">
           <div><div class="pp-plan-name">Plan seleccionado</div><div style="font-size:15px;font-weight:600;margin-top:2px" id="ppPlanName">Pro</div></div>
-          <div><div class="pp-plan-price" id="ppPlanPrice">$149</div><div style="font-size:10px;color:var(--texto-secundario);text-align:right">/mes</div></div>
+          <div><div class="pp-plan-price" id="ppPlanPrice">$29.99</div><div style="font-size:10px;color:var(--texto-secundario);text-align:right">/mes</div></div>
         </div>
         <div class="filters-title" style="margin-bottom:12px">Método de pago</div>
         <div class="pp-methods">
@@ -1845,7 +1845,7 @@ function validarBeta() {
 <div class="profile-menu" id="profileMenu">
   <div class="profile-menu-user"><strong id="menuUserName">—</strong><span id="menuUserEmail">—</span></div>
   <div class="profile-menu-item" onclick="irMiPerfil()">Mi perfil</div>
-  <div class="profile-menu-item" onclick="abrirPago('Pro','149')">Mejorar plan</div>
+  <div class="profile-menu-item" onclick="abrirPago('Pro','29.99')">Mejorar plan</div>
   <div class="profile-menu-divider"></div>
   <div class="profile-menu-item danger" onclick="cerrarSesion()">Cerrar sesión</div>
 </div>
@@ -1982,9 +1982,9 @@ function validarBeta() {
       <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">4. Planes y pagos</h2>
       <p style="margin:0 0 8px">TalentoEC ofrece planes de suscripción mensual con los siguientes precios en dólares americanos (USD):</p>
       <ul style="margin:0 0 12px;padding-left:20px">
-        <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Plan Básico:</strong> $9.99/mes — para candidatos, 25 ofertas + 12 correos automáticos diarios</li>
-        <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Plan Estándar:</strong> $19.99/mes — para candidatos, 10 búsquedas y hasta 25 correos diarios</li>
-        <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Plan Pro:</strong> $29.99/mes — para candidatos, 10 búsquedas y hasta 35 correos diarios</li>
+        <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Plan Básico:</strong> $9.99/mes — para candidatos, 3 búsquedas diarias + 12 correos automáticos</li>
+        <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Plan Estándar:</strong> $19.99/mes — para candidatos, 6 búsquedas y hasta 35 correos diarios</li>
+        <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Plan Pro:</strong> $29.99/mes — para candidatos, 10 búsquedas y hasta 55 correos diarios</li>
         <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Empleador Básico:</strong> $49/mes — hasta 20 correos al mes</li>
         <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Empleador Pro:</strong> $149/mes — hasta 200 correos al mes</li>
         <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Empleador Enterprise:</strong> $399/mes — correos ilimitados</li>
@@ -4907,8 +4907,20 @@ async function confirmarPostulacion(empresa, cargo, btn) {
 }
 
 // Genera los enlaces a los 5 portales de empleo para un cargo+ciudad+empresa
+// Quita niveles y palabras que hacen la búsqueda muy específica (Junior, Senior, etc.)
+function generalizarCargo(cargo) {
+  let c = (cargo||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\s]/g,' ');
+  // Quitar niveles de seniority y palabras que limitan la búsqueda
+  const quitar = ['junior','senior','jr','sr','trainee','pasante','practicante','aprendiz','i','ii','iii','iv','nivel','expert','experto','especialista','lider','jefe de','encargado de','auxiliar de','asistente de','ayudante de'];
+  let palabras = c.split(/\s+/).filter(Boolean);
+  palabras = palabras.filter(function(p){ return quitar.indexOf(p) === -1; });
+  // Tomar las primeras 3-4 palabras clave (el núcleo del cargo)
+  c = palabras.slice(0, 4).join(' ').trim();
+  return c || (cargo||'').toLowerCase().trim();
+}
+
 function portalesDeEmpleo(cargo, empresa, ciudad) {
-  const limpio = (cargo||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\s]/g,'').trim();
+  const limpio = generalizarCargo(cargo);
   const slug = limpio.replace(/\s+/g,'-');
   const enc = encodeURIComponent(limpio);
   const ciudadEnc = encodeURIComponent(ciudad||'Ecuador');
@@ -5105,10 +5117,7 @@ async function guardarCandidato(nombre, cargo, ciudad, email, fuente) {
   } else {
     showToast('Ya tienes a ' + nombre + ' guardado');
   }
-  const tg = document.getElementById('emp-tab-guardados');
-  if (tg && tg.style.display !== 'none') {
-    renderGuardados();
-  }
+  // (la pestaña de guardados fue eliminada; solo se guarda en localStorage)
 }
 
 function renderGuardados() {
