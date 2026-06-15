@@ -1594,8 +1594,20 @@ function validarBeta() {
           </div>
           <div style="flex:1;min-width:240px">
             <div class="vform-field" style="margin-bottom:12px">
-              <label class="vform-label">Nombre de la empresa</label>
+              <label class="vform-label">Nombre de la empresa <span style="color:var(--rojo)">*</span></label>
               <input class="vform-input" id="empNombre" placeholder="Ej: Estudio Creativo Andino" maxlength="100">
+            </div>
+            <div class="vform-field" style="margin-bottom:12px">
+              <label class="vform-label">RUC o Cédula <span style="color:var(--rojo)">*</span></label>
+              <input class="vform-input" id="empRuc" placeholder="13 dígitos (RUC) o 10 (cédula)" maxlength="13" inputmode="numeric">
+            </div>
+            <div class="vform-field" style="margin-bottom:12px">
+              <label class="vform-label">Teléfono de contacto <span style="color:var(--rojo)">*</span></label>
+              <input class="vform-input" id="empTelefono" placeholder="Ej: 0998765432" maxlength="20" inputmode="tel">
+            </div>
+            <div class="vform-field" style="margin-bottom:12px">
+              <label class="vform-label">Ciudad <span style="color:var(--rojo)">*</span></label>
+              <input class="vform-input" id="empCiudad" placeholder="Ej: Quito" maxlength="60">
             </div>
             <div class="vform-field" style="margin-bottom:12px">
               <label class="vform-label">Sector</label>
@@ -1611,6 +1623,7 @@ function validarBeta() {
           <label class="vform-label">Descripción de la empresa</label>
           <textarea class="vform-textarea" id="empDescripcion" maxlength="600" style="min-height:110px" placeholder="Cuéntales a los candidatos qué hace tu empresa, su cultura y por qué es un buen lugar para trabajar..."></textarea>
         </div>
+        <div style="font-size:11px;color:var(--texto-secundario);margin-bottom:10px"><span style="color:var(--rojo)">*</span> Campos obligatorios para poder publicar vacantes</div>
         <button class="btn-full" onclick="guardarPerfilEmpresa()">💾 Guardar perfil</button>
         <div id="empPerfilMsg" style="font-size:12px;margin-top:10px;text-align:center"></div>
       </div>
@@ -2659,6 +2672,14 @@ async function publicarVacante() {
     cargarMisVacantes();
     showToast(vacEditandoId ? '✅ Cambios guardados' : '✅ Vacante enviada a revisión');
   } catch(e) {
+    // Si el perfil de empresa está incompleto, redirigir a completarlo
+    if (e.message && e.message.includes('Completa el perfil')) {
+      msg.style.color='var(--rojo)'; msg.textContent='⚠ ' + e.message;
+      if (confirm('Para publicar vacantes primero debes completar el perfil de tu empresa (RUC o cédula, teléfono y ciudad).\n\n¿Ir a completar el perfil ahora?')) {
+        empTab('empresa');
+      }
+      return;
+    }
     msg.style.color='var(--rojo)'; msg.textContent='⚠ ' + e.message;
   }
 }
@@ -2831,7 +2852,8 @@ function renderATS(vacanteId) {
       </div>
       ${p.mensaje ? '<div style="font-size:12px;margin-top:8px;white-space:pre-line;border-left:2px solid var(--verde);padding-left:8px;color:var(--texto-secundario)">' + escHtml(p.mensaje) + '</div>' : ''}
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
-        ${p.cv ? `<button class="btn-sm-outline" style="font-size:11px;padding:6px 12px" onclick='verCV(${escHtml(JSON.stringify(String(vacanteId)))},${idx})'>📄 Ver CV</button>` : '<span style="font-size:11px;color:var(--texto-secundario);align-self:center">Sin CV adjunto</span>'}
+        ${p.cv ? `<button class="btn-sm-outline" style="font-size:11px;padding:6px 12px" onclick='verCV(${escHtml(JSON.stringify(String(vacanteId)))},${idx})'>📄 Ver CV</button>
+        <button class="btn-sm-outline" style="font-size:11px;padding:6px 12px" onclick='descargarCV(${escHtml(JSON.stringify(String(vacanteId)))},${idx})'>⬇️ Descargar CV</button>` : '<span style="font-size:11px;color:var(--texto-secundario);align-self:center">Sin CV adjunto</span>'}
         <button class="btn-sm-green" style="font-size:11px;padding:6px 12px" onclick='responderPostulante(${escHtml(JSON.stringify(String(p.id)))},"entrevista",${escHtml(JSON.stringify(String(vacanteId)))})'>📅 Invitar a entrevista</button>
         <button class="btn-sm-outline" style="font-size:11px;padding:6px 12px" onclick='responderPostulante(${escHtml(JSON.stringify(String(p.id)))},"descartar",${escHtml(JSON.stringify(String(vacanteId)))})'>⛔ Descartar</button>
       </div>
@@ -2872,10 +2894,36 @@ function verCV(vacanteId, idx) {
       </div>
       <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:14px">📧 ${escHtml(c.email||'')} ${c.telefono ? '· 📱 ' + escHtml(c.telefono) : ''}</div>
       <div style="white-space:pre-line;font-size:13px;line-height:1.7;background:var(--negro);border:1px solid var(--gris-borde);border-radius:8px;padding:16px;color:var(--texto-primario)">${escHtml(p.cv)}</div>
-      <button class="btn-full" style="margin-top:14px" onclick="navigator.clipboard.writeText(${escHtml(JSON.stringify(p.cv))}).then(()=>showToast('✓ CV copiado'))">📋 Copiar CV</button>
+      <div style="display:flex;gap:10px;margin-top:14px">
+        <button class="btn-full" onclick='descargarCV(${escHtml(JSON.stringify(String(vacanteId)))},${idx})'>⬇️ Descargar CV</button>
+        <button class="btn-sm-outline" style="white-space:nowrap" onclick="navigator.clipboard.writeText(${escHtml(JSON.stringify(p.cv))}).then(()=>showToast('✓ CV copiado'))">📋 Copiar</button>
+      </div>
     </div>`;
   document.body.appendChild(modal);
   modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+}
+
+// Descarga el CV del candidato como archivo de texto
+function descargarCV(vacanteId, idx) {
+  const p = (postulantesCache[vacanteId]||[])[idx];
+  if (!p || !p.cv) return;
+  const c = p.candidato || {};
+  const nombre = (c.nombre || 'Candidato').replace(/[^a-zA-Z0-9áéíóúñ ]/gi,'').trim();
+  const encabezado = 'CURRÍCULUM — ' + (c.nombre || 'Candidato') + '\n' +
+    (c.email ? 'Email: ' + c.email + '\n' : '') +
+    (c.telefono ? 'Teléfono: ' + c.telefono + '\n' : '') +
+    '\n' + '─'.repeat(40) + '\n\n';
+  const contenido = encabezado + p.cv;
+  const blob = new Blob([contenido], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'CV_' + nombre.replace(/\s+/g,'_') + '.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('⬇️ CV descargado');
 }
 
 async function responderPostulante(postId, tipo, vacanteId) {
@@ -3823,9 +3871,13 @@ async function cargarPerfilEmpresa() {
     const r = await apiCall('/api/auth/empresa/perfil');
     const p = r.perfil || {};
     document.getElementById('empNombre').value = p.empresa || '';
+    document.getElementById('empRuc').value = p.empresa_ruc || '';
+    document.getElementById('empTelefono').value = p.empresa_telefono || '';
+    document.getElementById('empCiudad').value = p.empresa_ciudad || '';
     document.getElementById('empSector').value = p.empresa_sector || '';
     document.getElementById('empWeb').value = p.empresa_web || '';
     document.getElementById('empDescripcion').value = p.empresa_descripcion || '';
+    window.__perfilCompleto = !!r.perfilCompleto;
     if (p.empresa_logo) {
       document.getElementById('empLogoPreview').innerHTML = '<img src="' + p.empresa_logo + '" style="width:100%;height:100%;object-fit:cover">';
     }
@@ -3860,10 +3912,21 @@ function subirLogoEmpresa(input) {
 
 async function guardarPerfilEmpresa() {
   const msg = document.getElementById('empPerfilMsg');
+  const nombre = document.getElementById('empNombre').value.trim();
+  const ruc = document.getElementById('empRuc').value.replace(/\D/g, '');
+  const telefono = document.getElementById('empTelefono').value.trim();
+  const ciudad = document.getElementById('empCiudad').value.trim();
+
+  // Validar campos obligatorios
+  if (!nombre) { msg.style.color='var(--rojo)'; msg.textContent='⚠ Escribe el nombre de la empresa'; return; }
+  if (ruc.length !== 10 && ruc.length !== 13) { msg.style.color='var(--rojo)'; msg.textContent='⚠ El RUC debe tener 13 dígitos o la cédula 10 dígitos'; return; }
+  if (!telefono || telefono.length < 7) { msg.style.color='var(--rojo)'; msg.textContent='⚠ Ingresa un teléfono válido'; return; }
+  if (!ciudad) { msg.style.color='var(--rojo)'; msg.textContent='⚠ Ingresa la ciudad'; return; }
+
   msg.style.color = 'var(--texto-secundario)'; msg.textContent = '⟳ Guardando...';
   try {
     const datos = {
-      empresa: document.getElementById('empNombre').value.trim(),
+      empresa: nombre, ruc, telefono, ciudad,
       sector: document.getElementById('empSector').value.trim(),
       web: document.getElementById('empWeb').value.trim(),
       descripcion: document.getElementById('empDescripcion').value.trim()
@@ -3872,7 +3935,8 @@ async function guardarPerfilEmpresa() {
     const r = await apiCall('/api/auth/empresa/perfil', { method:'POST', body: JSON.stringify(datos) });
     msg.style.color = 'var(--verde)'; msg.textContent = '✅ ' + (r.mensaje || 'Guardado');
     logoTemporal = null;
-    showToast('✅ Perfil de empresa actualizado');
+    window.__perfilCompleto = true;
+    showToast('✅ Perfil completo — ya puedes publicar vacantes');
   } catch(e) {
     msg.style.color = 'var(--rojo)'; msg.textContent = '⚠ ' + e.message;
   }
