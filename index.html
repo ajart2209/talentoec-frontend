@@ -5002,7 +5002,7 @@ function portalesDeEmpleo(cargo, empresa, ciudad) {
   const prov = PROV[cs];
   const computrabajo = prov ? `https://ec.computrabajo.com/trabajo-de-${slug}-en-${prov}-en-${cs.replace(/\s+/g,'-')}` : `https://ec.computrabajo.com/trabajo-de-${slug}`;
   return [
-    { nombre:'Multitrabajos', ico:'🟠', url:`https://www.multitrabajos.com/empleos-busqueda-${slug}.html`, color:'#FF6B00' },
+    { nombre:'Multitrabajos', ico:'🟠', url:`https://www.multitrabajos.com/empleos.html?q=${enc}`, color:'#FF6B00' },
     { nombre:'Computrabajo', ico:'🔵', url:computrabajo, color:'#0db0e0' },
     { nombre:'LinkedIn', ico:'💼', url:`https://www.linkedin.com/jobs/search/?keywords=${enc}&location=Ecuador`, color:'#0077b5' },
     { nombre:'Indeed', ico:'💚', url:`https://ec.indeed.com/jobs?q=${enc}&l=${ciudadEnc}`, color:'#2557a7' },
