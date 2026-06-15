@@ -2760,15 +2760,8 @@ async function cerrarVacante(id) {
 
 async function reabrirVacante(id) {
   try {
-    // Reactivar = editar para volver a pendiente (revisión rápida)
-    const r = await apiCall('/api/auth/vacantes/' + id);
-    const v = r.vacante;
-    if (!v) return;
-    await apiCall('/api/auth/vacantes/' + id, { method:'PUT', body: JSON.stringify({
-      cargo: v.cargo, descripcion: v.descripcion, ciudad: v.ciudad,
-      modalidad: v.modalidad, salario: v.salario, email_contacto: v.email_contacto, empresa: v.empresa
-    })});
-    showToast('▶ Vacante reactivada — pasará por revisión rápida');
+    const r = await apiCall('/api/auth/vacantes/' + id + '/reactivar', { method:'POST' });
+    showToast('▶ ' + (r.mensaje || 'Vacante reactivada'));
     cargarMisVacantes();
   } catch(e) { showToast('⚠ ' + e.message, true); }
 }
@@ -2953,11 +2946,21 @@ async function cargarVacantesAdmin(estado) {
         <div class="card-actions">
           ${v.estado !== 'aprobada' ? `<button class="btn-sm-green" onclick='moderarVacante(${escHtml(JSON.stringify(String(v.id)))},"aprobada","${escHtml(v.estado)}")'>✅ Aprobar</button>` : ''}
           ${v.estado !== 'rechazada' ? `<button class="btn-sm-outline" style="border-color:var(--rojo);color:var(--rojo)" onclick='moderarVacante(${escHtml(JSON.stringify(String(v.id)))},"rechazada","${escHtml(v.estado)}")'>❌ Rechazar</button>` : ''}
+          <button class="btn-sm-outline" style="border-color:var(--rojo);color:var(--rojo)" onclick='borrarVacanteAdmin(${escHtml(JSON.stringify(String(v.id)))},${escHtml(JSON.stringify(String(v.cargo||"")))},"${escHtml(v.estado)}")'>🗑️ Borrar</button>
         </div>
       </div>`).join('');
   } catch(e) {
     cont.innerHTML = '<div class="empty-state">⚠ ' + escHtml(e.message) + '</div>';
   }
+}
+
+async function borrarVacanteAdmin(id, cargo, estadoActual) {
+  if (!confirm('¿BORRAR la vacante "' + cargo + '" definitivamente?\n\nEsto la elimina junto con sus postulaciones. No se puede deshacer.')) return;
+  try {
+    await apiCall('/api/auth/vacantes/' + id, { method:'DELETE' });
+    showToast('🗑️ Vacante eliminada');
+    cargarVacantesAdmin(estadoActual || 'pendiente');
+  } catch(e) { showToast('⚠ ' + e.message, true); }
 }
 
 async function moderarVacante(id, estado, estadoActual) {
