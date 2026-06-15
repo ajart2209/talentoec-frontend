@@ -418,6 +418,12 @@ nav{z-index:100}
 .cargo-sug .cs-ico{font-size:15px}
 .cargo-sug .cs-cat{margin-left:auto;font-size:10px;color:var(--texto-secundario)}
 
+/* ---- PANEL DE PORTALES (5 sitios en cada empleo) ---- */
+.portales-panel{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:12px 0 4px;padding-top:12px;border-top:1px dashed var(--gris-borde)}
+@media(max-width:560px){.portales-panel{grid-template-columns:repeat(3,1fr)}}
+.portales-panel a{transition:transform .15s,box-shadow .2s;opacity:.92}
+.portales-panel a:hover{transform:translateY(-2px);opacity:1;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+
 /* ---- VACANTES EXCLUSIVAS ---- */
 .job-exclusiva{border-color:rgba(0,196,140,.5)!important;background:linear-gradient(135deg,rgba(0,196,140,.07),var(--gris-oscuro))}
 .exclusiva-badge{display:inline-block;background:linear-gradient(90deg,var(--verde),var(--verde-dark));color:var(--negro);
@@ -1247,7 +1253,7 @@ function validarBeta() {
           <span style="font-size:22px">🔍</span>
           <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700">Encuentra tu próximo empleo</div>
         </div>
-        <div style="font-size:12.5px;color:var(--texto-secundario);margin-bottom:16px">Buscamos en LinkedIn, Computrabajo, Multitrabajos, Indeed y más — en tiempo real. Cada búsqueda te trae hasta 5 ofertas reales con su link directo para postular.</div>
+        <div style="font-size:12.5px;color:var(--texto-secundario);margin-bottom:16px">Buscamos en LinkedIn, Computrabajo, Multitrabajos, Indeed y más — en tiempo real. Cada búsqueda te trae hasta 8 ofertas reales, cada una con acceso a 5 portales de empleo.</div>
         <div id="cvDetectadoBanner" style="display:none;background:rgba(0,196,140,0.1);border:1px solid rgba(0,196,140,0.3);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--verde)">
           ✦ Búsqueda autocompletada con tu CV guardado — puedes editarla
         </div>
@@ -4044,9 +4050,9 @@ async function buscarEmpleo() {
         'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
       },
       body: JSON.stringify({
-        model:'claude-haiku-4-5-20251001', max_tokens:3500,
+        model:'claude-haiku-4-5-20251001', max_tokens:5000,
         tools:[{type:'web_search_20250305',name:'web_search',max_uses:3}],
-        messages:[{role:'user',content:`Busca ofertas de trabajo REALES y ACTUALES en Ecuador para: "${query}". Ciudad: ${ciudad}. Modalidad: ${modalidad}.\n\nINSTRUCCIONES SOBRE SALARIOS:\n- Solo incluye salario si está EXPLÍCITAMENTE publicado en la oferta real\n- Si NO hay salario, usa "A convenir"\n- NUNCA inventes salarios. En Ecuador típicos: $482 (salario básico 2026) hasta $1.500\n\nBusca empleos REALES y ACTUALES en Ecuador.\n\nUsa web search para buscar en:\n- Multitrabajos.com, Computrabajo Ecuador, LinkedIn Jobs, Indeed Ecuador, Bumeran, Porfinempleo\n- Grupos de Facebook: Empleos Quito, Empleos Guayaquil, Trabajos Ecuador\n\nDevuelve EXACTAMENTE 5 empleos relevantes.\n\nPara el campo "url": incluye SOLO si tienes URL específica al detalle de la oferta. Si solo tienes URL al portal general, deja "url" vacío como "".\n\nPara "email": solo si la oferta lo publica explícitamente, si no, "" vacío.\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa","cargo":"título puesto","ciudad":"ciudad","salario":"rango USD si está","fuente":"LinkedIn/Multitrabajos/etc","match":85,"email":"","descripcion":"descripción breve","url":"","portales":["multitrabajos","computrabajo","linkedin","indeed","facebook"]}]}\n\nIMPORTANTE: Después de buscar, tu ÚLTIMA respuesta debe ser ÚNICAMENTE el objeto JSON con los empleos, empezando con { y terminando con }. No agregues texto explicativo antes ni después del JSON. Devuelve entre 3 y 5 empleos reales.`}]
+        messages:[{role:'user',content:`Busca ofertas de trabajo REALES y ACTUALES en Ecuador para: "${query}". Ciudad: ${ciudad}. Modalidad: ${modalidad}.\n\nINSTRUCCIONES SOBRE SALARIOS:\n- Solo incluye salario si está EXPLÍCITAMENTE publicado en la oferta real\n- Si NO hay salario, usa "A convenir"\n- NUNCA inventes salarios. En Ecuador típicos: $482 (salario básico 2026) hasta $1.500\n\nBusca empleos REALES y ACTUALES en Ecuador.\n\nUsa web search para buscar en:\n- Multitrabajos.com, Computrabajo Ecuador, LinkedIn Jobs, Indeed Ecuador, Bumeran, Porfinempleo\n- Grupos de Facebook: Empleos Quito, Empleos Guayaquil, Trabajos Ecuador\n\nDevuelve 8 empleos relevantes (mínimo 6 si no hay suficientes).\n\nPara el campo "url": incluye SOLO si tienes URL específica al detalle de la oferta. Si solo tienes URL al portal general, deja "url" vacío como "".\n\nPara "email": solo si la oferta lo publica explícitamente, si no, "" vacío.\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa","cargo":"título puesto","ciudad":"ciudad","salario":"rango USD si está","fuente":"LinkedIn/Multitrabajos/etc","match":85,"email":"","descripcion":"descripción breve","url":"","portales":["multitrabajos","computrabajo","linkedin","indeed","facebook"]}]}\n\nIMPORTANTE: Después de buscar, tu ÚLTIMA respuesta debe ser ÚNICAMENTE el objeto JSON con los empleos, empezando con { y terminando con }. No agregues texto explicativo antes ni después del JSON. Devuelve entre 6 y 8 empleos reales.`}]
       })
     });
     const data = await res.json();
@@ -4176,11 +4182,16 @@ function renderJobCards(jobs) {
       </div>
       <div class="tags-row"><span class="tag">${escHtml(j.fuente)}</span><span class="tag">${escHtml(j.salario)}</span><span class="tag">${escHtml(j.ciudad)}</span></div>
       <div style="font-size:12px;color:var(--texto-secundario)">${escHtml(j.descripcion)}</div>
+      ${exclusiva ? '' : `
+      <div class="portales-panel">
+        ${portalesDeEmpleo(j.cargo, j.empresa, j.ciudad).map(p => `<a href="${p.url}" target="_blank" onclick='marcarVisto(${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))})' style="background:${p.color};color:#fff;padding:9px 8px;border-radius:8px;text-decoration:none;font-weight:600;text-align:center;font-size:11.5px;display:flex;align-items:center;justify-content:center;gap:4px">${p.ico} ${p.nombre}</a>`).join('')}
+      </div>`}
       <div class="card-actions">
         ${exclusiva
           ? `<button class="btn-sm-green" onclick='postularVacante(${escHtml(JSON.stringify(String(j.vacante_id)))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))})'>⭐ Postular ahora (1 clic)</button>`
-          : tieneUrl ? `<button class="btn-sm-green" onclick='abrirOferta(${escHtml(JSON.stringify(urlOk))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))},this)'>🔗 Postular en oferta</button>` : `<button class="btn-sm-green" onclick='buscarOfertaReal(${escHtml(JSON.stringify(String(j.cargo||'')))}, ${escHtml(JSON.stringify(String(j.empresa||'')))}, ${escHtml(JSON.stringify(String(j.ciudad||'')))}, ${escHtml(JSON.stringify(j.portales||[]))})'>🔍 Buscar esta oferta</button>`}
-        ${!exclusiva && j.email && j.email!=='' && j.email!=='undefined' ? `<button class="btn-sm-outline" onclick='abrirEmailModal(${escHtml(JSON.stringify(String(j.email)))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))},${escHtml(JSON.stringify(currentUser?.nombre||'Candidato'))},true)'>✉ Correo automático</button>` : ''}
+          : `${tieneUrl ? `<button class="btn-sm-green" onclick='abrirOferta(${escHtml(JSON.stringify(urlOk))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))},this)'>🔗 Postular directo</button>` : ''}
+             <button class="btn-sm-green" onclick='confirmarPostulacion(${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))},this)'>✅ Ya postulé</button>`}
+        ${!exclusiva && j.email && j.email!=='' && j.email!=='undefined' ? `<button class="btn-sm-outline" onclick='abrirEmailModal(${escHtml(JSON.stringify(String(j.email)))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))},${escHtml(JSON.stringify(currentUser?.nombre||'Candidato'))},true)'>✉ Correo</button>` : ''}
       </div>
     </div>`;}).join('');
 }
@@ -4205,6 +4216,12 @@ function abrirOferta(url, empresa, cargo, btn) {
 }
 function reabrirOferta(url, btn) { window.open(url, '_blank'); }
 
+// Al hacer clic en un portal: marca el empleo como visto (sin borrarlo)
+function marcarVisto(empresa, cargo) {
+  const key = (empresa||'')+'|'+(cargo||'');
+  if (!empleosVistos.includes(key)) empleosVistos.push(key);
+}
+
 // Confirmar postulación: AHORA sí se registra y desaparece en futuras búsquedas
 async function confirmarPostulacion(empresa, cargo, btn) {
   correosEnviados.push({ to:'', subject:cargo, empresa:empresa, cargo:cargo, fecha:new Date().toLocaleString('es-EC'), estado:'Postulado' });
@@ -4222,6 +4239,36 @@ async function confirmarPostulacion(empresa, cargo, btn) {
     }, 50);
   }
   showToast('✅ ¡Postulación registrada! Mucha suerte 🍀');
+}
+
+// Genera los enlaces a los 5 portales de empleo para un cargo+ciudad+empresa
+function portalesDeEmpleo(cargo, empresa, ciudad) {
+  const limpio = (cargo||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\s]/g,'').trim();
+  const slug = limpio.replace(/\s+/g,'-');
+  const enc = encodeURIComponent(limpio);
+  const ciudadEnc = encodeURIComponent(ciudad||'Ecuador');
+  const cargoEmpresa = encodeURIComponent(limpio + ' ' + (empresa||'') + ' Ecuador');
+  const PROV = {'quito':'pichincha','guayaquil':'guayas','cuenca':'azuay','ambato':'tungurahua','machala':'el-oro','manta':'manabi','portoviejo':'manabi','loja':'loja','riobamba':'chimborazo','ibarra':'imbabura','esmeraldas':'esmeraldas','santo domingo':'santo-domingo-de-los-tsachilas','duran':'guayas','quevedo':'los-rios','latacunga':'cotopaxi'};
+  const cs = (ciudad||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+  const prov = PROV[cs];
+  const computrabajo = prov ? `https://ec.computrabajo.com/trabajo-de-${slug}-en-${prov}-en-${cs.replace(/\s+/g,'-')}` : `https://ec.computrabajo.com/trabajo-de-${slug}`;
+  return [
+    { nombre:'Multitrabajos', ico:'🟠', url:`https://www.multitrabajos.com/empleos-busqueda-${slug}.html`, color:'#FF6B00' },
+    { nombre:'Computrabajo', ico:'🔵', url:computrabajo, color:'#0db0e0' },
+    { nombre:'LinkedIn', ico:'💼', url:`https://www.linkedin.com/jobs/search/?keywords=${enc}&location=Ecuador`, color:'#0077b5' },
+    { nombre:'Indeed', ico:'💚', url:`https://ec.indeed.com/jobs?q=${enc}&l=${ciudadEnc}`, color:'#2557a7' },
+    { nombre:'Google', ico:'🔍', url:`https://www.google.com/search?q=${cargoEmpresa}&ibp=htl%3Bjobs`, color:'#4285f4' }
+  ];
+}
+
+// Despliega/oculta los portales dentro de una tarjeta
+function togglePortales(btn) {
+  const card = btn.closest('.job-card');
+  const panel = card.querySelector('.portales-panel');
+  if (!panel) return;
+  const abierto = panel.style.display === 'grid';
+  panel.style.display = abierto ? 'none' : 'grid';
+  btn.textContent = abierto ? '🌐 Ver en 5 portales' : '🔼 Ocultar portales';
 }
 
 // Buscar oferta - 4 portales con formatos correctos
