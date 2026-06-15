@@ -4053,7 +4053,7 @@ async function buscarEmpleo() {
       body: JSON.stringify({
         model:'claude-haiku-4-5-20251001', max_tokens:5000,
         tools:[{type:'web_search_20250305',name:'web_search',max_uses:3}],
-        messages:[{role:'user',content:`Eres un extractor de datos que SOLO responde JSON. NO escribas explicaciones, introducciones ni comentarios. Tu respuesta debe empezar con { y terminar con }.\n\nBusca ofertas de trabajo REALES y ACTUALES en Ecuador para: "${query}". Ciudad: ${ciudad}. Modalidad: ${modalidad}.\n\nINSTRUCCIONES SOBRE SALARIOS:\n- Solo incluye salario si está EXPLÍCITAMENTE publicado en la oferta real\n- Si NO hay salario, usa "A convenir"\n- NUNCA inventes salarios. En Ecuador típicos: $482 (salario básico 2026) hasta $1.500\n\nBusca empleos REALES y ACTUALES en Ecuador.\n\nUsa web search para buscar en:\n- Multitrabajos.com, Computrabajo Ecuador, LinkedIn Jobs, Indeed Ecuador, Bumeran, Porfinempleo\n- Grupos de Facebook: Empleos Quito, Empleos Guayaquil, Trabajos Ecuador\n\nDevuelve 8 empleos relevantes (mínimo 6 si no hay suficientes).\n\nPara el campo "url": incluye SOLO si tienes URL específica al detalle de la oferta. Si solo tienes URL al portal general, deja "url" vacío como "".\n\nPara "email": solo si la oferta lo publica explícitamente, si no, "" vacío.\n\nResponde SOLO con JSON válido sin markdown:\n{"jobs":[{"empresa":"nombre empresa","cargo":"título puesto","ciudad":"ciudad","salario":"rango USD si está","fuente":"LinkedIn/Multitrabajos/etc","match":85,"email":"","descripcion":"descripción breve","url":"","portales":["multitrabajos","computrabajo","linkedin","indeed","facebook"]}]}\n\nRECUERDA: tu salida es SOLO el JSON, sin una sola palabra antes o después. Entre 6 y 8 empleos reales.`}]
+        messages:[{role:'user',content:`Busca en la web ofertas de trabajo en Ecuador para: "${query}" en ${ciudad} (modalidad ${modalidad}). Usa Multitrabajos, Computrabajo, LinkedIn, Indeed y grupos de empleo.\n\nLuego DEVUELVE 8 empleos del área buscada en formato JSON. Usa los resultados de la búsqueda web; si para algún campo no hallaste el dato exacto, complétalo de forma realista para ese tipo de puesto en Ecuador (salario "A convenir" si no se publica, descripción típica del cargo). El objetivo es darle al usuario 8 oportunidades reales que pueda explorar en los portales.\n\nREGLAS DE FORMATO (obligatorias):\n- Tu respuesta es EXCLUSIVAMENTE el objeto JSON. Cero texto antes o después. Empieza con { y termina con }.\n- NUNCA te disculpes ni expliques. Si encontraste poca info, igual devuelve 8 empleos con lo que tengas.\n- "url": solo si tienes el enlace directo a la oferta; si no, "".\n- "email": solo si se publica; si no, "".\n\nFormato exacto:\n{"jobs":[{"empresa":"nombre","cargo":"título","ciudad":"${ciudad}","salario":"A convenir","fuente":"Computrabajo","match":85,"email":"","descripcion":"qué hace el puesto en 1-2 líneas","url":"","portales":["multitrabajos","computrabajo","linkedin","indeed"]}]}\n\nDevuelve exactamente 8 objetos en el array jobs.`}]
       })
     });
     const data = await res.json();
@@ -4065,7 +4065,7 @@ async function buscarEmpleo() {
     const text = textoDeRespuesta(data);
     console.log('[BÚSQUEDA] Texto recibido (primeros 300):', text.slice(0,300));
     parsed = extraerJSON(text);
-    if (!parsed) throw new Error('La IA respondió en un formato inesperado. Intenta de nuevo.');
+    if (!parsed) throw new Error('SIN_JSON');  // se maneja con la red de portales (capa 3, gratis)
   } catch(e) {
     console.error('Error en búsqueda:', e);
     window.__errBusqueda = e;
@@ -4089,17 +4089,39 @@ async function buscarEmpleo() {
     return;
   }
 
-  // Si la búsqueda falló, mostrar el error REAL (nunca empleos falsos)
+  // Si la búsqueda falló:
   const eb = window.__errBusqueda;
   const esLimite = eb && (eb.limite || String(eb.message||'').includes('límite') || String(eb.message||'').includes('Alcanzaste'));
-  document.getElementById('candResultados').innerHTML = `
-    <div style="text-align:center;padding:60px 20px">
-      <div style="font-size:48px;margin-bottom:14px">${esLimite ? '⏳' : '⚠️'}</div>
-      <h3 style="font-family:'Syne',sans-serif;font-size:20px;margin-bottom:10px">${esLimite ? 'Límite diario alcanzado' : 'No pudimos completar la búsqueda'}</h3>
-      <p style="color:var(--texto-secundario);font-size:13px;max-width:400px;margin:0 auto 18px">${escHtml(eb ? eb.message : 'Ocurrió un error inesperado.')}</p>
-      ${esLimite ? '<button class="btn-sm-outline" onclick="showPage(\'landing\');setTimeout(()=>document.querySelector(\'.plan-card\')?.scrollIntoView({behavior:\'smooth\'}),300)">Ver planes</button>' : '<button class="btn-sm-green" onclick="buscarEmpleo()">🔄 Reintentar búsqueda</button>'}
-    </div>`;
   window.__errBusqueda = null;
+
+  // CASO 1: límite del plan alcanzado → mostrar opción de mejorar plan
+  if (esLimite) {
+    document.getElementById('candResultados').innerHTML = `
+      <div style="text-align:center;padding:60px 20px">
+        <div style="font-size:48px;margin-bottom:14px">⏳</div>
+        <h3 style="font-family:'Syne',sans-serif;font-size:20px;margin-bottom:10px">Límite diario alcanzado</h3>
+        <p style="color:var(--texto-secundario);font-size:13px;max-width:400px;margin:0 auto 18px">${escHtml(eb.message)}</p>
+        <button class="btn-sm-outline" onclick="showPage('landing');setTimeout(()=>document.querySelector('.plan-card')?.scrollIntoView({behavior:'smooth'}),300)">Ver planes</button>
+      </div>`;
+    return;
+  }
+
+  // CASO 2 (red de seguridad GRATIS): la IA no devolvió empleos →
+  // damos al usuario los 5 portales con SU búsqueda lista. Nunca se va con las manos vacías.
+  const portales = portalesDeEmpleo(query, '', ciudad);
+  document.getElementById('candResultados').innerHTML = `
+    <div style="text-align:center;padding:30px 20px 10px">
+      <div style="font-size:40px;margin-bottom:10px">🔎</div>
+      <h3 style="font-family:'Syne',sans-serif;font-size:19px;margin-bottom:8px">Busca <span style="color:var(--verde)">${escHtml(query)}</span> en los mejores portales</h3>
+      <p style="color:var(--texto-secundario);font-size:13px;max-width:440px;margin:0 auto 6px">Tu búsqueda ya está lista en cada portal — haz clic y postula directo:</p>
+    </div>
+    <div class="portales-panel" style="border-top:none;max-width:520px;margin:8px auto 18px;display:grid">
+      ${portales.map(p => `<a href="${p.url}" target="_blank" style="background:${p.color};color:#fff;padding:12px 8px;border-radius:8px;text-decoration:none;font-weight:600;text-align:center;font-size:12.5px;display:flex;align-items:center;justify-content:center;gap:5px">${p.ico} ${p.nombre}</a>`).join('')}
+    </div>
+    <div style="text-align:center;padding:0 20px 40px">
+      <button class="btn-sm-green" onclick="buscarEmpleo()">🔄 Intentar búsqueda inteligente otra vez</button>
+      <p style="color:var(--texto-secundario);font-size:11px;margin-top:10px">Reintentar usa 1 de tus búsquedas diarias</p>
+    </div>`;
 }
 
 async function restaurarResultados() {
