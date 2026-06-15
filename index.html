@@ -3229,42 +3229,67 @@ function setLoggedInUI() {
     if (cvE && !cvE.value) cvE.value = currentUser.email || '';
   }
 
-  // Muestra las áreas del CV como botones; al tocar uno, busca esa área
-function mostrarChipsAreas() {
-  const banner = document.getElementById('cvDetectadoBanner');
-  const cont = document.getElementById('areasChips');
-  if (!banner || !cont || !cvData || !cvData.areasDetectadas || !cvData.areasDetectadas.length) {
-    if (banner) banner.style.display = 'none';
-    return;
+  // Detecta áreas/aptitudes del texto del CV (sin IA, gratis)
+function detectarAreasLocal(texto) {
+  if (!texto) return [];
+  const t = texto.toLowerCase();
+  const mapa = {
+    'Desarrollo de Software': ['programador','desarrollador','developer','software','react','javascript','python','java','node','frontend','backend','fullstack','full stack'],
+    'Bases de Datos': ['sql','postgresql','mysql','mongodb','base de datos','bases de datos','database'],
+    'Ingeniería de Sistemas': ['sistemas','informática','ingeniería','ingeniero','computación'],
+    'Marketing y Ventas': ['marketing','ventas','vendedor','comercial','publicidad','redes sociales','community manager'],
+    'Contabilidad y Finanzas': ['contador','contabilidad','contable','finanzas','auditoría','niif','tributario'],
+    'Administración': ['administración','administrador','gerente','gestión','recursos humanos','rrhh','talento humano'],
+    'Diseño Gráfico': ['diseñador','diseño','gráfico','photoshop','illustrator','figma','ux','ui'],
+    'Atención al Cliente': ['atención al cliente','servicio al cliente','call center','soporte','customer'],
+    'Salud': ['enfermero','enfermera','médico','medicina','salud','clínica','hospital','auxiliar de enfermería'],
+    'Educación': ['docente','profesor','maestro','educación','pedagogía','enseñanza'],
+    'Logística': ['logística','bodega','inventario','almacén','supply chain','transporte'],
+    'Construcción': ['construcción','obra','arquitecto','civil','albañil','maestro mayor'],
+    'Ingeniería de APIs': ['api','rest','apis','microservicios','endpoint'],
+    'Automatización': ['automatización','scripts','devops','ci/cd','docker'],
+    'Fintech / Pagos': ['fintech','pagos','payphone','paypal','pasarela','facturación electrónica']
+  };
+  const encontradas = [];
+  for (const [area, palabras] of Object.entries(mapa)) {
+    if (palabras.some(p => t.includes(p))) encontradas.push(area);
   }
-  banner.style.display = 'block';
-  cont.innerHTML = cvData.areasDetectadas.slice(0, 8).map(area =>
-    `<button onclick='buscarPorArea(${escHtml(JSON.stringify(String(area)))})' style="background:rgba(0,196,140,0.12);border:1px solid rgba(0,196,140,0.4);color:var(--verde);padding:6px 12px;border-radius:16px;font-size:12px;cursor:pointer;font-weight:600;transition:all .15s">${escHtml(area)}</button>`
-  ).join('');
+  return encontradas;
 }
 
-// Al tocar un área: la pone en el buscador y busca de inmediato
-function buscarPorArea(area) {
+// Rellena el buscador con las áreas del CV del candidato (todas, separadas por coma)
+function mostrarChipsAreas() {
+  const banner = document.getElementById('cvDetectadoBanner');
   const input = document.getElementById('busquedaQuery');
-  if (input) input.value = area;
-  buscarEmpleo();
+  if (!cvData) { if (banner) banner.style.display = 'none'; return; }
+
+  // Usar las áreas de la IA, o detectarlas del texto si no hay
+  let areas = (cvData.areasDetectadas && cvData.areasDetectadas.length) ? cvData.areasDetectadas : detectarAreasLocal(cvData.texto);
+  if (areas.length && (!cvData.areasDetectadas || !cvData.areasDetectadas.length)) cvData.areasDetectadas = areas;
+
+  if (!areas.length) { if (banner) banner.style.display = 'none'; return; }
+
+  // Rellenar el buscador con TODAS las áreas si está vacío
+  if (input && !input.value.trim()) {
+    input.value = areas.join(', ');
+  }
+  if (banner) banner.style.display = 'block';
 }
 
 // Autocompletar búsqueda con áreas del CV inmediatamente
   setTimeout(() => {
     if (cvData && cvData.areasDetectadas && cvData.areasDetectadas.length > 0) {
       const busquedaInput = document.getElementById('busquedaQuery');
-      // Rellena con la PRIMERA área (la más relevante) si está vacío
+      // Rellena con TODAS las áreas del CV si está vacío
       if (busquedaInput && !busquedaInput.value.trim()) {
-        busquedaInput.value = cvData.areasDetectadas[0];
-        console.log('✓ Búsqueda autocompletada con área principal:', cvData.areasDetectadas[0]);
+        busquedaInput.value = cvData.areasDetectadas.join(', ');
+        console.log('✓ Búsqueda autocompletada con áreas:', cvData.areasDetectadas);
       }
-      // Mostrar TODAS las áreas como chips clickeables
       mostrarChipsAreas();
 
       const frioInput = document.getElementById('frioArea');
       if (frioInput && !frioInput.value.trim()) {
-        frioInput.value = cvData.areasDetectadas[0];
+        frioInput.value = cvData.areasDetectadas.join(', ');
       }
 
       // Ciudad
@@ -3636,8 +3661,8 @@ function candTab(tab) {
       const queryInput = tab === 'busqueda' ? 'busquedaQuery' : 'frioArea';
       const input = document.getElementById(queryInput);
       if (input && !input.value.trim()) {
-        // Usar la PRIMERA área (más relevante); las demás están en los chips
-        const areaSugerida = cvData.areasDetectadas[0];
+        // Rellenar con TODAS las áreas del CV separadas por coma
+        const areaSugerida = cvData.areasDetectadas.join(', ');
         input.value = areaSugerida;
         input.setAttribute('value', areaSugerida);
 
