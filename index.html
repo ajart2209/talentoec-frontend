@@ -3357,6 +3357,37 @@ function actualizarPlanLockFrio() {
   }
 }
 
+// Convierte Markdown básico (de la IA) en HTML con formato real
+function formatearMarkdown(texto) {
+  if (!texto) return '';
+  // Escapar HTML primero (seguridad)
+  let html = String(texto)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  // Encabezados ## y ###
+  html = html.replace(/^###\s+(.+)$/gm, '<div style="font-weight:700;font-size:14px;margin:14px 0 6px;color:var(--verde)">$1</div>');
+  html = html.replace(/^##\s+(.+)$/gm, '<div style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:16px;margin:18px 0 8px;color:var(--texto-primario)">$1</div>');
+  html = html.replace(/^#\s+(.+)$/gm, '<div style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:18px;margin:10px 0 12px;color:var(--texto-primario)">$1</div>');
+  // Negrita **texto**
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  // Viñetas que empiezan con - o ◆ o •
+  html = html.replace(/^[\s]*[-–]\s*[◆•·]?\s*(.+)$/gm, '<div style="margin:4px 0;padding-left:14px">• $1</div>');
+  html = html.replace(/^[\s]*[◆•]\s+(.+)$/gm, '<div style="margin:4px 0;padding-left:14px">• $1</div>');
+  // Saltos de línea dobles -> espacio; simples -> <br>
+  html = html.replace(/\n{2,}/g, '<div style="height:8px"></div>');
+  html = html.replace(/\n/g, '<br>');
+  return html;
+}
+
+// Limpia el formato Markdown de un área (quita **, comillas, guiones, espacios extra)
+function limpiarArea(a) {
+  return String(a || '')
+    .replace(/\*+/g, '')        // quitar asteriscos **
+    .replace(/["'`]/g, '')      // quitar comillas
+    .replace(/^[-•·\s]+/, '')    // quitar guiones/viñetas al inicio
+    .replace(/\s+/g, ' ')        // espacios múltiples -> uno
+    .trim();
+}
+
 // Detecta áreas/aptitudes del texto del CV (sin IA, gratis)
 function detectarAreasLocal(texto) {
   if (!texto) return [];
@@ -3391,7 +3422,9 @@ function mostrarChipsAreas() {
   const input = document.getElementById('busquedaQuery');
   if (!cvData) { if (banner) banner.style.display = 'none'; return; }
   let areas = (cvData.areasDetectadas && cvData.areasDetectadas.length) ? cvData.areasDetectadas : detectarAreasLocal(cvData.texto);
-  if (areas.length && (!cvData.areasDetectadas || !cvData.areasDetectadas.length)) cvData.areasDetectadas = areas;
+  // Limpiar formato Markdown (** comillas) por si vienen de análisis viejos
+  areas = areas.map(function(a){ return (typeof limpiarArea==='function') ? limpiarArea(a) : a; }).filter(Boolean);
+  if (areas.length) cvData.areasDetectadas = areas;
   if (!areas.length) { if (banner) banner.style.display = 'none'; return; }
   if (input && !input.value.trim()) { input.value = areas.join(', '); }
   if (banner) banner.style.display = 'block';
@@ -3788,6 +3821,19 @@ function candTab(tab) {
   ['cv','busqueda','resultados','frio'].forEach(t => {
     document.getElementById('cand-tab-'+t).style.display = t===tab?'block':'none';
   });
+  // Al entrar al tab CV: vigilar cambios y reflejar si ya está analizado
+  if (tab === 'cv') {
+    setTimeout(() => {
+      if (typeof vigilarCambiosCV === 'function') vigilarCambiosCV();
+      // Si ya hay un análisis guardado, desactivar el botón
+      const yaAnalizado = (cvData && (cvData.cvMejorado || (cvData.areasDetectadas && cvData.areasDetectadas.length) || cvData.cartaPresentacion)) ||
+                          (document.getElementById('analysisContent') && document.getElementById('analysisContent').innerHTML.trim().length > 50);
+      if (yaAnalizado && cvData && cvData.texto) {
+        window.__cvTextoAnalizado = cvData.texto;
+        if (typeof marcarBotonAnalizar === 'function') marcarBotonAnalizar(true);
+      }
+    }, 150);
+  }
   // Restaurar última búsqueda guardada si entra a Resultados y está vacío
   if (tab === 'resultados') restaurarResultados();
   document.querySelectorAll('#page-candidato .tab-btn').forEach((b,i) => {
@@ -4240,6 +4286,59 @@ function mostrarCVGuardado() {
     }
   }
 }
+// Activa/desactiva el botón "Guardar y analizar" según si ya se analizó este CV
+function marcarBotonAnalizar(yaAnalizado) {
+  const btn = document.querySelector('button[onclick="guardarYAnalizar()"]');
+  if (!btn) return;
+  if (yaAnalizado) {
+    btn.textContent = '✓ CV analizado y guardado';
+    btn.style.opacity = '0.6';
+    btn.style.pointerEvents = 'none';
+    btn.disabled = true;
+  } else {
+    btn.textContent = 'Guardar y analizar →';
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'auto';
+    btn.disabled = false;
+  }
+}
+
+// Si el candidato edita el texto del CV, reactivar el botón para re-analizar
+function vigilarCambiosCV() {
+  const ta = document.getElementById('cvText');
+  if (!ta || ta.__vigilado) return;
+  ta.__vigilado = true;
+  ta.addEventListener('input', () => {
+    // Si el texto cambió respecto al analizado, reactivar el botón
+    if (window.__cvTextoAnalizado && ta.value.trim() !== window.__cvTextoAnalizado) {
+      marcarBotonAnalizar(false);
+    }
+  });
+}
+
+// ── Límite de análisis de CV: 3 por mes (se reinicia cada mes) ──
+const LIMITE_ANALISIS_MES = 3;
+function mesActual() {
+  const d = new Date();
+  return d.getFullYear() + '-' + (d.getMonth()+1);  // ej: "2026-6"
+}
+function analisisUsadosEsteMes() {
+  const userKey = (currentUser && currentUser.email) || 'anon';
+  const guardado = localStorage.getItem('analisis_cv_' + userKey);
+  if (!guardado) return 0;
+  try {
+    const obj = JSON.parse(guardado);
+    if (obj.mes !== mesActual()) return 0;  // mes distinto -> reiniciado
+    return obj.count || 0;
+  } catch(e) { return 0; }
+}
+function registrarAnalisisCV() {
+  const userKey = (currentUser && currentUser.email) || 'anon';
+  const usados = analisisUsadosEsteMes() + 1;
+  localStorage.setItem('analisis_cv_' + userKey, JSON.stringify({ mes: mesActual(), count: usados }));
+  return usados;
+}
+
 async function guardarYAnalizar() {
   const texto = document.getElementById('cvText').value.trim();
   const nombre = document.getElementById('cvNombre').value.trim();
@@ -4254,6 +4353,12 @@ async function guardarYAnalizar() {
     showToast('⚠ Ingresa tu teléfono / WhatsApp para que las empresas te contacten', true);
     const campoTel = document.getElementById('cvTelefono');
     if (campoTel) { campoTel.focus(); campoTel.style.borderColor = 'var(--rojo)'; }
+    return;
+  }
+  // Límite de 3 análisis por mes
+  const usados = analisisUsadosEsteMes();
+  if (usados >= LIMITE_ANALISIS_MES) {
+    showToast('⚠ Llegaste al límite de ' + LIMITE_ANALISIS_MES + ' análisis de CV este mes. Tu CV guardado sigue activo. El límite se reinicia el próximo mes.', true);
     return;
   }
   cvData = { texto, nombre, email, telefono, ciudad, area, fecha: new Date().toLocaleDateString('es-EC') };
@@ -4291,9 +4396,14 @@ ${texto}`}]
     const data = await res.json();
     analysis = data.content?.[0]?.text || '';
 
-    // Extraer áreas detectadas
+    // Extraer áreas detectadas y limpiar formato Markdown (** , comillas, /, etc.)
     const areasMatch = analysis.match(/ÁREAS PROFESIONALES[^\n]*\n([^\n]+)/i);
-    if (areasMatch) { areasDetectadas = areasMatch[1].split(',').map(function(a){return a.trim();}).filter(Boolean); }
+    if (areasMatch) {
+      areasDetectadas = areasMatch[1]
+        .split(/[,\/]/)                          // separar por coma O barra /
+        .map(function(a){ return limpiarArea(a); })
+        .filter(Boolean);
+    }
   } catch(e) {}
 
   // Detectar áreas básicas del CV si no se detectaron por TalentoEC
@@ -4384,8 +4494,19 @@ ${area}, Ecuador, ${ciudad}, profesional, experiencia, tiempo completo, empresas
   }
   cvData.cartaPresentacion = carta;
 
-  document.getElementById('analysisContent').textContent = analysis;
+  document.getElementById('analysisContent').innerHTML = formatearMarkdown(analysis);
   document.getElementById('analysisStatus').textContent = '✓ Análisis completado · Carta generada';
+  // Recordar el texto que se analizó y desactivar el botón (evita re-analizar igual)
+  window.__cvTextoAnalizado = texto;
+  marcarBotonAnalizar(true);
+  // Registrar el análisis usado y avisar cuántos quedan
+  const usadosAhora = registrarAnalisisCV();
+  const restantes = LIMITE_ANALISIS_MES - usadosAhora;
+  if (restantes > 0) {
+    setTimeout(() => showToast('✓ Análisis ' + usadosAhora + ' de ' + LIMITE_ANALISIS_MES + ' este mes · Te quedan ' + restantes), 1200);
+  } else {
+    setTimeout(() => showToast('✓ Usaste tus ' + LIMITE_ANALISIS_MES + ' análisis del mes. Se reinician el próximo mes.'), 1200);
+  }
   // removed: mejorarCVBtn hidden permanently
 
   // Mostrar chips de áreas detectadas
