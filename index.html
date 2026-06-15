@@ -1454,19 +1454,18 @@ function validarBeta() {
 
     <div class="tab-row">
       <button class="tab-btn active" onclick="empTab('vacantes')">📢 Mis vacantes</button>
-      <button class="tab-btn" onclick="empTab('buscar')">Buscar candidatos</button>
-      <button class="tab-btn" onclick="empTab('guardados')">Guardados</button>
-      <button class="tab-btn" onclick="empTab('correos')">Correos enviados</button>
+      <button class="tab-btn" onclick="empTab('metricas')">📊 Métricas</button>
+      <button class="tab-btn" onclick="empTab('empresa')">🏢 Mi empresa</button>
     </div>
 
     <!-- TAB: MIS VACANTES (publicación GRATIS) -->
     <div id="emp-tab-vacantes">
       <div style="background:linear-gradient(135deg,rgba(0,196,140,0.08),rgba(0,196,140,0.02));border:1px solid rgba(0,196,140,0.25);border-radius:14px;padding:18px 20px;margin-bottom:18px">
-        <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px">Publica tu vacante <span style="color:var(--verde)">GRATIS</span></div>
+        <div id="vacFormTitulo" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px">Publica tu vacante <span style="color:var(--verde)">GRATIS</span></div>
         <div style="font-size:12px;color:var(--texto-secundario)">Tu oferta aparecerá destacada en las búsquedas de miles de candidatos. Pasa por una revisión rápida (menos de 24h) antes de publicarse.</div>
       </div>
 
-      <div class="vform" style="margin-bottom:24px">
+      <div class="vform" style="margin-bottom:24px" id="vacFormBox">
         <!-- COLUMNA IZQUIERDA: formulario -->
         <div class="section-box">
           <div class="vform-grid">
@@ -1529,7 +1528,10 @@ function validarBeta() {
               <div class="vform-counter" id="vacCounter">0 / 2000 caracteres · mínimo 20</div>
             </div>
           </div>
-          <button class="btn-full" style="margin-top:16px" onclick="publicarVacante()">📢 Publicar vacante gratis</button>
+          <div style="display:flex;gap:10px;margin-top:16px">
+            <button class="btn-full" id="vacSubmitBtn" onclick="publicarVacante()">📢 Publicar vacante gratis</button>
+            <button class="btn-sm-outline" id="vacCancelBtn" style="display:none;white-space:nowrap" onclick="cancelarEdicionVacante()">✕ Cancelar</button>
+          </div>
           <div id="vacMsg" style="font-size:12px;margin-top:10px;text-align:center"></div>
         </div>
 
@@ -1537,7 +1539,7 @@ function validarBeta() {
         <div class="vform-preview">
           <div class="vform-preview-title">👁 ASÍ LA VERÁN LOS CANDIDATOS</div>
           <div class="job-card job-exclusiva" id="vacPreviewCard">
-            <div class="exclusiva-badge">⭐ EXCLUSIVO TALENTOEC · Postulación directa</div>
+            <div class="exclusiva-badge">⭐ EXCLUSIVO TALENTOEC · Envía tu CV directo</div>
             <div class="job-card-top">
               <div>
                 <div class="job-title" id="pvCargo">Tu cargo aquí</div>
@@ -1552,7 +1554,7 @@ function validarBeta() {
             </div>
             <div style="font-size:12px;color:var(--texto-secundario);white-space:pre-line;max-height:180px;overflow:hidden" id="pvDesc">La descripción de tu vacante aparecerá aquí mientras escribes...</div>
             <div class="card-actions">
-              <button class="btn-sm-green" style="pointer-events:none">⭐ Postular ahora (1 clic)</button>
+              <button class="btn-sm-green" style="pointer-events:none">📄 Enviar mi CV (1 clic)</button>
             </div>
           </div>
           <div class="vform-tips">
@@ -1567,6 +1569,50 @@ function validarBeta() {
 
       <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:12px">Tus vacantes publicadas</div>
       <div id="misVacantesList"><div class="empty-state">Aún no has publicado vacantes</div></div>
+    </div>
+
+    <!-- TAB: MÉTRICAS (#5) -->
+    <div id="emp-tab-metricas" style="display:none">
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:4px">📊 Métricas de tus vacantes</div>
+      <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:18px">Mira el rendimiento de tus publicaciones: cuántas personas las vieron y cuántas postularon.</div>
+      <div id="metricasResumen" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px"></div>
+      <div id="metricasDetalle"></div>
+    </div>
+
+    <!-- TAB: MI EMPRESA (#3) -->
+    <div id="emp-tab-empresa" style="display:none">
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:4px">🏢 Perfil de tu empresa</div>
+      <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:18px">Un perfil completo hace que tus vacantes se vean más profesionales y genera más confianza en los candidatos.</div>
+      <div class="section-box" style="max-width:620px">
+        <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;margin-bottom:18px">
+          <div style="text-align:center">
+            <div id="empLogoPreview" style="width:90px;height:90px;border-radius:14px;background:var(--negro);border:2px dashed var(--gris-borde);display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden">🏢</div>
+            <label class="vform-tool-btn" style="margin-top:8px;display:inline-block;cursor:pointer">📷 Subir logo
+              <input type="file" id="empLogoInput" accept="image/png,image/jpeg,image/webp" style="display:none" onchange="subirLogoEmpresa(this)">
+            </label>
+          </div>
+          <div style="flex:1;min-width:240px">
+            <div class="vform-field" style="margin-bottom:12px">
+              <label class="vform-label">Nombre de la empresa</label>
+              <input class="vform-input" id="empNombre" placeholder="Ej: Estudio Creativo Andino" maxlength="100">
+            </div>
+            <div class="vform-field" style="margin-bottom:12px">
+              <label class="vform-label">Sector</label>
+              <input class="vform-input" id="empSector" placeholder="Ej: Tecnología, Comercio, Salud..." maxlength="60">
+            </div>
+            <div class="vform-field">
+              <label class="vform-label">Sitio web (opcional)</label>
+              <input class="vform-input" id="empWeb" placeholder="https://tuempresa.com" maxlength="200">
+            </div>
+          </div>
+        </div>
+        <div class="vform-field" style="margin-bottom:14px">
+          <label class="vform-label">Descripción de la empresa</label>
+          <textarea class="vform-textarea" id="empDescripcion" maxlength="600" style="min-height:110px" placeholder="Cuéntales a los candidatos qué hace tu empresa, su cultura y por qué es un buen lugar para trabajar..."></textarea>
+        </div>
+        <button class="btn-full" onclick="guardarPerfilEmpresa()">💾 Guardar perfil</button>
+        <div id="empPerfilMsg" style="font-size:12px;margin-top:10px;text-align:center"></div>
+      </div>
     </div>
 
     <!-- TAB: BUSCAR -->
@@ -2757,30 +2803,83 @@ Ofrecemos:
   showToast('📋 Plantilla cargada — completa los campos entre [corchetes]');
 }
 
+let vacEditandoId = null;  // si !== null, estamos editando
+
 async function publicarVacante() {
   const msg = document.getElementById('vacMsg');
+  const salarioVal = (document.getElementById('vacSalario') && document.getElementById('vacSalario').value.trim()) || 'A convenir';
   const datos = {
     cargo: document.getElementById('vacCargo').value.trim(),
     empresa: document.getElementById('vacEmpresa').value.trim(),
     ciudad: document.getElementById('vacCiudad').value,
     modalidad: document.getElementById('vacModalidad').value,
-    salario: document.getElementById('vacSalario').value.trim(),
+    salario: salarioVal,
     email_contacto: document.getElementById('vacEmail').value.trim(),
     descripcion: document.getElementById('vacDescripcion').value.trim()
   };
   if (!datos.cargo || datos.cargo.length < 3) { msg.style.color='var(--rojo)'; msg.textContent='Escribe el cargo (mínimo 3 caracteres)'; return; }
   if (!datos.descripcion || datos.descripcion.length < 20) { msg.style.color='var(--rojo)'; msg.textContent='La descripción debe tener al menos 20 caracteres'; return; }
   if (!datos.email_contacto || !datos.email_contacto.includes('@')) { msg.style.color='var(--rojo)'; msg.textContent='Ingresa un email válido para recibir postulantes'; return; }
-  msg.style.color='var(--texto-secundario)'; msg.textContent='⟳ Publicando...';
+  msg.style.color='var(--texto-secundario)'; msg.textContent = vacEditandoId ? '⟳ Guardando cambios...' : '⟳ Publicando...';
   try {
-    const r = await apiCall('/api/auth/vacantes', { method:'POST', body: JSON.stringify(datos) });
-    msg.style.color='var(--verde)'; msg.textContent='✅ ' + (r.mensaje || 'Vacante creada');
-    ['vacCargo','vacSalario','vacDescripcion'].forEach(id => document.getElementById(id).value='');
+    let r;
+    if (vacEditandoId) {
+      r = await apiCall('/api/auth/vacantes/' + vacEditandoId, { method:'PUT', body: JSON.stringify(datos) });
+    } else {
+      r = await apiCall('/api/auth/vacantes', { method:'POST', body: JSON.stringify(datos) });
+    }
+    msg.style.color='var(--verde)'; msg.textContent='✅ ' + (r.mensaje || 'Listo');
+    cancelarEdicionVacante();  // limpia formulario y modo edición
     cargarMisVacantes();
-    showToast('✅ Vacante enviada a revisión');
+    showToast(vacEditandoId ? '✅ Cambios guardados' : '✅ Vacante enviada a revisión');
   } catch(e) {
     msg.style.color='var(--rojo)'; msg.textContent='⚠ ' + e.message;
   }
+}
+
+// Cargar una vacante en el formulario para editar
+async function editarVacante(id) {
+  try {
+    const r = await apiCall('/api/auth/vacantes/' + id);
+    const v = r.vacante;
+    if (!v) return;
+    vacEditandoId = id;
+    document.getElementById('vacCargo').value = v.cargo || '';
+    document.getElementById('vacEmpresa').value = v.empresa || '';
+    document.getElementById('vacCiudad').value = v.ciudad || 'Quito';
+    document.getElementById('vacModalidad').value = v.modalidad || 'Presencial';
+    document.getElementById('vacEmail').value = v.email_contacto || '';
+    document.getElementById('vacDescripcion').value = v.descripcion || '';
+    // Salario: setear en el selector o en "otro"
+    const sel = document.getElementById('vacSalarioSel');
+    const otro = document.getElementById('vacSalarioOtro');
+    if (sel) {
+      const existe = [...sel.options].some(o => o.value === v.salario);
+      if (existe) { sel.value = v.salario; if(otro) otro.style.display='none'; }
+      else { sel.value = '__otro__'; if(otro){ otro.style.display='block'; otro.value = v.salario; } }
+    }
+    document.getElementById('vacSalario').value = v.salario || 'A convenir';
+    vacContador(); vacPreview();
+    // Cambiar el botón a modo edición + banner
+    document.getElementById('vacFormTitulo').innerHTML = '✏️ Editar vacante <span style="color:var(--texto-secundario);font-size:12px;font-weight:400">— al guardar volverá a revisión</span>';
+    document.getElementById('vacSubmitBtn').textContent = '💾 Guardar cambios';
+    document.getElementById('vacCancelBtn').style.display = 'inline-block';
+    // Scroll al formulario
+    document.getElementById('vacFormBox').scrollIntoView({ behavior:'smooth', block:'start' });
+  } catch(e) { showToast('⚠ ' + e.message, true); }
+}
+
+function cancelarEdicionVacante() {
+  vacEditandoId = null;
+  ['vacCargo','vacEmpresa','vacEmail','vacDescripcion'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  const sel = document.getElementById('vacSalarioSel'); if(sel) sel.value='A convenir';
+  const otro = document.getElementById('vacSalarioOtro'); if(otro){ otro.style.display='none'; otro.value=''; }
+  const hid = document.getElementById('vacSalario'); if(hid) hid.value='A convenir';
+  if (document.getElementById('vacFormTitulo')) document.getElementById('vacFormTitulo').textContent = 'Publica tu vacante gratis';
+  if (document.getElementById('vacSubmitBtn')) document.getElementById('vacSubmitBtn').textContent = '📢 Publicar vacante gratis';
+  if (document.getElementById('vacCancelBtn')) document.getElementById('vacCancelBtn').style.display = 'none';
+  if (document.getElementById('vacMsg')) document.getElementById('vacMsg').textContent = '';
+  vacContador && vacContador(); vacPreview && vacPreview();
 }
 
 const ESTADO_VAC = {
@@ -2813,8 +2912,9 @@ async function cargarMisVacantes() {
           <span class="tag" style="color:var(--verde);border-color:rgba(0,196,140,.4)">👥 ${v.postulantes||0} postulante(s)</span>
         </div>
         <div class="card-actions">
-          ${(v.postulantes||0) > 0 ? `<button class="btn-sm-green" onclick='verPostulantes(${escHtml(JSON.stringify(String(v.id)))})'>Ver postulantes</button>` : ''}
-          ${v.estado !== 'cerrada' ? `<button class="btn-sm-outline" onclick='cerrarVacante(${escHtml(JSON.stringify(String(v.id)))})'>Cerrar vacante</button>` : ''}
+          ${(v.postulantes||0) > 0 ? `<button class="btn-sm-green" onclick='verPostulantes(${escHtml(JSON.stringify(String(v.id)))})'>👥 Ver postulantes (${v.postulantes})</button>` : ''}
+          ${v.estado !== 'cerrada' ? `<button class="btn-sm-outline" onclick='editarVacante(${escHtml(JSON.stringify(String(v.id)))})'>✏️ Editar</button>` : ''}
+          ${v.estado !== 'cerrada' ? `<button class="btn-sm-outline" onclick='cerrarVacante(${escHtml(JSON.stringify(String(v.id)))})'>🔒 Cerrar</button>` : ''}
         </div>
       </div>`;
     }).join('');
@@ -2831,44 +2931,150 @@ async function cerrarVacante(id) {
   } catch(e) { showToast('⚠ ' + e.message, true); }
 }
 
+const ATS_ESTADOS = {
+  nuevo:       { txt:'🔵 Nuevo',       color:'#3B82F6' },
+  revision:    { txt:'👀 En revisión', color:'var(--amarillo)' },
+  entrevista:  { txt:'📅 Entrevista',  color:'var(--verde)' },
+  contratado:  { txt:'🎉 Contratado',  color:'#16A34A' },
+  descartado:  { txt:'⛔ Descartado',  color:'var(--texto-secundario)' }
+};
+let postulantesCache = {};  // por vacante, para re-render local
+
 async function verPostulantes(id) {
   try {
     const r = await apiCall('/api/auth/vacantes/' + id + '/postulantes');
-    const lista = (r.postulantes || []).map(p => {
-      const c = p.candidato || {};
-      return `<div style="background:var(--negro);border:1px solid var(--gris-borde);border-radius:8px;padding:12px;margin-bottom:8px">
-        <div style="font-weight:600;font-size:14px">${escHtml(c.nombre||'Candidato')}</div>
-        <div style="font-size:12px;color:var(--texto-secundario)">📧 ${escHtml(c.email||'')} ${c.telefono ? '· 📱 ' + escHtml(c.telefono) : ''} ${c.ciudad ? '· 📍 ' + escHtml(c.ciudad) : ''}</div>
-        ${p.mensaje ? '<div style="font-size:12px;margin-top:6px;white-space:pre-line;border-left:2px solid var(--verde);padding-left:8px">' + escHtml(p.mensaje) + '</div>' : ''}
-        <div style="font-size:10px;color:var(--texto-secundario);margin-top:6px">${new Date(p.creado_en).toLocaleString('es-EC')}</div>
-      </div>`;
-    }).join('') || '<div class="empty-state">Sin postulantes aún</div>';
+    postulantesCache[id] = r.postulantes || [];
     const cont = document.getElementById('misVacantesList');
+    document.getElementById('postulantesBox')?.remove();
     cont.insertAdjacentHTML('afterbegin', `
       <div class="section-box" id="postulantesBox" style="margin-bottom:14px;border-color:rgba(0,196,140,.4)">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-          <div style="font-family:'Syne',sans-serif;font-weight:700">Postulantes — ${escHtml(r.cargo||'')}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:17px">Postulantes — ${escHtml(r.cargo||'')}</div>
           <button class="btn-sm-outline" onclick="document.getElementById('postulantesBox').remove()">✕ Cerrar</button>
         </div>
-        ${lista}
-        <div style="font-size:11px;color:var(--texto-secundario);margin-top:8px">💡 También recibiste estos datos por correo. Responde directamente al candidato.</div>
+        <div id="atsResumen" style="font-size:11px;color:var(--texto-secundario);margin-bottom:12px"></div>
+        <div id="atsLista"></div>
       </div>`);
+    renderATS(id);
+    document.getElementById('postulantesBox').scrollIntoView({behavior:'smooth',block:'start'});
+  } catch(e) { showToast('⚠ ' + e.message, true); }
+}
+
+function renderATS(vacanteId) {
+  const posts = postulantesCache[vacanteId] || [];
+  const cont = document.getElementById('atsLista');
+  if (!cont) return;
+  // Resumen por estado
+  const conteo = { nuevo:0, revision:0, entrevista:0, contratado:0, descartado:0 };
+  posts.forEach(p => conteo[p.estado||'nuevo']++);
+  const resumen = document.getElementById('atsResumen');
+  if (resumen) resumen.innerHTML = Object.entries(ATS_ESTADOS).map(([k,v]) =>
+    `<span style="margin-right:12px">${v.txt}: <strong style="color:${v.color}">${conteo[k]}</strong></span>`).join('');
+
+  if (!posts.length) { cont.innerHTML = '<div class="empty-state">Sin postulantes aún</div>'; return; }
+
+  cont.innerHTML = posts.map((p,idx) => {
+    const c = p.candidato || {};
+    const st = ATS_ESTADOS[p.estado||'nuevo'];
+    return `<div style="background:var(--negro);border:1px solid var(--gris-borde);border-left:3px solid ${st.color};border-radius:8px;padding:14px;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <div style="font-weight:600;font-size:15px">${escHtml(c.nombre||'Candidato')}</div>
+          <div style="font-size:12px;color:var(--texto-secundario);margin-top:2px">📧 ${escHtml(c.email||'')} ${c.telefono ? '· 📱 ' + escHtml(c.telefono) : ''} ${c.ciudad ? '· 📍 ' + escHtml(c.ciudad) : ''}</div>
+        </div>
+        <span style="font-size:11px;font-weight:700;color:${st.color};white-space:nowrap">${st.txt}</span>
+      </div>
+      ${p.mensaje ? '<div style="font-size:12px;margin-top:8px;white-space:pre-line;border-left:2px solid var(--verde);padding-left:8px;color:var(--texto-secundario)">' + escHtml(p.mensaje) + '</div>' : ''}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+        ${p.cv ? `<button class="btn-sm-outline" style="font-size:11px;padding:6px 12px" onclick='verCV(${escHtml(JSON.stringify(String(vacanteId)))},${idx})'>📄 Ver CV</button>` : '<span style="font-size:11px;color:var(--texto-secundario);align-self:center">Sin CV adjunto</span>'}
+        <button class="btn-sm-green" style="font-size:11px;padding:6px 12px" onclick='responderPostulante(${escHtml(JSON.stringify(String(p.id)))},"entrevista",${escHtml(JSON.stringify(String(vacanteId)))})'>📅 Invitar a entrevista</button>
+        <button class="btn-sm-outline" style="font-size:11px;padding:6px 12px" onclick='responderPostulante(${escHtml(JSON.stringify(String(p.id)))},"descartar",${escHtml(JSON.stringify(String(vacanteId)))})'>⛔ Descartar</button>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center">
+        <span style="font-size:10px;color:var(--texto-secundario)">Mover a:</span>
+        ${Object.entries(ATS_ESTADOS).map(([k,v]) => (p.estado||'nuevo')!==k ?
+          `<button onclick='cambiarEstadoPostulante(${escHtml(JSON.stringify(String(p.id)))},"${k}",${escHtml(JSON.stringify(String(vacanteId)))})' style="font-size:10px;background:transparent;border:1px solid var(--gris-borde);color:${v.color};padding:3px 8px;border-radius:12px;cursor:pointer">${v.txt}</button>` : '').join('')}
+      </div>
+      <div style="font-size:10px;color:var(--texto-secundario);margin-top:8px">Postuló: ${new Date(p.creado_en).toLocaleString('es-EC')}</div>
+    </div>`;
+  }).join('');
+}
+
+async function cambiarEstadoPostulante(postId, estado, vacanteId) {
+  try {
+    await apiCall('/api/auth/postulantes/' + postId + '/estado', { method:'POST', body: JSON.stringify({ estado }) });
+    // Actualizar cache local y re-render
+    const posts = postulantesCache[vacanteId] || [];
+    const p = posts.find(x => String(x.id) === String(postId));
+    if (p) p.estado = estado;
+    renderATS(vacanteId);
+    showToast('✓ Estado actualizado');
+  } catch(e) { showToast('⚠ ' + e.message, true); }
+}
+
+function verCV(vacanteId, idx) {
+  const p = (postulantesCache[vacanteId]||[])[idx];
+  if (!p || !p.cv) return;
+  const c = p.candidato || {};
+  const modal = document.createElement('div');
+  modal.className = 'modal-bg open';
+  modal.style.cssText = 'display:flex';
+  modal.innerHTML = `
+    <div class="modal" style="max-width:640px;max-height:85vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:18px">CV — ${escHtml(c.nombre||'Candidato')}</div>
+        <button class="btn-sm-outline" onclick="this.closest('.modal-bg').remove()">✕</button>
+      </div>
+      <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:14px">📧 ${escHtml(c.email||'')} ${c.telefono ? '· 📱 ' + escHtml(c.telefono) : ''}</div>
+      <div style="white-space:pre-line;font-size:13px;line-height:1.7;background:var(--negro);border:1px solid var(--gris-borde);border-radius:8px;padding:16px;color:var(--texto-primario)">${escHtml(p.cv)}</div>
+      <button class="btn-full" style="margin-top:14px" onclick="navigator.clipboard.writeText(${escHtml(JSON.stringify(p.cv))}).then(()=>showToast('✓ CV copiado'))">📋 Copiar CV</button>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+}
+
+async function responderPostulante(postId, tipo, vacanteId) {
+  const titulo = tipo === 'entrevista' ? 'Invitar a entrevista' : 'Descartar candidato';
+  const placeholder = tipo === 'entrevista'
+    ? 'Mensaje opcional (ej: disponibilidad para la entrevista, modalidad...)'
+    : 'Mensaje opcional (feedback amable para el candidato)';
+  const extra = prompt(titulo + '\n\n' + (tipo==='entrevista' ? 'Se enviará un correo invitando al candidato a entrevista.' : 'Se enviará un correo notificando amablemente al candidato.') + '\n\nMensaje adicional (opcional):', '');
+  if (extra === null) return;  // canceló
+  try {
+    const r = await apiCall('/api/auth/postulantes/' + postId + '/responder', { method:'POST', body: JSON.stringify({ tipo, mensaje_extra: extra }) });
+    const posts = postulantesCache[vacanteId] || [];
+    const p = posts.find(x => String(x.id) === String(postId));
+    if (p) p.estado = tipo === 'entrevista' ? 'entrevista' : 'descartado';
+    renderATS(vacanteId);
+    showToast(r.emailEnviado ? '✓ Correo enviado al candidato' : '✓ Estado actualizado (correo no enviado)');
   } catch(e) { showToast('⚠ ' + e.message, true); }
 }
 
 // ── CANDIDATO: postular a vacante exclusiva ──
 async function postularVacante(id, empresa, cargo) {
+  if (!currentUser) { openAuth('register'); showToast('Crea tu cuenta gratis para enviar tu CV 🎉'); return; }
+
+  // Verificar que tenga CV guardado — si no, mandarlo a crearlo
+  const tieneCV = (cvData && cvData.texto && cvData.texto.length > 30) || (currentUser.cvData && currentUser.cvData.texto);
+  if (!tieneCV) {
+    if (confirm('Para enviar tu CV a ' + empresa + ' primero necesitas cargarlo (1 sola vez).\n\n¿Ir a crear tu CV ahora?')) {
+      showPage('candidato');
+      setTimeout(() => candTab('cv'), 100);
+    }
+    return;
+  }
+
   try {
-    showToast('⟳ Enviando postulación...');
+    showToast('⟳ Enviando tu CV a ' + empresa + '...');
     const r = await apiCall('/api/auth/vacantes/' + id + '/postular', {
       method:'POST',
-      body: JSON.stringify({ mensaje: 'Hola, estoy interesado/a en la vacante de ' + cargo + '. Quedo atento/a a una entrevista. (Postulación vía TalentoEC)' })
+      body: JSON.stringify({ mensaje: 'Hola, soy ' + (currentUser.nombre||'un candidato') + ' y me interesa la vacante de ' + cargo + '. Adjunto mi CV a través de TalentoEC. Quedo atento/a a su respuesta.' })
     });
-    showToast('✅ ' + (r.mensaje || 'Postulación enviada'));
-    correosEnviados.push({ to:'', subject:cargo, empresa:empresa, cargo:cargo, fecha:new Date().toLocaleString('es-EC'), estado:'Postulado' });
+    showToast('✅ ¡CV enviado a ' + empresa + '! Te contactarán por tu correo.');
+    correosEnviados.push({ to:'', subject:cargo, empresa:empresa, cargo:cargo, fecha:new Date().toLocaleString('es-EC'), estado:'CV enviado' });
     guardarCorreosEnviados();
   } catch(e) {
-    showToast(e.message.includes('Ya postulaste') ? 'ℹ Ya habías postulado a esta vacante' : '⚠ ' + e.message, !e.message.includes('Ya postulaste'));
+    showToast(e.message.includes('Ya postulaste') ? 'ℹ Ya enviaste tu CV a esta vacante' : '⚠ ' + e.message, !e.message.includes('Ya postulaste'));
   }
 }
 
@@ -3397,9 +3603,12 @@ async function cargarBolsa() {
       <div class="job-card job-exclusiva" style="margin-bottom:14px;animation:fadeIn .4s ease ${Math.min(i,8)*.05}s forwards;opacity:0">
         <div class="exclusiva-badge">⭐ EXCLUSIVO TALENTOEC</div>
         <div class="job-card-top">
-          <div>
-            <div class="job-title">${escHtml(v.cargo)}</div>
-            <div class="job-company">${escHtml(v.empresa)} · ${escHtml(v.ciudad)}</div>
+          <div style="display:flex;gap:12px;align-items:center">
+            ${v.empresa_logo ? `<img src="${escHtml(v.empresa_logo)}" style="width:46px;height:46px;border-radius:10px;object-fit:cover;flex-shrink:0">` : ''}
+            <div>
+              <div class="job-title">${escHtml(v.cargo)}</div>
+              <div class="job-company">${escHtml(v.empresa)} · ${escHtml(v.ciudad)}</div>
+            </div>
           </div>
         </div>
         <div class="tags-row">
@@ -3409,7 +3618,7 @@ async function cargarBolsa() {
         </div>
         <div style="font-size:12.5px;color:var(--texto-secundario);white-space:pre-line;max-height:120px;overflow:hidden;line-height:1.6">${escHtml(v.descripcion)}</div>
         <div class="card-actions">
-          <button class="btn-sm-green" onclick='postularBolsa(${escHtml(JSON.stringify(String(v.id)))},${escHtml(JSON.stringify(String(v.empresa||"")))},${escHtml(JSON.stringify(String(v.cargo||"")))})'>⭐ Postular ahora (1 clic)</button>
+          <button class="btn-sm-green" onclick='postularBolsa(${escHtml(JSON.stringify(String(v.id)))},${escHtml(JSON.stringify(String(v.empresa||"")))},${escHtml(JSON.stringify(String(v.cargo||"")))})'>📄 Enviar mi CV</button>
         </div>
       </div>`).join('');
   } catch(e) {
@@ -3605,17 +3814,121 @@ function candTab(tab) {
     }
   }
 }
+// ════ #5: MÉTRICAS DEL EMPLEADOR ════
+async function cargarMetricas() {
+  const resumen = document.getElementById('metricasResumen');
+  const detalle = document.getElementById('metricasDetalle');
+  if (!resumen) return;
+  resumen.innerHTML = '<div class="empty-state" style="grid-column:1/-1">Cargando...</div>';
+  detalle.innerHTML = '';
+  try {
+    const r = await apiCall('/api/auth/empresa/metricas');
+    const m = r.resumen || {};
+    const cards = [
+      { n:m.activas||0, l:'Vacantes activas', c:'var(--verde)' },
+      { n:m.vistas||0, l:'Vistas totales', c:'#3B82F6' },
+      { n:m.postulantes||0, l:'Postulantes', c:'var(--amarillo)' },
+      { n:(m.conversion||0)+'%', l:'Conversión', c:'#16A34A' }
+    ];
+    resumen.innerHTML = cards.map(c => `
+      <div style="background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:12px;padding:16px;text-align:center">
+        <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:${c.c}">${c.n}</div>
+        <div style="font-size:11px;color:var(--texto-secundario);margin-top:4px">${c.l}</div>
+      </div>`).join('');
+
+    const det = r.detalle || [];
+    if (!det.length) {
+      detalle.innerHTML = '<div class="empty-state">Publica una vacante para ver sus métricas</div>';
+      return;
+    }
+    detalle.innerHTML = `
+      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:10px">Rendimiento por vacante</div>
+      ${det.map(d => `
+        <div style="background:var(--negro);border:1px solid var(--gris-borde);border-radius:8px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+          <div style="font-weight:600;font-size:13px">${escHtml(d.cargo)}</div>
+          <div style="display:flex;gap:16px;font-size:12px;color:var(--texto-secundario)">
+            <span>👁 ${d.vistas} vistas</span>
+            <span>👥 ${d.postulantes} postulantes</span>
+            <span style="color:var(--verde)">${d.conversion}% conv.</span>
+          </div>
+        </div>`).join('')}`;
+  } catch(e) {
+    resumen.innerHTML = '<div class="empty-state" style="grid-column:1/-1">⚠ ' + escHtml(e.message) + '</div>';
+  }
+}
+
+// ════ #3: PERFIL DE EMPRESA ════
+async function cargarPerfilEmpresa() {
+  try {
+    const r = await apiCall('/api/auth/empresa/perfil');
+    const p = r.perfil || {};
+    document.getElementById('empNombre').value = p.empresa || '';
+    document.getElementById('empSector').value = p.empresa_sector || '';
+    document.getElementById('empWeb').value = p.empresa_web || '';
+    document.getElementById('empDescripcion').value = p.empresa_descripcion || '';
+    if (p.empresa_logo) {
+      document.getElementById('empLogoPreview').innerHTML = '<img src="' + p.empresa_logo + '" style="width:100%;height:100%;object-fit:cover">';
+    }
+  } catch(e) {}
+}
+
+let logoTemporal = null;
+function subirLogoEmpresa(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 500000) { showToast('⚠ El logo debe pesar menos de 500KB', true); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    // Redimensionar a máx 200px para que el data-uri sea pequeño
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const max = 200;
+      let { width, height } = img;
+      if (width > height) { if (width > max) { height = height*max/width; width = max; } }
+      else { if (height > max) { width = width*max/height; height = max; } }
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      logoTemporal = canvas.toDataURL('image/jpeg', 0.82);
+      document.getElementById('empLogoPreview').innerHTML = '<img src="' + logoTemporal + '" style="width:100%;height:100%;object-fit:cover">';
+      showToast('✓ Logo cargado — recuerda guardar');
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function guardarPerfilEmpresa() {
+  const msg = document.getElementById('empPerfilMsg');
+  msg.style.color = 'var(--texto-secundario)'; msg.textContent = '⟳ Guardando...';
+  try {
+    const datos = {
+      empresa: document.getElementById('empNombre').value.trim(),
+      sector: document.getElementById('empSector').value.trim(),
+      web: document.getElementById('empWeb').value.trim(),
+      descripcion: document.getElementById('empDescripcion').value.trim()
+    };
+    if (logoTemporal) datos.logo = logoTemporal;
+    const r = await apiCall('/api/auth/empresa/perfil', { method:'POST', body: JSON.stringify(datos) });
+    msg.style.color = 'var(--verde)'; msg.textContent = '✅ ' + (r.mensaje || 'Guardado');
+    logoTemporal = null;
+    showToast('✅ Perfil de empresa actualizado');
+  } catch(e) {
+    msg.style.color = 'var(--rojo)'; msg.textContent = '⚠ ' + e.message;
+  }
+}
+
 function empTab(tab) {
-  ['vacantes','buscar','guardados','correos'].forEach(t => {
+  ['vacantes','metricas','empresa'].forEach(t => {
     const el = document.getElementById('emp-tab-'+t);
     if (el) el.style.display = t===tab?'block':'none';
   });
   document.querySelectorAll('#page-empleador .tab-btn').forEach((b,i) => {
-    b.classList.toggle('active', ['vacantes','buscar','guardados','correos'][i]===tab);
+    b.classList.toggle('active', ['vacantes','metricas','empresa'][i]===tab);
   });
   if (tab === 'vacantes') cargarMisVacantes();
-  if (tab==='correos') renderCorreos();
-  if (tab==='guardados') renderGuardados();
+  if (tab === 'metricas') cargarMetricas();
+  if (tab === 'empresa') cargarPerfilEmpresa();
 }
 
 // ======= CV =======
@@ -4198,7 +4511,7 @@ function renderJobCards(jobs) {
       const exclusiva = !!j.exclusiva;
       return `
     <div class="job-card${exclusiva ? ' job-exclusiva' : ''}" style="animation:fadeIn .4s ease ${i*.08}s forwards;opacity:0">
-      ${exclusiva ? '<div class="exclusiva-badge">⭐ EXCLUSIVO TALENTOEC · Postulación directa</div>' : ''}
+      ${exclusiva ? '<div class="exclusiva-badge">⭐ EXCLUSIVO TALENTOEC · Envía tu CV directo</div>' : ''}
       <div class="job-card-top">
         <div><div class="job-title">${escHtml(j.cargo)}</div><div class="job-company">${escHtml(j.empresa)} · ${escHtml(j.ciudad)}</div></div>
         <div class="match-badge">${parseInt(j.match)||0}%</div>
@@ -4211,7 +4524,7 @@ function renderJobCards(jobs) {
       </div>`}
       <div class="card-actions">
         ${exclusiva
-          ? `<button class="btn-sm-green" onclick='postularVacante(${escHtml(JSON.stringify(String(j.vacante_id)))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))})'>⭐ Postular ahora (1 clic)</button>`
+          ? `<button class="btn-sm-green" onclick='postularVacante(${escHtml(JSON.stringify(String(j.vacante_id)))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))})'>📄 Enviar mi CV</button>`
           : `${tieneUrl ? `<button class="btn-sm-green" onclick='abrirOferta(${escHtml(JSON.stringify(urlOk))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))},this)'>🔗 Postular directo</button>` : ''}
              <button class="btn-sm-green" onclick='confirmarPostulacion(${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))},this)'>✅ Ya postulé</button>`}
         ${!exclusiva && j.email && j.email!=='' && j.email!=='undefined' ? `<button class="btn-sm-outline" onclick='abrirEmailModal(${escHtml(JSON.stringify(String(j.email)))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))},${escHtml(JSON.stringify(currentUser?.nombre||'Candidato'))},true)'>✉ Correo</button>` : ''}
