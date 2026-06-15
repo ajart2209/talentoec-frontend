@@ -3217,19 +3217,7 @@ function actualizarPlanLockFrio() {
   }
 }
 
-function setLoggedInUI() {
-  // Verificar bloqueo de correos en frío
-  setTimeout(actualizarPlanLockFrio, 200);
-
-  // Autocompletar campos del CV con datos del usuario logueado
-  if (currentUser) {
-    const cvN = document.getElementById('cvNombre');
-    const cvE = document.getElementById('cvEmail');
-    if (cvN && !cvN.value) cvN.value = currentUser.nombre || '';
-    if (cvE && !cvE.value) cvE.value = currentUser.email || '';
-  }
-
-  // Detecta áreas/aptitudes del texto del CV (sin IA, gratis)
+// Detecta áreas/aptitudes del texto del CV (sin IA, gratis)
 function detectarAreasLocal(texto) {
   if (!texto) return [];
   const t = texto.toLowerCase();
@@ -3262,19 +3250,26 @@ function mostrarChipsAreas() {
   const banner = document.getElementById('cvDetectadoBanner');
   const input = document.getElementById('busquedaQuery');
   if (!cvData) { if (banner) banner.style.display = 'none'; return; }
-
-  // Usar las áreas de la IA, o detectarlas del texto si no hay
   let areas = (cvData.areasDetectadas && cvData.areasDetectadas.length) ? cvData.areasDetectadas : detectarAreasLocal(cvData.texto);
   if (areas.length && (!cvData.areasDetectadas || !cvData.areasDetectadas.length)) cvData.areasDetectadas = areas;
-
   if (!areas.length) { if (banner) banner.style.display = 'none'; return; }
-
-  // Rellenar el buscador con TODAS las áreas si está vacío
-  if (input && !input.value.trim()) {
-    input.value = areas.join(', ');
-  }
+  if (input && !input.value.trim()) { input.value = areas.join(', '); }
   if (banner) banner.style.display = 'block';
 }
+
+function setLoggedInUI() {
+  // Verificar bloqueo de correos en frío
+  setTimeout(actualizarPlanLockFrio, 200);
+
+  // Autocompletar campos del CV con datos del usuario logueado
+  if (currentUser) {
+    const cvN = document.getElementById('cvNombre');
+    const cvE = document.getElementById('cvEmail');
+    if (cvN && !cvN.value) cvN.value = currentUser.nombre || '';
+    if (cvE && !cvE.value) cvE.value = currentUser.email || '';
+  }
+
+
 
 // Autocompletar búsqueda con áreas del CV inmediatamente
   setTimeout(() => {
@@ -4548,7 +4543,7 @@ function portalesDeEmpleo(cargo, empresa, ciudad) {
   const slug = limpio.replace(/\s+/g,'-');
   const enc = encodeURIComponent(limpio);
   const ciudadEnc = encodeURIComponent(ciudad||'Ecuador');
-  const cargoEmpresa = encodeURIComponent(limpio + ' ' + (empresa||'') + ' Ecuador');
+  const googleQuery = encodeURIComponent(limpio + ' empleo ' + (ciudad || 'Ecuador'));
   const PROV = {'quito':'pichincha','guayaquil':'guayas','cuenca':'azuay','ambato':'tungurahua','machala':'el-oro','manta':'manabi','portoviejo':'manabi','loja':'loja','riobamba':'chimborazo','ibarra':'imbabura','esmeraldas':'esmeraldas','santo domingo':'santo-domingo-de-los-tsachilas','duran':'guayas','quevedo':'los-rios','latacunga':'cotopaxi'};
   const cs = (ciudad||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
   const prov = PROV[cs];
@@ -4558,7 +4553,7 @@ function portalesDeEmpleo(cargo, empresa, ciudad) {
     { nombre:'Computrabajo', ico:'🔵', url:computrabajo, color:'#0db0e0' },
     { nombre:'LinkedIn', ico:'💼', url:`https://www.linkedin.com/jobs/search/?keywords=${enc}&location=Ecuador`, color:'#0077b5' },
     { nombre:'Indeed', ico:'💚', url:`https://ec.indeed.com/jobs?q=${enc}&l=${ciudadEnc}`, color:'#2557a7' },
-    { nombre:'Google', ico:'🔍', url:`https://www.google.com/search?q=${cargoEmpresa}&ibp=htl%3Bjobs`, color:'#4285f4' }
+    { nombre:'Google', ico:'🔍', url:`https://www.google.com/search?q=${googleQuery}&ibp=htl%3Bjobs`, color:'#4285f4' }
   ];
 }
 
@@ -4588,7 +4583,7 @@ function buscarOfertaReal(cargo, empresa, ciudad, portales) {
   // Codificación URL estándar
   const cargoEnc = encodeURIComponent(cargoLimpio);
   const ciudadEnc = encodeURIComponent(ciudad);
-  const cargoEmpresa = encodeURIComponent(cargoLimpio + ' ' + empresa + ' Ecuador');
+  const cargoEmpresa = encodeURIComponent(cargoLimpio + ' empleo ' + (ciudad || 'Ecuador'));
 
   // Mapa ciudad → provincia para el patrón canónico de Computrabajo
   // (verificado: /trabajo-de-{cargo}-en-{provincia}-en-{ciudad})
