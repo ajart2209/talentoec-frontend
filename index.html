@@ -1180,7 +1180,7 @@ function validarBeta() {
           <div class="field"><label>Email de contacto</label><input type="email" id="cvEmail" placeholder="juan@gmail.com"></div>
         </div>
         <div class="form-row">
-          <div class="field"><label>Teléfono / WhatsApp <span style="color:var(--texto-secundario);font-size:11px">(para que te contacten)</span></label><input type="tel" id="cvTelefono" placeholder="0998765432" inputmode="tel"></div>
+          <div class="field"><label>Teléfono / WhatsApp <span style="color:var(--rojo)">*</span> <span style="color:var(--texto-secundario);font-size:11px">(para que te contacten)</span></label><input type="tel" id="cvTelefono" placeholder="0998765432" inputmode="tel"></div>
         </div>
         <div class="form-row">
           <div class="field"><label>Ciudad</label>
@@ -4220,6 +4220,14 @@ async function guardarYAnalizar() {
   const ciudad = document.getElementById('cvCiudad').value;
   const area = document.getElementById('cvArea').value;
   if (!texto) { showToast('⚠ Pega o sube tu CV primero', true); return; }
+  // Teléfono obligatorio (para que las empresas puedan contactar al candidato)
+  const telLimpio = telefono.replace(/\D/g, '');
+  if (!telefono || telLimpio.length < 7) {
+    showToast('⚠ Ingresa tu teléfono / WhatsApp para que las empresas te contacten', true);
+    const campoTel = document.getElementById('cvTelefono');
+    if (campoTel) { campoTel.focus(); campoTel.style.borderColor = 'var(--rojo)'; }
+    return;
+  }
   cvData = { texto, nombre, email, telefono, ciudad, area, fecha: new Date().toLocaleDateString('es-EC') };
   document.getElementById('cvAnalysis').style.display = 'block';
   document.getElementById('analysisStatus').textContent = 'Analizando tu CV...';
