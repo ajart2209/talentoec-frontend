@@ -2863,7 +2863,7 @@ function renderATS(vacanteId) {
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
         ${p.cv ? `<button class="btn-sm-outline" style="font-size:11px;padding:6px 12px" onclick='verCV(${escHtml(JSON.stringify(String(vacanteId)))},${idx})'>📄 Ver CV</button>
         <button class="btn-sm-outline" style="font-size:11px;padding:6px 12px" onclick='descargarCV(${escHtml(JSON.stringify(String(vacanteId)))},${idx})'>⬇️ Descargar CV</button>` : '<span style="font-size:11px;color:var(--texto-secundario);align-self:center">Sin CV adjunto</span>'}
-        <button class="btn-sm-green" style="font-size:11px;padding:6px 12px" onclick='responderPostulante(${escHtml(JSON.stringify(String(p.id)))},"entrevista",${escHtml(JSON.stringify(String(vacanteId)))})'>📅 Invitar a entrevista</button>
+        ${p.candidato && p.candidato.telefono ? `<button class="btn-sm-green" style="font-size:11px;padding:6px 12px" onclick='contactarWhatsApp(${escHtml(JSON.stringify(String(vacanteId)))},${idx})'>💬 WhatsApp</button>` : ''}
         <button class="btn-sm-outline" style="font-size:11px;padding:6px 12px" onclick='responderPostulante(${escHtml(JSON.stringify(String(p.id)))},"descartar",${escHtml(JSON.stringify(String(vacanteId)))})'>⛔ Descartar</button>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center">
@@ -2961,6 +2961,28 @@ function descargarCV(vacanteId, idx) {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
   showToast('⬇️ CV descargado (texto)');
+}
+
+// Abre WhatsApp con el candidato, con un mensaje inicial profesional
+function contactarWhatsApp(vacanteId, idx) {
+  const p = (postulantesCache[vacanteId]||[])[idx];
+  if (!p || !p.candidato || !p.candidato.telefono) {
+    showToast('⚠ Este candidato no tiene teléfono registrado', true);
+    return;
+  }
+  // Limpiar el teléfono (solo dígitos) y agregar código de Ecuador si falta
+  let tel = String(p.candidato.telefono).replace(/\D/g, '');
+  if (tel.startsWith('0')) tel = '593' + tel.substring(1);   // 0998... -> 593998...
+  else if (!tel.startsWith('593')) tel = '593' + tel;         // 998... -> 593998...
+
+  const cargo = p.cargo || (typeof verVacanteActual !== 'undefined' && verVacanteActual ? verVacanteActual.cargo : '') || 'la vacante';
+  const empresa = (currentUser && currentUser.empresa) || 'nuestra empresa';
+  const nombreCand = (p.candidato.nombre || '').split(' ')[0] || '';
+
+  const mensaje = `Hola ${nombreCand}, te contactamos de ${empresa} por tu postulación en TalentoEC. Vimos tu CV y nos gustaría conversar contigo. ¿Tienes disponibilidad?`;
+  const url = `https://wa.me/${tel}?text=${encodeURIComponent(mensaje)}`;
+  window.open(url, '_blank');
+  showToast('💬 Abriendo WhatsApp con ' + (nombreCand || 'el candidato'));
 }
 
 async function responderPostulante(postId, tipo, vacanteId) {
