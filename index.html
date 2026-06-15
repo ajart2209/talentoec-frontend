@@ -2923,6 +2923,7 @@ async function postularVacante(id, empresa, cargo) {
 }
 
 // ── ADMIN: moderación de vacantes ──
+let vacantesAdminCache = {};
 async function cargarVacantesAdmin(estado) {
   const cont = document.getElementById('adminVacantesList');
   if (!cont) return;
@@ -2930,6 +2931,7 @@ async function cargarVacantesAdmin(estado) {
   try {
     const r = await apiCall('/api/auth/admin/vacantes?estado=' + (estado || 'pendiente'));
     const vacs = r.vacantes || [];
+    vacs.forEach(v => vacantesAdminCache[v.id] = v);
     document.querySelectorAll('.admvac-filtro').forEach(b => b.classList.toggle('on', b.dataset.e === (estado||'pendiente')));
     if (!vacs.length) { cont.innerHTML = '<div class="empty-state">Sin vacantes en este estado</div>'; return; }
     cont.innerHTML = vacs.map(v => `
@@ -2941,17 +2943,75 @@ async function cargarVacantesAdmin(estado) {
           </div>
           <span style="font-size:10px;color:var(--texto-secundario)">${new Date(v.creado_en).toLocaleDateString('es-EC')}</span>
         </div>
-        <div style="font-size:12px;color:var(--texto-secundario);white-space:pre-line;margin-bottom:8px">${escHtml(v.descripcion)}</div>
-        <div style="font-size:11px;color:var(--texto-secundario);margin-bottom:10px">📧 Contacto: ${escHtml(v.email_contacto)}</div>
+        <div style="font-size:12px;color:var(--texto-secundario);white-space:pre-line;margin-bottom:8px;max-height:60px;overflow:hidden">${escHtml(v.descripcion)}</div>
         <div class="card-actions">
-          ${v.estado !== 'aprobada' ? `<button class="btn-sm-green" onclick='moderarVacante(${escHtml(JSON.stringify(String(v.id)))},"aprobada","${escHtml(v.estado)}")'>✅ Aprobar</button>` : ''}
-          ${v.estado !== 'rechazada' ? `<button class="btn-sm-outline" style="border-color:var(--rojo);color:var(--rojo)" onclick='moderarVacante(${escHtml(JSON.stringify(String(v.id)))},"rechazada","${escHtml(v.estado)}")'>❌ Rechazar</button>` : ''}
-          <button class="btn-sm-outline" style="border-color:var(--rojo);color:var(--rojo)" onclick='borrarVacanteAdmin(${escHtml(JSON.stringify(String(v.id)))},${escHtml(JSON.stringify(String(v.cargo||"")))},"${escHtml(v.estado)}")'>🗑️ Borrar</button>
+          <button class="btn-sm-green" onclick='revisarVacante(${escHtml(JSON.stringify(String(v.id)))})'>🔍 Revisar a fondo</button>
         </div>
       </div>`).join('');
   } catch(e) {
     cont.innerHTML = '<div class="empty-state">⚠ ' + escHtml(e.message) + '</div>';
   }
+}
+
+// Modal de revisión completa de una vacante (para decidir aprobar/rechazar)
+function revisarVacante(id) {
+  const v = vacantesAdminCache[id];
+  if (!v) return;
+  const emp = v.empleador || {};
+  const diasEmpresa = emp.creado ? Math.floor((Date.now() - new Date(emp.creado)) / 86400000) : null;
+  // Señales de alerta para ayudarte a decidir
+  const alertas = [];
+  const descLower = (v.descripcion||'').toLowerCase();
+  if (/(whatsapp|telegram).{0,20}(\+?\d{7,})/i.test(v.descripcion||'')) alertas.push('Incluye número de WhatsApp/Telegram en la descripción');
+  if (/gana[r]?\s*\$?\s*\d{3,}/i.test(descLower) || /\$\d{3,}.{0,15}(semana|dia|día)/i.test(descLower)) alertas.push('Promete ganancias altas rápidas (posible estafa)');
+  if (/(inversion|invertir|deposito|depósito|pago inicial|registro.{0,10}\$)/i.test(descLower)) alertas.push('Pide inversión o pago inicial (señal de estafa)');
+  if (!emp.email || !emp.email.includes('@')) alertas.push('Empleador sin email válido');
+  if (diasEmpresa !== null && diasEmpresa < 1) alertas.push('Cuenta de empleador creada hoy');
+  if ((v.descripcion||'').length < 60) alertas.push('Descripción muy corta / poco detallada');
+
+  const modal = document.createElement('div');
+  modal.className = 'modal-bg open';
+  modal.style.cssText = 'display:flex';
+  modal.innerHTML = `
+    <div class="modal" style="max-width:620px;max-height:88vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:18px">🔍 Revisar vacante</div>
+        <button class="btn-sm-outline" onclick="this.closest('.modal-bg').remove()">✕</button>
+      </div>
+
+      ${alertas.length ? `<div style="background:rgba(255,90,90,.1);border:1px solid var(--rojo);border-radius:10px;padding:12px 14px;margin-bottom:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--rojo);margin-bottom:6px">⚠ ${alertas.length} señal(es) de alerta:</div>
+        ${alertas.map(a => '<div style="font-size:12px;color:var(--texto-secundario)">• ' + escHtml(a) + '</div>').join('')}
+      </div>` : '<div style="background:rgba(0,196,140,.08);border:1px solid rgba(0,196,140,.3);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--verde)">✓ Sin señales de alerta automáticas detectadas</div>'}
+
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px">${escHtml(v.cargo)}</div>
+      <div style="font-size:13px;color:var(--texto-secundario);margin-bottom:12px">${escHtml(v.empresa)} · ${escHtml(v.ciudad)} · ${escHtml(v.modalidad)} · ${escHtml(v.salario)}</div>
+
+      <div style="font-size:12px;font-weight:700;margin-bottom:4px">📝 Descripción completa:</div>
+      <div style="white-space:pre-line;font-size:13px;line-height:1.6;background:var(--negro);border:1px solid var(--gris-borde);border-radius:8px;padding:14px;margin-bottom:14px;color:var(--texto-primario)">${escHtml(v.descripcion)}</div>
+
+      <div style="font-size:12px;font-weight:700;margin-bottom:6px">🏢 Datos del empleador (verifica que sea real):</div>
+      <div style="background:var(--negro);border:1px solid var(--gris-borde);border-radius:8px;padding:14px;margin-bottom:16px;font-size:12.5px;line-height:1.8">
+        <div><strong>Responsable:</strong> ${escHtml(emp.nombre || '—')}</div>
+        <div><strong>Email:</strong> ${escHtml(emp.email || '—')}</div>
+        ${emp.telefono ? '<div><strong>Teléfono:</strong> ' + escHtml(emp.telefono) + '</div>' : ''}
+        <div><strong>Email de contacto vacante:</strong> ${escHtml(v.email_contacto)}</div>
+        ${emp.empresa_sector ? '<div><strong>Sector:</strong> ' + escHtml(emp.empresa_sector) + '</div>' : ''}
+        ${emp.empresa_web ? '<div><strong>Web:</strong> <a href="' + escHtml(emp.empresa_web) + '" target="_blank" style="color:var(--verde)">' + escHtml(emp.empresa_web) + '</a></div>' : '<div style="color:var(--texto-secundario)">Sin sitio web registrado</div>'}
+        ${emp.empresa_descripcion ? '<div style="margin-top:6px"><strong>Sobre la empresa:</strong> ' + escHtml(emp.empresa_descripcion) + '</div>' : ''}
+        ${diasEmpresa !== null ? '<div style="color:var(--texto-secundario);margin-top:4px">Cuenta creada hace ' + diasEmpresa + ' día(s)</div>' : ''}
+      </div>
+
+      <div style="font-size:11px;color:var(--texto-secundario);margin-bottom:10px">💡 Tip: busca el email o el nombre de la empresa en Google para verificar que existe. Si pide dinero al candidato o promete ganancias irreales, recházala.</div>
+
+      <div style="display:flex;gap:10px">
+        <button class="btn-full" style="background:var(--verde)" onclick='moderarVacante(${escHtml(JSON.stringify(String(v.id)))},"aprobada","${escHtml(v.estado)}");this.closest(".modal-bg").remove()'>✅ Aprobar y publicar</button>
+        <button class="btn-sm-outline" style="border-color:var(--rojo);color:var(--rojo);white-space:nowrap" onclick='moderarVacante(${escHtml(JSON.stringify(String(v.id)))},"rechazada","${escHtml(v.estado)}");this.closest(".modal-bg").remove()'>❌ Rechazar</button>
+        <button class="btn-sm-outline" style="border-color:var(--rojo);color:var(--rojo)" onclick='borrarVacanteAdmin(${escHtml(JSON.stringify(String(v.id)))},${escHtml(JSON.stringify(String(v.cargo||"")))},"${escHtml(v.estado)}");this.closest(".modal-bg").remove()'>🗑️</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
 }
 
 async function borrarVacanteAdmin(id, cargo, estadoActual) {
