@@ -1861,7 +1861,7 @@ function validarBeta() {
       <span style="background:var(--amarillo);color:var(--negro);font-weight:700;padding:5px 14px;border-radius:20px;font-size:11px">ADMIN</span>
     </div>
 
-    <!-- Métricas globales -->
+    <!-- Métricas globales (4 tarjetas) -->
     <div class="dash-cards" style="grid-template-columns:repeat(4,1fr)">
       <div class="dash-card">
         <div class="dash-card-num" id="adminTotalUsers">0</div>
@@ -1877,24 +1877,11 @@ function validarBeta() {
       </div>
       <div class="dash-card">
         <div class="dash-card-num" id="adminIngresos" style="color:var(--verde)">$0</div>
-
-    <!-- MODERACIÓN DE VACANTES -->
-    <div class="section-box" style="margin-top:20px">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
-        <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700">📢 Moderación de vacantes</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="admvac-filtro on" data-e="pendiente" onclick="cargarVacantesAdmin('pendiente')">⏳ Pendientes</button>
-          <button class="admvac-filtro" data-e="aprobada" onclick="cargarVacantesAdmin('aprobada')">✅ Aprobadas</button>
-          <button class="admvac-filtro" data-e="rechazada" onclick="cargarVacantesAdmin('rechazada')">❌ Rechazadas</button>
-        </div>
-      </div>
-      <div id="adminVacantesList"><div class="empty-state">Cargando...</div></div>
-    </div>
-
         <div class="dash-card-label">Ingresos del mes</div>
       </div>
     </div>
 
+    <!-- Métricas secundarias (3 tarjetas) -->
     <div class="dash-cards" style="grid-template-columns:repeat(3,1fr);margin-top:14px">
       <div class="dash-card">
         <div class="dash-card-num" id="adminBusquedas">0</div>
@@ -1908,6 +1895,19 @@ function validarBeta() {
         <div class="dash-card-num" id="adminConversion">0%</div>
         <div class="dash-card-label">Tasa conversión</div>
       </div>
+    </div>
+
+    <!-- MODERACIÓN DE VACANTES (ahora a lo ancho, debajo de las métricas) -->
+    <div class="section-box" style="margin-top:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+        <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700">📢 Moderación de vacantes</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="admvac-filtro on" data-e="pendiente" onclick="cargarVacantesAdmin('pendiente')">⏳ Pendientes</button>
+          <button class="admvac-filtro" data-e="aprobada" onclick="cargarVacantesAdmin('aprobada')">✅ Aprobadas</button>
+          <button class="admvac-filtro" data-e="rechazada" onclick="cargarVacantesAdmin('rechazada')">❌ Rechazadas</button>
+        </div>
+      </div>
+      <div id="adminVacantesList"><div class="empty-state">Cargando...</div></div>
     </div>
 
     <!-- INDICADOR USO DE RESEND -->
