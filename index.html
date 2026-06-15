@@ -3382,8 +3382,10 @@ function formatearMarkdown(texto) {
 function limpiarArea(a) {
   return String(a || '')
     .replace(/\*+/g, '')        // quitar asteriscos **
+    .replace(/_+/g, '')         // quitar guiones bajos __ (markdown)
     .replace(/["'`]/g, '')      // quitar comillas
     .replace(/^[-•·\s]+/, '')    // quitar guiones/viñetas al inicio
+    .replace(/[-\s]+$/, '')      // quitar guiones/espacios al final
     .replace(/\s+/g, ' ')        // espacios múltiples -> uno
     .trim();
 }
@@ -3391,27 +3393,82 @@ function limpiarArea(a) {
 // Detecta áreas/aptitudes del texto del CV (sin IA, gratis)
 function detectarAreasLocal(texto) {
   if (!texto) return [];
-  const t = texto.toLowerCase();
+  if (typeof texto !== 'string') texto = String(texto);  // robustez ante arrays/números
+  // Quitar tildes del texto para que "médico" haga match con "medico" del mapa
+  const t = texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ñ/g, 'n');
   const mapa = {
+    // ── Tecnología ──
     'Desarrollo de Software': ['programador','desarrollador','developer','software','react','javascript','python','java','node','frontend','backend','fullstack','full stack'],
     'Bases de Datos': ['sql','postgresql','mysql','mongodb','base de datos','bases de datos','database'],
-    'Ingeniería de Sistemas': ['sistemas','informática','ingeniería','ingeniero','computación'],
-    'Marketing y Ventas': ['marketing','ventas','vendedor','comercial','publicidad','redes sociales','community manager'],
-    'Contabilidad y Finanzas': ['contador','contabilidad','contable','finanzas','auditoría','niif','tributario'],
-    'Administración': ['administración','administrador','gerente','gestión','recursos humanos','rrhh','talento humano'],
-    'Diseño Gráfico': ['diseñador','diseño','gráfico','photoshop','illustrator','figma','ux','ui'],
-    'Atención al Cliente': ['atención al cliente','servicio al cliente','call center','soporte','customer'],
-    'Salud': ['enfermero','enfermera','médico','medicina','salud','clínica','hospital','auxiliar de enfermería'],
-    'Educación': ['docente','profesor','maestro','educación','pedagogía','enseñanza'],
-    'Logística': ['logística','bodega','inventario','almacén','supply chain','transporte'],
-    'Construcción': ['construcción','obra','arquitecto','civil','albañil','maestro mayor'],
-    'Ingeniería de APIs': ['api','rest','apis','microservicios','endpoint'],
-    'Automatización': ['automatización','scripts','devops','ci/cd','docker'],
-    'Fintech / Pagos': ['fintech','pagos','payphone','paypal','pasarela','facturación electrónica']
+    'Ingeniería de Sistemas': ['sistemas','informatica','computacion','redes','soporte tecnico','it'],
+    'Diseño Gráfico': ['diseñador grafico','diseñadora grafica','diseño grafico','diseñador','diseñadora','diseño','design','photoshop','illustrator','indesign','corel','coreldraw','branding','identidad visual','artes graficas','publicidad grafica','logotipo','editorial','creativo'],
+    // ── Negocios ──
+    'Marketing y Ventas': ['marketing','ventas','vendedor','vendedora','comercial','publicidad','redes sociales','community manager','asesor comercial','ejecutivo de ventas','impulsador','impulsadora','perchador','mercaderista','promotor','promotora','televentas','preventa','fuerza de ventas'],
+    'Contabilidad y Finanzas': ['contador','contadora','contabilidad','contable','finanzas','auditoria','niif','tributario','sri','nomina'],
+    'Administración': ['administracion','administrador','administradora','gerente','gestion','recursos humanos','rrhh','talento humano','asistente administrativo','secretaria','secretario'],
+    'Atención al Cliente': ['atencion al cliente','servicio al cliente','call center','contact center','soporte','customer','cajero','cajera','recepcionista','teleoperador','telemarketing','bilingue','agente call center','help desk'],
+    'Banca y Seguros': ['banco','bancario','financiera','cooperativa','seguros','credito','cobranzas','asesor financiero'],
+    // ── Salud ──
+    'Salud y Medicina': ['enfermero','enfermera','medico','medica','medicina','salud','clinica','hospital','auxiliar de enfermeria','odontologo','farmacia','farmaceutico','laboratorio','fisioterapeuta'],
+    'Psicología': ['psicologo','psicologa','psicologia','terapeuta','salud mental'],
+    // ── Educación ──
+    'Educación': ['docente','profesor','profesora','maestro','maestra','educacion','pedagogia','enseñanza','tutor','parvularia','educadora'],
+    // ── Oficios y servicios ──
+    'Gastronomía y Cocina': ['cocinero','cocinera','chef','cocina','gastronomia','panadero','pastelero','mesero','mesera','barista','ayudante de cocina','bartender'],
+    'Trabajo Doméstico': ['empleada domestica','empleada','niñera','niñero','limpieza','aseo','conserje','domestico','cuidado de niños','cuidadora','cuidador'],
+    'Seguridad': ['guardia','seguridad','vigilante','guardia de seguridad','monitoreo','custodio'],
+    'Belleza y Estética': ['estilista','peluquero','peluquera','barbero','manicurista','cosmetologa','spa','estetica','maquillador','maquilladora'],
+    'Limpieza y Mantenimiento': ['limpieza','mantenimiento','conserje','jardinero','jardineria','aseo'],
+    // ── Técnicos ──
+    'Mecánica Automotriz': ['mecanico','mecanica','automotriz','enderezador','pintor automotriz','vulcanizador','llantero'],
+    'Electricidad': ['electricista','electrico','instalaciones electricas','electronico','electronica'],
+    'Construcción': ['construccion','obra','arquitecto','civil','albañil','maestro mayor','maestro de obra','plomero','gasfitero','pintor','carpintero','soldador'],
+    'Logística y Transporte': ['logistica','bodega','bodeguero','inventario','almacen','transporte','chofer','choferes','conductor','conductora','despachador','mensajero','repartidor','delivery','taxista','motorizado','motorizada','licencia tipo','licencia profesional','montacarguista','montacargas','furgon','camion','camionero','trailero','tractomula','distribucion','courier','encomiendas','grua'],
+    'Agricultura y Ganadería': ['agricultor','agronomo','agropecuario','ganaderia','agricola','campo','cultivo','floricola','bananera'],
+    // ── Diseño y creatividad ──
+    'Diseño de Interiores': ['diseñador de interiores','diseñadora de interiores','interiorismo','decoracion','interiores','ambientacion','mobiliario','espacios'],
+    'Arquitectura': ['arquitecto','arquitectura','autocad','revit','planos','render','renderizado','maqueta','urbanismo'],
+    'Diseño Industrial': ['diseño industrial','diseñador industrial','diseño de producto','prototipo','modelado 3d','solidworks','impresion 3d','ergonomia'],
+    'Diseño de Modas': ['diseño de modas','diseñador de modas','diseñadora de modas','modas','moda','textil','confeccion','costura','patronaje','modisteria','sastre','sastreria','corte y confeccion'],
+    'Diseño Web y Multimedia': ['diseño web','diseñador web','multimedia','motion graphics','animacion','animador','3d','after effects','premiere','maya','blender','modelado'],
+    'Diseño UX/UI': ['ux','ui','experiencia de usuario','interfaz','figma','prototipado','wireframe','usabilidad'],
+    'Audiovisual y Fotografía': ['fotografo','fotografia','video','editor de video','camarografo','produccion audiovisual'],
+    // ── Turismo y otros ──
+    'Turismo y Hotelería': ['turismo','hotel','hoteleria','recepcionista de hotel','guia turistico','camarera','housekeeping','agencia de viajes'],
+    'Legal': ['abogado','abogada','juridico','legal','derecho','notaria'],
+    'Ingeniería Industrial': ['ingeniero industrial','produccion','procesos','calidad','manufactura','operario','operaria','operador de maquina','obrero','empacador','empacadora','ensamblador','linea de produccion','maquila','planta'],
+    'Nutrición y Bienestar': ['nutricionista','nutricion','dietista','entrenador','entrenadora','gimnasio','fitness','instructor'],
+    'Veterinaria': ['veterinario','veterinaria','mascota','animales','pecuario'],
+    'Limpieza Industrial': ['limpieza industrial','lavanderia','planchado','desinfeccion','fumigacion'],
+    'Petróleo y Minería': ['petroleo','petrolero','minería','minero','perforacion','oil','gas','refineria','campo petrolero','geologo'],
+    'Telecomunicaciones': ['telecomunicaciones','telecom','fibra optica','antenas','instalador de internet','tecnico de redes','cnt','claro','movistar'],
+    'Recursos Humanos': ['recursos humanos','rrhh','talento humano','reclutamiento','reclutador','reclutadora','seleccion de personal','nomina','bienestar laboral','generalista de rrhh'],
+    'Comercio Exterior': ['comercio exterior','importaciones','exportaciones','aduana','aduanero','agente afianzado','logistica internacional','incoterms'],
+    'Farmacia': ['farmacia','farmaceutico','quimico farmaceutico','auxiliar de farmacia','dependiente de farmacia','regente'],
+    'Servicios Generales': ['servicios generales','utility','mantenimiento general','ayudante general','peon','estibador','cargador'],
+    'Periodismo y Comunicación': ['periodista','periodismo','comunicacion social','redactor','reportero','locutor','presentador','relaciones publicas','prensa'],
+    'Ingeniería Mecánica': ['ingeniero mecanico','mecanica industrial','mantenimiento industrial','tornero','fresador','matriceria','metalmecanica'],
+    'Ingeniería Química': ['ingeniero quimico','quimico','laboratorista','procesos quimicos','control de calidad','alimentos'],
+    'Telemarketing y Cobranzas': ['cobranzas','recuperacion de cartera','gestor de cobranzas','call center cobranzas','gestor telefonico'],
+    'Trabajo Social': ['trabajador social','trabajo social','promotor social','desarrollo comunitario','gestor social'],
+    'Deportes y Recreación': ['entrenador deportivo','profesor de educacion fisica','deportes','recreacion','animador turistico','salvavidas','arbitro'],
+    'Música y Arte': ['musico','musica','cantante','artista','pintor artistico','escultor','actor','actriz','bailarin','bailarina','dj']
   };
   const encontradas = [];
+  // Normaliza quitando tildes y ñ→n para comparar parejo en ambos lados
+  function norm(s){ return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ñ/g,'n'); }
+  // Para palabras cortas (<=3 letras) usamos límite de palabra para evitar falsos positivos
+  // Ej: "auxiliar" contiene "ux" pero NO es diseño UX. "desarrollador" contiene "it" pero no es IT.
+  function coincide(texto, palabra) {
+    const pal = norm(palabra);
+    if (pal.length <= 3) {
+      const re = new RegExp('(^|[^a-z0-9])' + pal.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '([^a-z0-9]|$)', 'i');
+      return re.test(texto);
+    }
+    return texto.includes(pal);
+  }
   for (const [area, palabras] of Object.entries(mapa)) {
-    if (palabras.some(p => t.includes(p))) encontradas.push(area);
+    if (palabras.some(p => coincide(t, p))) encontradas.push(area);
   }
   return encontradas;
 }
@@ -4453,7 +4510,7 @@ ${texto}`}]
       'Administración': ['administrador', 'administración', 'gerente', 'gerencia', 'asistente', 'secretaria', 'ejecutivo'],
       'Contabilidad y Finanzas': ['contador', 'contabilidad', 'finanzas', 'financiero', 'auditor', 'cpa', 'tributario', 'economista'],
       'Recursos Humanos': ['rrhh', 'recursos humanos', 'reclutador', 'talento', 'selección', 'hr'],
-      'Diseño': ['diseñador', 'diseño', 'design', 'ux', 'ui', 'gráfico', 'creativo', 'figma', 'photoshop'],
+  
       'Educación': ['profesor', 'docente', 'maestro', 'educación', 'enseñanza', 'pedagogía'],
       'Salud': ['médico', 'enfermera', 'enfermero', 'doctor', 'odontólogo', 'farmacéutico', 'psicólogo', 'salud'],
       'Ingeniería': ['ingeniero', 'ingeniería', 'civil', 'industrial', 'mecánico', 'eléctrico', 'químico'],
@@ -4909,12 +4966,27 @@ async function confirmarPostulacion(empresa, cargo, btn) {
 // Genera los enlaces a los 5 portales de empleo para un cargo+ciudad+empresa
 // Quita niveles y palabras que hacen la búsqueda muy específica (Junior, Senior, etc.)
 function generalizarCargo(cargo) {
-  let c = (cargo||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\s]/g,' ');
-  // Quitar niveles de seniority y palabras que limitan la búsqueda
-  const quitar = ['junior','senior','jr','sr','trainee','pasante','practicante','aprendiz','i','ii','iii','iv','nivel','expert','experto','especialista','lider','jefe de','encargado de','auxiliar de','asistente de','ayudante de'];
+  let c = (cargo||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
+  // Quitar "licencia tipo X" y "tipo X" (de choferes), que limitan la búsqueda
+  c = c.replace(/\blicencia\s+tipo\s+[a-z0-9]+/gi, '');
+  c = c.replace(/\btipo\s+[a-z0-9]+/gi, '');
+  c = c.replace(/\blicencia\s+profesional\b/gi, '');
+  c = c.replace(/\blicencia\b/gi, '');
+  c = c.replace(/\s+/g,' ').trim();
+  // Quitar prefijos al inicio que limitan ("Asistente de", "Auxiliar de", etc.)
+  c = c.replace(/^(asistente|auxiliar|ayudante|encargado|jefe|lider|coordinador|supervisor|practicante|pasante)\s+de\s+/i, '');
+  // Palabras a quitar en cualquier posición (niveles, seniority, calificativos vagos)
+  const quitar = ['junior','senior','jr','sr','trainee','pasante','practicante','aprendiz','i','ii','iii','iv','v','nivel','expert','experto','experta','especialista','certificado','certificada','titulado','titulada','profesional','calificado','calificada','para','de','con','en','del','la','el'];
   let palabras = c.split(/\s+/).filter(Boolean);
   palabras = palabras.filter(function(p){ return quitar.indexOf(p) === -1; });
-  // Tomar las primeras 3-4 palabras clave (el núcleo del cargo)
+  // Quitar "auxiliar/asistente/ayudante" al inicio si quedan sueltos y hay más palabras después
+  while (palabras.length > 1 && ['auxiliar','asistente','ayudante'].indexOf(palabras[0]) !== -1) {
+    palabras.shift();
+  }
+  // Quitar "auxiliar/asistente/ayudante" al FINAL si quedan sueltos (ej: "enfermera auxiliar")
+  while (palabras.length > 1 && ['auxiliar','asistente','ayudante'].indexOf(palabras[palabras.length-1]) !== -1) {
+    palabras.pop();
+  }
   c = palabras.slice(0, 4).join(' ').trim();
   return c || (cargo||'').toLowerCase().trim();
 }
