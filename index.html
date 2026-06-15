@@ -3416,7 +3416,7 @@ function detectarAreasLocal(texto) {
   return encontradas;
 }
 
-// Rellena el buscador con las áreas del CV del candidato (todas, separadas por coma)
+// Rellena el buscador con las 3-4 ÁREAS PRINCIPALES (la IA reparte los 8 empleos entre ellas)
 function mostrarChipsAreas() {
   const banner = document.getElementById('cvDetectadoBanner');
   const input = document.getElementById('busquedaQuery');
@@ -3426,8 +3426,46 @@ function mostrarChipsAreas() {
   areas = areas.map(function(a){ return (typeof limpiarArea==='function') ? limpiarArea(a) : a; }).filter(Boolean);
   if (areas.length) cvData.areasDetectadas = areas;
   if (!areas.length) { if (banner) banner.style.display = 'none'; return; }
-  if (input && !input.value.trim()) { input.value = areas.join(', '); }
-  if (banner) banner.style.display = 'block';
+
+  // Usar las 3-4 áreas principales (las más relevantes del CV)
+  const principales = areas.slice(0, 4);
+
+  // Rellenar el buscador con esas 3-4 áreas (la IA repartirá los 8 empleos entre ellas)
+  if (input && !input.value.trim()) { input.value = principales.join(', '); }
+
+  // Mostrar el banner explicando que busca en esas áreas
+  if (banner) {
+    banner.style.display = 'block';
+    let html = '<div style="font-size:12px;color:var(--verde);margin-bottom:8px">✦ Buscaremos empleos en tus áreas principales:</div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
+    html += principales.map(function(a){
+      return '<span style="background:rgba(0,196,140,0.12);border:1px solid rgba(0,196,140,0.4);color:var(--verde);padding:5px 11px;border-radius:14px;font-size:11px;font-weight:600">' + escHtml(a) + '</span>';
+    }).join('');
+    html += '</div>';
+    // Mostrar las demás áreas como opción de cambiar
+    const otras = areas.slice(4, 9);
+    if (otras.length) {
+      html += '<div style="font-size:11px;color:var(--texto-secundario);margin:8px 0 5px">Otras áreas detectadas (toca para añadir):</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
+      html += otras.map(function(a){
+        return '<button onclick=\'agregarAreaBusqueda(' + escHtml(JSON.stringify(String(a))) + ')\' style="background:transparent;border:1px dashed rgba(0,196,140,0.4);color:var(--texto-secundario);padding:5px 11px;border-radius:14px;font-size:11px;cursor:pointer">+ ' + escHtml(a) + '</button>';
+      }).join('');
+      html += '</div>';
+    }
+    banner.innerHTML = html;
+  }
+}
+
+// Añade un área extra a la búsqueda (reemplaza la búsqueda con esa área enfocada)
+function agregarAreaBusqueda(area) {
+  const input = document.getElementById('busquedaQuery');
+  if (input) input.value = area;  // enfocar la búsqueda solo en esa área
+  if (cvData && cvData.areasDetectadas) {
+    const resto = cvData.areasDetectadas.filter(function(a){ return a !== area; });
+    cvData.areasDetectadas = [area].concat(resto);
+    mostrarChipsAreas();
+  }
+  buscarEmpleo();
 }
 
 function setLoggedInUI() {
@@ -4634,6 +4672,17 @@ async function buscarEmpleo() {
     })); })
     .catch(e => {});
 
+  // Detectar si la búsqueda tiene varias áreas (separadas por coma) para repartir los 8 empleos
+  const areasBusqueda = query.split(',').map(function(a){ return a.trim(); }).filter(Boolean);
+  let instruccionReparto;
+  if (areasBusqueda.length >= 2) {
+    const n = Math.min(areasBusqueda.length, 4);
+    const areasUsar = areasBusqueda.slice(0, n);
+    instruccionReparto = 'El usuario tiene experiencia en varias areas: ' + areasUsar.join(', ') + '. DEVUELVE 8 empleos REPARTIDOS entre esas areas (aproximadamente ' + Math.ceil(8/n) + ' por area), priorizando la primera (' + areasUsar[0] + ') que es la principal. Cada empleo debe ser de UNA de esas areas, no mezcles areas en un mismo puesto.';
+  } else {
+    instruccionReparto = 'DEVUELVE 8 empleos del area buscada.';
+  }
+
   // Buscar empleos con Claude + web search
   let parsed = null;
   {
@@ -4646,7 +4695,7 @@ async function buscarEmpleo() {
       body: JSON.stringify({
         model:'claude-haiku-4-5-20251001', max_tokens:5000,
         tools:[{type:'web_search_20250305',name:'web_search',max_uses:3}],
-        messages:[{role:'user',content:`Busca en la web ofertas de trabajo en Ecuador para: "${query}" en ${ciudad} (modalidad ${modalidad}). Usa Multitrabajos, Computrabajo, LinkedIn, Indeed y grupos de empleo.\n\nLuego DEVUELVE 8 empleos del área buscada en formato JSON. Usa los resultados de la búsqueda web; si para algún campo no hallaste el dato exacto, complétalo de forma realista para ese tipo de puesto en Ecuador (salario "A convenir" si no se publica, descripción típica del cargo). El objetivo es darle al usuario 8 oportunidades reales que pueda explorar en los portales.\n\nREGLAS DE FORMATO (obligatorias):\n- Tu respuesta es EXCLUSIVAMENTE el objeto JSON. Cero texto antes o después. Empieza con { y termina con }.\n- NUNCA te disculpes ni expliques. Si encontraste poca info, igual devuelve 8 empleos con lo que tengas.\n- "url": solo si tienes el enlace directo a la oferta; si no, "".\n- "email": solo si se publica; si no, "".\n\nFormato exacto:\n{"jobs":[{"empresa":"nombre","cargo":"título","ciudad":"${ciudad}","salario":"A convenir","fuente":"Computrabajo","match":85,"email":"","descripcion":"qué hace el puesto en 1-2 líneas","url":"","portales":["multitrabajos","computrabajo","linkedin","indeed"]}]}\n\nDevuelve exactamente 8 objetos en el array jobs.`}]
+        messages:[{role:'user',content:`Busca en la web ofertas de trabajo en Ecuador para: "${query}" en ${ciudad} (modalidad ${modalidad}). Usa Multitrabajos, Computrabajo, LinkedIn, Indeed y grupos de empleo.\n\nLuego ${instruccionReparto} En formato JSON. Usa los resultados de la búsqueda web; si para algún campo no hallaste el dato exacto, complétalo de forma realista para ese tipo de puesto en Ecuador (salario "A convenir" si no se publica, descripción típica del cargo). El objetivo es darle al usuario 8 oportunidades reales que pueda explorar en los portales.\n\nREGLAS DE FORMATO (obligatorias):\n- Tu respuesta es EXCLUSIVAMENTE el objeto JSON. Cero texto antes o después. Empieza con { y termina con }.\n- NUNCA te disculpes ni expliques. Si encontraste poca info, igual devuelve 8 empleos con lo que tengas.\n- "url": solo si tienes el enlace directo a la oferta; si no, "".\n- "email": solo si se publica; si no, "".\n\nFormato exacto:\n{"jobs":[{"empresa":"nombre","cargo":"título","ciudad":"${ciudad}","salario":"A convenir","fuente":"Computrabajo","match":85,"email":"","descripcion":"qué hace el puesto en 1-2 líneas","url":"","portales":["multitrabajos","computrabajo","linkedin","indeed"]}]}\n\nDevuelve exactamente 8 objetos en el array jobs.`}]
       })
     });
     const data = await res.json();
