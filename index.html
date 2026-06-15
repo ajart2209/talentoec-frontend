@@ -1180,6 +1180,9 @@ function validarBeta() {
           <div class="field"><label>Email de contacto</label><input type="email" id="cvEmail" placeholder="juan@gmail.com"></div>
         </div>
         <div class="form-row">
+          <div class="field"><label>Teléfono / WhatsApp <span style="color:var(--texto-secundario);font-size:11px">(para que te contacten)</span></label><input type="tel" id="cvTelefono" placeholder="0998765432" inputmode="tel"></div>
+        </div>
+        <div class="form-row">
           <div class="field"><label>Ciudad</label>
             <select id="cvCiudad">
               <option>Quito</option>
@@ -2183,6 +2186,7 @@ async function loginConSesion(u) {
     showPage('candidato');
     if (document.getElementById('cvNombre')) document.getElementById('cvNombre').value = currentUser.nombre;
     if (document.getElementById('cvEmail')) document.getElementById('cvEmail').value = currentUser.email;
+    if (document.getElementById('cvTelefono') && currentUser.telefono) document.getElementById('cvTelefono').value = currentUser.telefono;
   }, 300);
 }
 
@@ -2277,6 +2281,7 @@ ${cvData.nombre || currentUser?.nombre || 'Candidato'}`;
       cv_mejorado: cvData.cvMejorado || '',
       carta_presentacion: carta,
       areas_detectadas: cvData.areasDetectadas,
+      telefono: cvData.telefono || null,
       cv_archivo: cvData.archivoOriginal || null,
       cv_archivo_nombre: cvData.archivoNombre || null,
       cv_archivo_tipo: cvData.archivoTipo || null
@@ -4211,10 +4216,11 @@ async function guardarYAnalizar() {
   const texto = document.getElementById('cvText').value.trim();
   const nombre = document.getElementById('cvNombre').value.trim();
   const email = document.getElementById('cvEmail').value.trim();
+  const telefono = document.getElementById('cvTelefono') ? document.getElementById('cvTelefono').value.trim() : '';
   const ciudad = document.getElementById('cvCiudad').value;
   const area = document.getElementById('cvArea').value;
   if (!texto) { showToast('⚠ Pega o sube tu CV primero', true); return; }
-  cvData = { texto, nombre, email, ciudad, area, fecha: new Date().toLocaleDateString('es-EC') };
+  cvData = { texto, nombre, email, telefono, ciudad, area, fecha: new Date().toLocaleDateString('es-EC') };
   document.getElementById('cvAnalysis').style.display = 'block';
   document.getElementById('analysisStatus').textContent = 'Analizando tu CV...';
   document.getElementById('analysisContent').innerHTML = '<div style="color:var(--verde)">⟳ Procesando...</div>';
