@@ -2736,13 +2736,18 @@ const ESTADO_VAC = {
   cerrada:   { txt:'🔒 Cerrada',     color:'var(--texto-secundario)' }
 };
 
+let _cargandoVacantes = false;
 async function cargarMisVacantes() {
   const cont = document.getElementById('misVacantesList');
   if (!cont) return;
+  if (_cargandoVacantes) return;  // evitar llamadas duplicadas
+  _cargandoVacantes = true;
+  // Mostrar indicador de carga inmediato
+  cont.innerHTML = '<div class="empty-state" style="padding:30px"><div style="font-size:24px;margin-bottom:8px">⟳</div>Cargando tus vacantes...</div>';
   try {
     const r = await apiCall('/api/auth/vacantes/mias');
     const vacs = r.vacantes || [];
-    if (!vacs.length) { cont.innerHTML = '<div class="empty-state">Aún no has publicado vacantes</div>'; return; }
+    if (!vacs.length) { cont.innerHTML = '<div class="empty-state">Aún no has publicado vacantes</div>'; _cargandoVacantes = false; return; }
     cont.innerHTML = vacs.map(v => {
       const st = ESTADO_VAC[v.estado] || ESTADO_VAC.pendiente;
       return `
@@ -2769,6 +2774,7 @@ async function cargarMisVacantes() {
   } catch(e) {
     cont.innerHTML = '<div class="empty-state">⚠ ' + escHtml(e.message) + '</div>';
   }
+  _cargandoVacantes = false;
 }
 
 async function cerrarVacante(id) {
@@ -3666,6 +3672,8 @@ function goHome() { showPage('landing'); }
 
 // ======= PAGES =======
 function showPage(page) {
+  // Despertar el servidor apenas el usuario navega (gana segundos antes de cargar datos)
+  if (['empleador','candidato','admin'].includes(page) && typeof despertarServidor === 'function') despertarServidor();
   if (page === 'admin') setTimeout(() => { if (typeof cargarVacantesAdmin === 'function') cargarVacantesAdmin('pendiente'); }, 400);
   // Protección de páginas - requieren login
   const paginasProtegidas = ['candidato', 'empleador', 'perfil', 'admin'];
@@ -3942,7 +3950,15 @@ async function guardarPerfilEmpresa() {
   }
 }
 
+// Despierta el servidor (Railway gratis lo duerme tras inactividad)
+let _servidorDespierto = false;
+function despertarServidor() {
+  if (_servidorDespierto) return;
+  fetch(BACKEND_URL + '/api/auth/health').then(() => { _servidorDespierto = true; }).catch(() => {});
+}
+
 function empTab(tab) {
+  despertarServidor();
   ['vacantes','metricas','empresa'].forEach(t => {
     const el = document.getElementById('emp-tab-'+t);
     if (el) el.style.display = t===tab?'block':'none';
