@@ -3008,7 +3008,7 @@ async function responderPostulante(postId, tipo, vacanteId) {
 }
 
 // ── CANDIDATO: postular a vacante exclusiva ──
-async function postularVacante(id, empresa, cargo) {
+async function postularVacante(id, empresa, cargo, btn) {
   if (!currentUser) { openAuth('register'); showToast('Crea tu cuenta gratis para enviar tu CV 🎉'); return; }
 
   // Verificar que tenga CV guardado — si no, mandarlo a crearlo
@@ -3027,12 +3027,40 @@ async function postularVacante(id, empresa, cargo) {
       method:'POST',
       body: JSON.stringify({ mensaje: 'Hola, soy ' + (currentUser.nombre||'un candidato') + ' y me interesa la vacante de ' + cargo + '. Adjunto mi CV a través de TalentoEC. Quedo atento/a a su respuesta.' })
     });
-    showToast('✅ ¡CV enviado a ' + empresa + '! Te contactarán por tu correo.');
+    showToast('✅ ¡CV enviado a ' + empresa + '! Te contactarán pronto.');
     correosEnviados.push({ to:'', subject:cargo, empresa:empresa, cargo:cargo, fecha:new Date().toLocaleString('es-EC'), estado:'CV enviado' });
     guardarCorreosEnviados();
+    marcarVacantePostulada(btn);  // ocultar/transformar la tarjeta
   } catch(e) {
-    showToast(e.message.includes('Ya postulaste') ? 'ℹ Ya enviaste tu CV a esta vacante' : '⚠ ' + e.message, !e.message.includes('Ya postulaste'));
+    const yaPostulo = e.message.includes('Ya postulaste');
+    showToast(yaPostulo ? 'ℹ Ya enviaste tu CV a esta vacante' : '⚠ ' + e.message, !yaPostulo);
+    if (yaPostulo) marcarVacantePostulada(btn);  // si ya postuló, también ocultarla
   }
+}
+
+// Oculta (con animación) la tarjeta de una vacante a la que ya se envió el CV
+function marcarVacantePostulada(btn) {
+  if (!btn) return;
+  const card = btn.closest('.job-card');
+  if (!card) return;
+  // Transformar el botón a estado "enviado"
+  btn.textContent = '✅ CV enviado';
+  btn.style.pointerEvents = 'none';
+  btn.style.opacity = '0.7';
+  // Desvanecer y colapsar la tarjeta suavemente
+  card.style.transition = 'opacity .5s, transform .5s, max-height .6s, margin .6s, padding .6s';
+  card.style.maxHeight = card.offsetHeight + 'px';
+  setTimeout(() => {
+    card.style.opacity = '0';
+    card.style.transform = 'scale(0.96)';
+    card.style.maxHeight = '0';
+    card.style.marginTop = '0';
+    card.style.marginBottom = '0';
+    card.style.paddingTop = '0';
+    card.style.paddingBottom = '0';
+    card.style.overflow = 'hidden';
+  }, 800);
+  setTimeout(() => { card.remove(); }, 1500);
 }
 
 // ── ADMIN: moderación de vacantes ──
@@ -3692,7 +3720,7 @@ async function cargarBolsa() {
         </div>
         <div style="font-size:12.5px;color:var(--texto-secundario);white-space:pre-line;max-height:120px;overflow:hidden;line-height:1.6">${escHtml(v.descripcion)}</div>
         <div class="card-actions">
-          <button class="btn-sm-green" onclick='postularBolsa(${escHtml(JSON.stringify(String(v.id)))},${escHtml(JSON.stringify(String(v.empresa||"")))},${escHtml(JSON.stringify(String(v.cargo||"")))})'>📄 Enviar mi CV</button>
+          <button class="btn-sm-green" onclick='postularBolsa(${escHtml(JSON.stringify(String(v.id)))},${escHtml(JSON.stringify(String(v.empresa||"")))},${escHtml(JSON.stringify(String(v.cargo||"")))},this)'>📄 Enviar mi CV</button>
         </div>
       </div>`).join('');
   } catch(e) {
@@ -3717,7 +3745,7 @@ function tiempoRelativo(fecha) {
 }
 
 // Postular desde la bolsa (pide login solo en este momento)
-async function postularBolsa(id, empresa, cargo) {
+async function postularBolsa(id, empresa, cargo, btn) {
   if (!currentUser) {
     openAuth('register');
     showToast('Crea tu cuenta gratis para postular a ' + cargo + ' 🎉');
@@ -3727,7 +3755,7 @@ async function postularBolsa(id, empresa, cargo) {
     showToast('Las cuentas de empleador no pueden postular.', true);
     return;
   }
-  await postularVacante(id, empresa, cargo);
+  await postularVacante(id, empresa, cargo, btn);
 }
 function goHome() { showPage('landing'); }
 
@@ -4655,7 +4683,7 @@ function renderJobCards(jobs) {
       </div>`}
       <div class="card-actions">
         ${exclusiva
-          ? `<button class="btn-sm-green" onclick='postularVacante(${escHtml(JSON.stringify(String(j.vacante_id)))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))})'>📄 Enviar mi CV</button>`
+          ? `<button class="btn-sm-green" onclick='postularVacante(${escHtml(JSON.stringify(String(j.vacante_id)))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))},this)'>📄 Enviar mi CV</button>`
           : `${tieneUrl ? `<button class="btn-sm-green" onclick='abrirOferta(${escHtml(JSON.stringify(urlOk))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))},this)'>🔗 Postular directo</button>` : ''}
              <button class="btn-sm-green" onclick='confirmarPostulacion(${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))},this)'>✅ Ya postulé</button>`}
         ${!exclusiva && j.email && j.email!=='' && j.email!=='undefined' ? `<button class="btn-sm-outline" onclick='abrirEmailModal(${escHtml(JSON.stringify(String(j.email)))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))},${escHtml(JSON.stringify(currentUser?.nombre||'Candidato'))},true)'>✉ Correo</button>` : ''}
