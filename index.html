@@ -2276,7 +2276,10 @@ ${cvData.nombre || currentUser?.nombre || 'Candidato'}`;
       cv_texto: cvData.texto,
       cv_mejorado: cvData.cvMejorado || '',
       carta_presentacion: carta,
-      areas_detectadas: cvData.areasDetectadas
+      areas_detectadas: cvData.areasDetectadas,
+      cv_archivo: cvData.archivoOriginal || null,
+      cv_archivo_nombre: cvData.archivoNombre || null,
+      cv_archivo_tipo: cvData.archivoTipo || null
     });
   }
 }
@@ -2909,12 +2912,40 @@ function verCV(vacanteId, idx) {
   modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
 }
 
-// Descarga el CV del candidato como archivo de texto
+// Descarga el CV del candidato — el archivo ORIGINAL (PDF/Word) si existe, o texto como respaldo
 function descargarCV(vacanteId, idx) {
   const p = (postulantesCache[vacanteId]||[])[idx];
-  if (!p || !p.cv) return;
+  if (!p) return;
   const c = p.candidato || {};
   const nombre = (c.nombre || 'Candidato').replace(/[^a-zA-Z0-9áéíóúñ ]/gi,'').trim();
+
+  // ── Si hay archivo original (PDF/Word), descargarlo idéntico ──
+  if (p.cv_archivo) {
+    try {
+      const a = document.createElement('a');
+      a.href = p.cv_archivo;  // data URL base64 (ya incluye el tipo)
+      // Nombre: usar el original, o construir uno con la extensión correcta
+      let nombreArchivo = p.cv_archivo_nombre;
+      if (!nombreArchivo) {
+        let ext = 'pdf';
+        if (p.cv_archivo_tipo && p.cv_archivo_tipo.includes('word')) ext = 'docx';
+        else if (p.cv_archivo.startsWith('data:application/pdf')) ext = 'pdf';
+        else if (p.cv_archivo.includes('wordprocessingml')) ext = 'docx';
+        nombreArchivo = 'CV_' + nombre.replace(/\s+/g,'_') + '.' + ext;
+      }
+      a.download = nombreArchivo;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast('⬇️ CV descargado (' + nombreArchivo + ')');
+      return;
+    } catch(err) {
+      console.error('Error descargando archivo original, usando texto:', err);
+    }
+  }
+
+  // ── Respaldo: si no hay archivo original, descargar el texto ──
+  if (!p.cv) { showToast('⚠ Este candidato no adjuntó archivo de CV', true); return; }
   const encabezado = 'CURRÍCULUM — ' + (c.nombre || 'Candidato') + '\n' +
     (c.email ? 'Email: ' + c.email + '\n' : '') +
     (c.telefono ? 'Teléfono: ' + c.telefono + '\n' : '') +
@@ -2929,7 +2960,7 @@ function descargarCV(vacanteId, idx) {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  showToast('⬇️ CV descargado');
+  showToast('⬇️ CV descargado (texto)');
 }
 
 async function responderPostulante(postId, tipo, vacanteId) {
@@ -3515,7 +3546,10 @@ async function iniciarSesion() {
       cvMejorado: user.cvData.cvMejorado || user.cvData.cv_mejorado || '',
       cartaPresentacion: user.cvData.cartaPresentacion || user.cvData.carta_presentacion || '',
       areasDetectadas: user.cvData.areasDetectadas || user.cvData.areas_detectadas || [],
-      fecha: user.cvData.fecha || user.cvData.cv_fecha || ''
+      fecha: user.cvData.fecha || user.cvData.cv_fecha || '',
+      archivoOriginal: user.cvData.archivoOriginal || user.cvData.cv_archivo || null,
+      archivoNombre: user.cvData.archivoNombre || user.cvData.cv_archivo_nombre || null,
+      archivoTipo: user.cvData.archivoTipo || user.cvData.cv_archivo_tipo || null
     };
   } else {
     cvData = {};
@@ -3972,6 +4006,25 @@ function empTab(tab) {
 }
 
 // ======= CV =======
+// Guarda el archivo original (PDF/Word/TXT) en base64 para que el empleador lo descargue idéntico
+function guardarArchivoOriginal(file) {
+  // Límite de 3 MB para no saturar (un CV normal pesa mucho menos)
+  if (file.size > 3 * 1024 * 1024) {
+    console.warn('Archivo muy grande para guardar original (>3MB), solo se guardará el texto');
+    if (cvData) { cvData.archivoOriginal = null; cvData.archivoNombre = null; cvData.archivoTipo = null; }
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    if (!window.cvData) window.cvData = {};
+    cvData.archivoOriginal = e.target.result;  // data URL base64
+    cvData.archivoNombre = file.name;
+    cvData.archivoTipo = file.type || '';
+    console.log('✓ Archivo original guardado:', file.name, '(' + Math.round(file.size/1024) + ' KB)');
+  };
+  reader.readAsDataURL(file);  // convierte a base64 (data:...)
+}
+
 async function handleFile(input) {
   const file = input.files[0]; if (!file) return;
   const nombre = file.name.toLowerCase();
@@ -3988,7 +4041,6 @@ async function handleFile(input) {
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
           const content = await page.getTextContent();
-          // Reconstruir líneas respetando posición Y
           let lastY = null;
           for (const item of content.items) {
             if (lastY !== null && Math.abs(item.transform[5] - lastY) > 5) {
@@ -4000,6 +4052,7 @@ async function handleFile(input) {
           texto += '\n';
         }
         document.getElementById('cvText').value = texto.trim();
+        guardarArchivoOriginal(file);  // guardar el PDF original
         mostrarCVCargado(file.name, texto.length);
         showToast('✓ PDF cargado correctamente');
       } catch(err) {
@@ -4017,6 +4070,7 @@ async function handleFile(input) {
         const texto = result.value.trim();
         if (!texto) { showToast('⚠ El archivo Word está vacío', true); return; }
         document.getElementById('cvText').value = texto;
+        guardarArchivoOriginal(file);  // guardar el Word original
         mostrarCVCargado(file.name, texto.length);
         showToast('✓ Word cargado correctamente');
       } catch(err) {
@@ -4030,6 +4084,7 @@ async function handleFile(input) {
     const reader = new FileReader();
     reader.onload = e => {
       document.getElementById('cvText').value = e.target.result.trim();
+      guardarArchivoOriginal(file);  // guardar el TXT original
       mostrarCVCargado(file.name, e.target.result.length);
       showToast('✓ Archivo de texto cargado');
     };
