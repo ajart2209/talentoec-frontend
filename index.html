@@ -2739,7 +2739,8 @@ async function cargarMisVacantes() {
         <div class="card-actions">
           ${(v.postulantes||0) > 0 ? `<button class="btn-sm-green" onclick='verPostulantes(${escHtml(JSON.stringify(String(v.id)))})'>👥 Ver postulantes (${v.postulantes})</button>` : ''}
           ${v.estado !== 'cerrada' ? `<button class="btn-sm-outline" onclick='editarVacante(${escHtml(JSON.stringify(String(v.id)))})'>✏️ Editar</button>` : ''}
-          ${v.estado !== 'cerrada' ? `<button class="btn-sm-outline" onclick='cerrarVacante(${escHtml(JSON.stringify(String(v.id)))})'>🔒 Cerrar</button>` : ''}
+          ${v.estado !== 'cerrada' ? `<button class="btn-sm-outline" onclick='cerrarVacante(${escHtml(JSON.stringify(String(v.id)))})'>⏸ Pausar</button>` : `<button class="btn-sm-green" onclick='reabrirVacante(${escHtml(JSON.stringify(String(v.id)))})'>▶ Reactivar</button>`}
+          <button class="btn-sm-outline" style="border-color:var(--rojo);color:var(--rojo)" onclick='borrarVacante(${escHtml(JSON.stringify(String(v.id)))},${escHtml(JSON.stringify(String(v.cargo||"")))})'>🗑️ Borrar</button>
         </div>
       </div>`;
     }).join('');
@@ -2749,9 +2750,34 @@ async function cargarMisVacantes() {
 }
 
 async function cerrarVacante(id) {
+  if (!confirm('¿Pausar esta vacante? Dejará de aparecer en las búsquedas, pero podrás reactivarla después.')) return;
   try {
     await apiCall('/api/auth/vacantes/' + id + '/cerrar', { method:'POST' });
-    showToast('Vacante cerrada');
+    showToast('⏸ Vacante pausada');
+    cargarMisVacantes();
+  } catch(e) { showToast('⚠ ' + e.message, true); }
+}
+
+async function reabrirVacante(id) {
+  try {
+    // Reactivar = editar para volver a pendiente (revisión rápida)
+    const r = await apiCall('/api/auth/vacantes/' + id);
+    const v = r.vacante;
+    if (!v) return;
+    await apiCall('/api/auth/vacantes/' + id, { method:'PUT', body: JSON.stringify({
+      cargo: v.cargo, descripcion: v.descripcion, ciudad: v.ciudad,
+      modalidad: v.modalidad, salario: v.salario, email_contacto: v.email_contacto, empresa: v.empresa
+    })});
+    showToast('▶ Vacante reactivada — pasará por revisión rápida');
+    cargarMisVacantes();
+  } catch(e) { showToast('⚠ ' + e.message, true); }
+}
+
+async function borrarVacante(id, cargo) {
+  if (!confirm('¿BORRAR la vacante "' + cargo + '" definitivamente?\n\nEsto eliminará la vacante y todas sus postulaciones. No se puede deshacer.')) return;
+  try {
+    await apiCall('/api/auth/vacantes/' + id, { method:'DELETE' });
+    showToast('🗑️ Vacante eliminada');
     cargarMisVacantes();
   } catch(e) { showToast('⚠ ' + e.message, true); }
 }
