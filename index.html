@@ -2053,7 +2053,23 @@ const BACKEND_URL = 'https://talentoec-backend-production.up.railway.app';
 const BOLSA_ACTIVA = false;
 
 // Helper para llamar al backend con manejo de errores
+// Detector de conexión: avisa cuando el usuario pierde o recupera internet
+if (typeof window !== 'undefined') {
+  window.addEventListener('offline', () => {
+    try { showToast('📵 Te quedaste sin internet. Algunas acciones no funcionarán.'); } catch(e) {}
+  });
+  window.addEventListener('online', () => {
+    try { showToast('✅ ¡Internet de vuelta! Ya puedes seguir.'); } catch(e) {}
+  });
+}
+
 async function apiCall(endpoint, options = {}) {
+  // Sin internet: avisar claro antes de intentar
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    const e = new Error('Sin conexión a internet. Revisa tu señal e intenta de nuevo.');
+    e.sinConexion = true;
+    throw e;
+  }
   try {
     const token = localStorage.getItem('talento_token');
     const headers = {
@@ -2062,13 +2078,40 @@ async function apiCall(endpoint, options = {}) {
       ...(options.headers || {})
     };
     const res = await fetch(BACKEND_URL + endpoint, { ...options, headers });
-    const data = await res.json();
+    // Token expirado o inválido → cerrar sesión y mandar a login
+    if (res.status === 401) {
+      manejarSesionExpirada();
+      const e = new Error('Tu sesión expiró. Vuelve a iniciar sesión.');
+      e.sesionExpirada = true;
+      throw e;
+    }
+    const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || data.message || 'Error de servidor');
     return data;
   } catch(err) {
+    // Error de red (sin internet, servidor caído): mensaje humano
+    if (err instanceof TypeError && String(err.message).includes('fetch')) {
+      const e = new Error('No pudimos conectar. Revisa tu internet e intenta de nuevo.');
+      e.sinConexion = true;
+      console.error('API Error (red):', err);
+      throw e;
+    }
     console.error('API Error:', err);
     throw err;
   }
+}
+
+// Maneja el token expirado: limpia la sesión y avisa al usuario una sola vez
+let _sesionExpiradaAvisada = false;
+function manejarSesionExpirada() {
+  localStorage.removeItem('talento_token');
+  if (_sesionExpiradaAvisada) return;
+  _sesionExpiradaAvisada = true;
+  try { showToast('Tu sesión expiró por seguridad. Vuelve a iniciar sesión 🔐'); } catch(e) {}
+  setTimeout(() => {
+    try { openAuth('login'); } catch(e) {}
+    _sesionExpiradaAvisada = false;
+  }, 1500);
 }
 // Escape de HTML para datos externos (anti-XSS en render de empleos)
 function escHtml(s) {
@@ -4755,6 +4798,7 @@ async function buscarEmpleo() {
         messages:[{role:'user',content:`Busca en la web ofertas de trabajo en Ecuador para: "${query}" en ${ciudad} (modalidad ${modalidad}). Usa Multitrabajos, Computrabajo, LinkedIn, Indeed y grupos de empleo.\n\nLuego ${instruccionReparto} En formato JSON. Usa los resultados de la búsqueda web; si para algún campo no hallaste el dato exacto, complétalo de forma realista para ese tipo de puesto en Ecuador (salario "A convenir" si no se publica, descripción típica del cargo). El objetivo es darle al usuario 8 oportunidades reales que pueda explorar en los portales.\n\nREGLAS DE FORMATO (obligatorias):\n- Tu respuesta es EXCLUSIVAMENTE el objeto JSON. Cero texto antes o después. Empieza con { y termina con }.\n- NUNCA te disculpes ni expliques. Si encontraste poca info, igual devuelve 8 empleos con lo que tengas.\n- "url": solo si tienes el enlace directo a la oferta; si no, "".\n- "email": solo si se publica; si no, "".\n\nFormato exacto:\n{"jobs":[{"empresa":"nombre","cargo":"título","ciudad":"${ciudad}","salario":"A convenir","fuente":"Computrabajo","match":85,"email":"","descripcion":"qué hace el puesto en 1-2 líneas","url":"","portales":["multitrabajos","computrabajo","linkedin","indeed"]}]}\n\nDevuelve exactamente 8 objetos en el array jobs.`}]
       })
     });
+    if (res.status === 401) { manejarSesionExpirada(); throw new Error('Tu sesión expiró. Vuelve a iniciar sesión.'); }
     const data = await res.json();
     if (!res.ok) {
       const err = new Error((data && data.error) || ('Error del servidor (' + res.status + ')'));
