@@ -14,6 +14,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TalentoEC — Conectando Ecuador</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<!-- ===== Cajita de Pago PayPhone v2.0 (entorno seguro: la tarjeta NUNCA pasa por TalentoEC) ===== -->
+<link rel="stylesheet" href="https://cdn.payphonetodoesposible.com/box/v2.0/payphone-payment-box.css">
+<script type="module" src="https://cdn.payphonetodoesposible.com/box/v2.0/payphone-payment-box.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -1775,44 +1778,13 @@ function validarBeta() {
           <div><div class="pp-plan-name">Plan seleccionado</div><div style="font-size:15px;font-weight:600;margin-top:2px" id="ppPlanName">Pro</div></div>
           <div><div class="pp-plan-price" id="ppPlanPrice">$29.99</div><div style="font-size:10px;color:var(--texto-secundario);text-align:right">/mes</div></div>
         </div>
-        <div class="filters-title" style="margin-bottom:12px">Método de pago</div>
-        <div class="pp-methods">
-          <div class="pp-method selected" onclick="selectPPMethod('tarjeta',this)">
-            <div class="pp-method-icon">💳</div>
-            <div class="pp-method-label">Tarjeta</div>
-            <div class="pp-method-desc">Crédito o débito</div>
-          </div>
-          <div class="pp-method" onclick="selectPPMethod('celular',this)">
-            <div class="pp-method-icon">📱</div>
-            <div class="pp-method-label">PayPhone App</div>
-            <div class="pp-method-desc">Pago por celular</div>
-          </div>
-        </div>
-
-        <!-- Tarjeta form -->
-        <div class="pp-form-section visible" id="ppTarjetaForm">
-          <div class="field"><label>Número de tarjeta</label><input type="text" placeholder="0000 0000 0000 0000" maxlength="19" oninput="formatCard(this)"></div>
-          <div class="form-row">
-            <div class="field"><label>Vencimiento</label><input type="text" placeholder="MM/AA" maxlength="5"></div>
-            <div class="field"><label>CVV</label><input type="text" placeholder="123" maxlength="3"></div>
-          </div>
-          <div class="field"><label>Nombre en la tarjeta</label><input type="text" placeholder="JUAN PÉREZ"></div>
-        </div>
-
-        <!-- Celular form -->
-        <div class="pp-form-section" id="ppCelularForm">
-          <div class="field">
-            <label>Número de celular</label>
-            <div class="pp-phone-input">
-              <div class="pp-phone-prefix">+593</div>
-              <input type="tel" placeholder="0999 123 456" style="flex:1;background:var(--negro);border:1px solid var(--gris-borde);color:var(--texto-primario);padding:10px 14px;border-radius:8px;font-size:14px;outline:none">
-            </div>
-            <div style="font-size:11px;color:var(--texto-secundario);margin-top:6px">Recibirás una notificación en tu app PayPhone para confirmar</div>
-          </div>
-        </div>
-
-        <button class="btn-pp-pay" onclick="procesarPago()">Pagar con PayPhone →</button>
-        <div class="pp-security">Pago cifrado SSL · PCI DSS · 100% seguro en Ecuador</div>
+        <div class="filters-title" style="margin-bottom:12px">Pago seguro</div>
+        <!-- Aquí PayPhone inyecta su Cajita de Pago (tarjeta y PayPhone App).
+             El usuario ingresa los datos en el entorno cifrado de PayPhone,
+             nunca en TalentoEC. -->
+        <div id="ppBox" style="min-height:60px"></div>
+        <div id="ppBoxAviso" style="font-size:12px;color:var(--rojo);text-align:center;margin-top:10px;display:none"></div>
+        <div class="pp-security">Procesado por PayPhone · Pago cifrado · Tus datos de tarjeta no pasan por TalentoEC</div>
         <div style="text-align:center;margin-top:12px"><button onclick="cerrarPago()" style="background:none;border:none;color:var(--texto-secundario);font-size:12px;cursor:pointer">Cancelar</button></div>
       </div>
     </div>
@@ -2045,6 +2017,17 @@ function validarBeta() {
 <script>
 // ======= CONFIG =======
 const BACKEND_URL = 'https://talentoec-backend-production.up.railway.app';
+
+// ======= PAYPHONE (Cajita de Pago) =======
+// 👉 Pega aquí los DOS valores que te da PayPhone en su panel de developers,
+//    en la sección de tu aplicación / cajita de pago:
+//    - Token de la cajita (es el token de aplicación; sí va en el frontend)
+//    - Store ID (identificador de tu tienda)
+// ⚠️ En el panel de PayPhone, configura la "URL de Respuesta" de la cajita
+//    apuntando a tu propia página (la URL pública de tu index.html en GitHub Pages).
+//    PayPhone regresará al usuario a esa URL con ?id=...&clientTransactionId=...
+const PAYPHONE_TOKEN    = 'PEGA_AQUI_TU_TOKEN_DE_LA_CAJITA';
+const PAYPHONE_STORE_ID = 'PEGA_AQUI_TU_STORE_ID';
 
 // ⚙️ INTERRUPTOR: Bolsa de empleo pública.
 // Ponlo en true cuando tengas ~50 vacantes publicadas para que la
@@ -6159,35 +6142,128 @@ function renderCorreos() {
     </div>`).join('');
 }
 
-// ======= PAYPHONE =======
+// ======= PAYPHONE (Cajita de Pago real) =======
+
+// Mapa de cada plan -> monto en CENTAVOS (PayPhone trabaja en centavos enteros)
+// y la clave interna del plan que se activará al confirmarse el pago.
+const PP_PLANES = {
+  'Básico':               { cents:999,   key:'basico' },
+  'Estándar':             { cents:1999,  key:'estandar' },
+  'Pro':                  { cents:2999,  key:'pro' },
+  'Empleador Básico':     { cents:4900,  key:'emp_basico' },
+  'Empleador Pro':        { cents:14900, key:'emp_pro' },
+  'Empleador Enterprise': { cents:39900, key:'emp_enterprise' }
+};
+
 function abrirPago(plan, precio) {
+  // Para "que se cargue solo" al usuario correcto, hace falta sesión iniciada.
+  if (!currentUser) {
+    try { showToast('Primero inicia sesión para contratar tu plan.'); } catch(e){}
+    try { abrirAuth ? abrirAuth() : showPage('login'); } catch(e){}
+    return;
+  }
+  const info = PP_PLANES[plan];
+  if (!info) { try{ showToast('Plan no reconocido.'); }catch(e){} return; }
+
   document.getElementById('ppPlanName').textContent = 'Plan ' + plan;
   document.getElementById('ppPlanPrice').textContent = '$' + precio;
   document.getElementById('ppModal').classList.add('open');
-  document.getElementById('ppPayView').style.display='block';
-  document.getElementById('ppSuccess').className='pp-success';
+  document.getElementById('ppPayView').style.display = 'block';
+  document.getElementById('ppSuccess').className = 'pp-success';
+
+  const aviso = document.getElementById('ppBoxAviso');
+  aviso.style.display = 'none';
+
+  // ¿Faltan las credenciales? Avisar en vez de romper.
+  if (PAYPHONE_TOKEN.startsWith('PEGA_AQUI') || PAYPHONE_STORE_ID.startsWith('PEGA_AQUI')) {
+    aviso.textContent = '⚙️ Falta configurar el Token y el Store ID de PayPhone en el código.';
+    aviso.style.display = 'block';
+    return;
+  }
+
+  // ID único de esta transacción. Guardamos a qué plan corresponde para
+  // recuperarlo cuando PayPhone nos regrese a la página.
+  const clientTxId = 'TEC-' + Date.now() + '-' + Math.random().toString(36).slice(2,8);
+  try {
+    localStorage.setItem('pp_pendiente', JSON.stringify({
+      clientTxId, planKey: info.key, planLabel: plan, email: currentUser.email
+    }));
+  } catch(e){}
+
+  // Renderizar la Cajita segura de PayPhone.
+  const cont = document.getElementById('ppBox');
+  cont.innerHTML = '';
+  if (typeof PPaymentButtonBox === 'undefined') {
+    aviso.textContent = 'La pasarela aún está cargando. Espera unos segundos e intenta de nuevo.';
+    aviso.style.display = 'block';
+    return;
+  }
+  try {
+    const ppb = new PPaymentButtonBox({
+      token: PAYPHONE_TOKEN,
+      storeId: PAYPHONE_STORE_ID,
+      clientTransactionId: clientTxId,
+      amount: info.cents,
+      amountWithoutTax: info.cents, // sin desglose de IVA; ajústalo con tu contador si aplica
+      amountWithTax: 0,
+      tax: 0,
+      service: 0,
+      tip: 0,
+      currency: 'USD',
+      reference: 'TalentoEC - Plan ' + plan,
+      lang: 'es'
+    });
+    ppb.render('ppBox');
+  } catch(err) {
+    aviso.textContent = 'No se pudo cargar la pasarela. Revisa tu conexión e intenta de nuevo.';
+    aviso.style.display = 'block';
+  }
 }
+
 function cerrarPago() { document.getElementById('ppModal').classList.remove('open'); }
-function selectPPMethod(method, el) {
-  document.querySelectorAll('.pp-method').forEach(m=>m.classList.remove('selected'));
-  el.classList.add('selected');
-  document.getElementById('ppTarjetaForm').className = 'pp-form-section' + (method==='tarjeta'?' visible':'');
-  document.getElementById('ppCelularForm').className = 'pp-form-section' + (method==='celular'?' visible':'');
-}
-function formatCard(input) {
-  let v = input.value.replace(/\D/g,'').substring(0,16);
-  input.value = v.replace(/(.{4})/g,'$1 ').trim();
-}
-async function procesarPago() {
-  document.querySelector('.btn-pp-pay').textContent = '⟳ Procesando...';
-  await new Promise(r=>setTimeout(r,2000));
-  document.getElementById('ppPayView').style.display='none';
-  document.getElementById('ppSuccess').className='pp-success visible';
-  const planKey = (document.getElementById('ppPlanName').textContent.toLowerCase().includes('básico')||document.getElementById('ppPlanName').textContent.includes('9')) ? 'basico' : (document.getElementById('ppPlanName').textContent.toLowerCase().includes('estándar')||document.getElementById('ppPlanName').textContent.includes('19')) ? 'estandar' : 'pro';
-  if (currentUser) { currentUser.plan = planKey; await saveToStorage('talento_user', currentUser); updateLimitBar(); }
-  document.getElementById('empPlanPill').textContent = 'PLAN PRO ACTIVO';
-}
 function cerrarPagoExito() { cerrarPago(); if(currentUser) showPage('empleador'); }
+
+// Al volver de PayPhone, la URL trae ?id=...&clientTransactionId=...
+// Confirmamos contra el BACKEND (nunca solo en el navegador) y activamos el plan.
+async function verificarRetornoPayphone() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  const clientTxId = params.get('clientTransactionId');
+  if (!id || !clientTxId) return;
+
+  // Limpiar la URL para que no se reprocese al recargar.
+  try { history.replaceState({}, '', window.location.pathname); } catch(e){}
+
+  let pendiente = {};
+  try { pendiente = JSON.parse(localStorage.getItem('pp_pendiente') || '{}'); } catch(e){}
+
+  try {
+    const r = await apiCall('/api/pagos/confirmar', {
+      method: 'POST',
+      body: JSON.stringify({ id, clientTxId })
+    });
+    if (r && r.aprobado) {
+      const planKey = r.plan || pendiente.planKey || 'pro';
+      if (currentUser) {
+        currentUser.plan = planKey;
+        try { await saveToStorage('talento_user', currentUser); } catch(e){}
+        try { updateLimitBar(); } catch(e){}
+      }
+      // Mostrar pantalla de éxito.
+      document.getElementById('ppModal').classList.add('open');
+      document.getElementById('ppPayView').style.display = 'none';
+      document.getElementById('ppSuccess').className = 'pp-success visible';
+      try { localStorage.removeItem('pp_pendiente'); } catch(e){}
+    } else {
+      try { showToast('El pago no se completó o fue rechazado. No se hizo ningún cobro.'); } catch(e){}
+    }
+  } catch(err) {
+    try { showToast('No pudimos confirmar el pago. Si te cobraron, escríbenos por WhatsApp.'); } catch(e){}
+  }
+}
+if (typeof window !== 'undefined') {
+  window.addEventListener('load', verificarRetornoPayphone);
+}
 
 // ======= UTILS =======
 const PLANES = {
