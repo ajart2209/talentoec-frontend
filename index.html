@@ -1322,12 +1322,9 @@ function validarBeta() {
           <div class="chips-row" id="fuentesChips">
             <span class="chip on" onclick="toggleChip(this)">LinkedIn</span>
             <span class="chip on" onclick="toggleChip(this)">Multitrabajos</span>
-            <span class="chip on" onclick="toggleChip(this)">Indeed EC</span>
-            <span class="chip on" onclick="toggleChip(this)">OLX Ecuador</span>
             <span class="chip on" onclick="toggleChip(this)">Computrabajo</span>
+            <span class="chip on" onclick="toggleChip(this)">Indeed EC</span>
             <span class="chip on" onclick="toggleChip(this)">Facebook Empleos</span>
-            <span class="chip" onclick="toggleChip(this)">Twitter/X</span>
-            <span class="chip" onclick="toggleChip(this)">Universidades EC</span>
           </div>
         </div>
         <button class="btn-full" onclick="buscarEmpleo()" style="font-size:15px;padding:14px">🔍 Buscar empleos ahora</button>
@@ -2636,6 +2633,14 @@ async function refrescarSesionDesdeNube() {
       try { setLoggedInUI(); } catch(e){}
       try { await saveToStorage('talento_user', currentUser); } catch(e){}
       try { updateLimitBar(); } catch(e){}
+      // Pre-verificar el pago (candidatos sin marca local) para que NO parpadee
+      // el modal de planes al entrar al panel si ya pagaron.
+      try {
+        if (currentUser.tipo === 'candidato' && currentUser.rol !== 'admin'
+            && !tienePagoOk()) {
+          verificarPagoBackend();
+        }
+      } catch(e){}
       return true;
     }
   } catch(e) {
@@ -4828,6 +4833,11 @@ async function buscarEmpleo() {
   const ciudad = document.getElementById('busquedaCiudad').value;
   const modalidad = document.getElementById('busquedaModalidad').value;
   const fuentes = [...document.querySelectorAll('#fuentesChips .chip.on')].map(c=>c.textContent);
+  // Texto de fuentes para la IA: usa las que el usuario dejó activas; si no hay
+  // ninguna, usa el conjunto por defecto. (Mapeo a nombres que la IA entiende.)
+  const fuentesTexto = (fuentes && fuentes.length)
+    ? fuentes.join(', ').replace('Indeed EC','Indeed').replace('Facebook Empleos','grupos de empleo de Facebook')
+    : 'Multitrabajos, Computrabajo, LinkedIn, Indeed y grupos de empleo';
 
   candTab('resultados');
   // Mostrar pantalla de carga grande - solo hombre trabajando
@@ -4882,7 +4892,7 @@ async function buscarEmpleo() {
       body: JSON.stringify({
         model:'claude-haiku-4-5-20251001', max_tokens:5000,
         tools:[{type:'web_search_20250305',name:'web_search',max_uses:3}],
-        messages:[{role:'user',content:`Busca en la web ofertas de trabajo en Ecuador para: "${query}" en ${ciudad} (modalidad ${modalidad}). Usa Multitrabajos, Computrabajo, LinkedIn, Indeed y grupos de empleo.\n\nLuego ${instruccionReparto} En formato JSON. Usa los resultados de la búsqueda web; si para algún campo no hallaste el dato exacto, complétalo de forma realista para ese tipo de puesto en Ecuador (salario "A convenir" si no se publica, descripción típica del cargo). El objetivo es darle al usuario 8 oportunidades reales que pueda explorar en los portales.\n\nREGLAS DE FORMATO (obligatorias):\n- Tu respuesta es EXCLUSIVAMENTE el objeto JSON. Cero texto antes o después. Empieza con { y termina con }.\n- NUNCA te disculpes ni expliques. Si encontraste poca info, igual devuelve 8 empleos con lo que tengas.\n- "url": solo si tienes el enlace directo a la oferta; si no, "".\n- "email": solo si se publica; si no, "".\n\nFormato exacto:\n{"jobs":[{"empresa":"nombre","cargo":"título","ciudad":"${ciudad}","salario":"A convenir","fuente":"Computrabajo","match":85,"email":"","descripcion":"qué hace el puesto en 1-2 líneas","url":"","portales":["multitrabajos","computrabajo","linkedin","indeed"]}]}\n\nDevuelve exactamente 8 objetos en el array jobs.`}]
+        messages:[{role:'user',content:`Busca en la web ofertas de trabajo en Ecuador para: "${query}" en ${ciudad} (modalidad ${modalidad}). Usa ${fuentesTexto}.\n\nLuego ${instruccionReparto} En formato JSON. Usa los resultados de la búsqueda web; si para algún campo no hallaste el dato exacto, complétalo de forma realista para ese tipo de puesto en Ecuador (salario "A convenir" si no se publica, descripción típica del cargo). El objetivo es darle al usuario 8 oportunidades reales que pueda explorar en los portales.\n\nREGLAS DE FORMATO (obligatorias):\n- Tu respuesta es EXCLUSIVAMENTE el objeto JSON. Cero texto antes o después. Empieza con { y termina con }.\n- NUNCA te disculpes ni expliques. Si encontraste poca info, igual devuelve 8 empleos con lo que tengas.\n- "url": solo si tienes el enlace directo a la oferta; si no, "".\n- "email": solo si se publica; si no, "".\n\nFormato exacto:\n{"jobs":[{"empresa":"nombre","cargo":"título","ciudad":"${ciudad}","salario":"A convenir","fuente":"Computrabajo","match":85,"email":"","descripcion":"qué hace el puesto en 1-2 líneas","url":"","portales":["multitrabajos","computrabajo","linkedin","indeed"]}]}\n\nDevuelve exactamente 8 objetos en el array jobs.`}]
       })
     });
     if (res.status === 401) { manejarSesionExpirada(); throw new Error('Tu sesión expiró. Vuelve a iniciar sesión.'); }
@@ -6280,18 +6290,37 @@ function marcarPagoOk() {
 
 // Verifica en el backend si el candidato ya tiene un pago hecho (sirve cuando
 // entra desde otro dispositivo y no tiene la marca local) — evita cobrar 2 veces.
+// ¿Ya consultamos el backend por pagos en esta carga de página?
+let _pagoConsultado = false;
+
+// Consulta el historial de pagos del backend y marca como pagado si corresponde.
+// (Sin efectos visuales — solo devuelve true/false y deja la marca local.)
 async function verificarPagoBackend() {
   try {
     const r = await apiCall('/api/pagos/historial', { method: 'GET' });
+    _pagoConsultado = true;
     if (r && Array.isArray(r.pagos) && r.pagos.some(p => p.estado === 'completado')) {
       marcarPagoOk();
-      cerrarPlanesRegistro();
-      try { showToast('✓ Pago verificado, bienvenido de vuelta'); } catch(e){}
-      showPage('candidato');
       return true;
     }
   } catch (e) {}
   return false;
+}
+
+// Overlay discreto "verificando" (evita el parpadeo del modal de planes completo)
+function mostrarVerificandoPago() {
+  if (document.getElementById('verificandoPago')) return;
+  const d = document.createElement('div');
+  d.id = 'verificandoPago';
+  d.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px';
+  d.innerHTML = `
+    <div style="width:54px;height:54px;border:4px solid rgba(0,196,140,0.15);border-top-color:var(--verde);border-radius:50%;animation:spin 1s linear infinite"></div>
+    <div style="color:var(--texto-secundario);font-size:14px">Verificando tu cuenta…</div>`;
+  document.body.appendChild(d);
+}
+function cerrarVerificandoPago() {
+  const d = document.getElementById('verificandoPago');
+  if (d) d.remove();
 }
 
 // Si es candidato y aún no pagó, lo lleva a elegir plan (bloquea el panel).
@@ -6300,10 +6329,25 @@ function forzarPagoSiCandidato() {
   if (!currentUser) return false;
   if (currentUser.rol === 'admin' || currentUser.tipo === 'empleador') return false;
   if (tienePagoOk()) return false;
-  // No tiene marca local: revisa el backend por si ya pagó en otro dispositivo
-  verificarPagoBackend();
-  mostrarPlanesRegistro();
-  return true;
+
+  // Ya consultamos el backend en esta sesión y NO hay pago → mostrar planes directo.
+  if (_pagoConsultado) {
+    mostrarPlanesRegistro();
+    return true;
+  }
+
+  // Aún no consultamos: mostrar "verificando…" (discreto) y decidir según el backend.
+  // Esto evita que el modal de planes parpadee en cuentas que ya pagaron.
+  mostrarVerificandoPago();
+  verificarPagoBackend().then(pago => {
+    cerrarVerificandoPago();
+    if (pago) {
+      showPage('candidato'); // ya había pagado (otro dispositivo) → entra sin planes
+    } else {
+      mostrarPlanesRegistro(); // de verdad no ha pagado → mostrar planes
+    }
+  });
+  return true; // bloquea el panel mientras verificamos
 }
 
 // Modal OBLIGATORIO con los 3 planes de candidato (al registrarse o si no ha pagado)
