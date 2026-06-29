@@ -1145,7 +1145,7 @@ function validarBeta() {
       </div>
       <div style="display:flex;justify-content:space-between;margin-top:8px">
         <span style="font-size:11px;color:var(--texto-secundario)">Mín. diario: <span id="correosDiaMin">10</span> · Máx.: <span id="correosDiaMax2">20</span></span>
-        <button onclick="showPage('landing')" style="font-size:11px;color:var(--verde);background:none;border:none;cursor:pointer;text-decoration:underline">Mejorar plan →</button>
+        <button onclick="verPlanes()" style="font-size:11px;color:var(--verde);background:none;border:none;cursor:pointer;text-decoration:underline">Mejorar plan →</button>
       </div>
     </div>
 
@@ -1666,7 +1666,7 @@ function validarBeta() {
           <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--verde)" id="perfilPlanNombre">Básico</div>
           <div style="font-size:12px;color:var(--texto-secundario);margin-top:4px" id="perfilPlanDetalle">10-20 correos/día</div>
         </div>
-        <button onclick="showPage('landing')" class="btn-sm-green">Mejorar plan</button>
+        <button onclick="verPlanes()" class="btn-sm-green">Mejorar plan</button>
       </div>
     </div>
 
@@ -1817,7 +1817,7 @@ function validarBeta() {
 <div class="profile-menu" id="profileMenu">
   <div class="profile-menu-user"><strong id="menuUserName">—</strong><span id="menuUserEmail">—</span></div>
   <div class="profile-menu-item" onclick="irMiPerfil()">Mi perfil</div>
-  <div class="profile-menu-item" onclick="abrirPago('Pro','29.99')">Mejorar plan</div>
+  <div class="profile-menu-item" onclick="verPlanes()">Mejorar plan</div>
   <div class="profile-menu-divider"></div>
   <div class="profile-menu-item danger" onclick="cerrarSesion()">Cerrar sesión</div>
 </div>
@@ -3935,6 +3935,26 @@ function showPage(page) {
   document.getElementById('page-' + page).classList.add('active');
   document.querySelectorAll('.ntab').forEach(b => b.classList.remove('active'));
   if (document.getElementById('ntab-' + page)) document.getElementById('ntab-' + page).classList.add('active');
+}
+
+// Lleva al usuario a la sección de planes para que elija CUALQUIER plan
+// (en vez de mandarlo directo a uno solo). Para empleadores muestra y baja
+// a los planes de empresa; para candidatos baja a los planes de candidato.
+function verPlanes() {
+  showPage('landing');
+  setTimeout(() => {
+    const esEmpleador = currentUser && (currentUser.tipo === 'empleador');
+    if (esEmpleador) {
+      const emp = document.getElementById('empleadorPlansSection');
+      if (emp) {
+        emp.style.display = 'block';
+        emp.scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+    }
+    const sec = document.querySelector('.planes-section');
+    if (sec) sec.scrollIntoView({ behavior: 'smooth' });
+  }, 300);
 }
 
 // ======= TABS =======
