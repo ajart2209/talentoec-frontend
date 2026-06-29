@@ -889,7 +889,7 @@ function validarBeta() {
         <ul class="plan-features">
           <li>Todo del plan Básico</li>
           <li>6 búsquedas al día = 240 ofertas (48 empleos × 5 portales)</li>
-          <li>🔥 Correos en frío: contacta empresas antes de que publiquen la vacante (10/día)</li>
+          <li style="opacity:.55">🔒 Correos en frío: exclusivo del plan Pro</li>
           <li>25 postulaciones por correo al día</li>
           <li>Plantillas de carta de presentación profesional</li>
           <li>Seguimiento de tus postulaciones</li>
@@ -915,7 +915,7 @@ function validarBeta() {
         <ul class="plan-features">
           <li>Todo del plan Estándar</li>
           <li>10 búsquedas al día = 400 ofertas (80 empleos × 5 portales)</li>
-          <li>🔥 20 correos en frío al día para adelantarte a todos</li>
+          <li>🔥 10 correos en frío al día para adelantarte a todos (exclusivo Pro)</li>
           <li>35 postulaciones por correo al día</li>
           <li>⭐ Acceso prioritario a vacantes exclusivas</li>
           <li>Resultados más rápidos (búsqueda prioritaria)</li>
@@ -952,8 +952,8 @@ function validarBeta() {
 
         <div style="color:var(--texto-secundario);padding:8px 0;border-bottom:1px solid var(--gris-borde)">Correos en frío / día</div>
         <div style="color:var(--texto-primario);padding:8px 0;border-bottom:1px solid var(--gris-borde);text-align:center">—</div>
+        <div style="color:var(--texto-primario);padding:8px 0;border-bottom:1px solid var(--gris-borde);text-align:center">—</div>
         <div style="color:var(--texto-primario);padding:8px 0;border-bottom:1px solid var(--gris-borde);text-align:center">10</div>
-        <div style="color:var(--texto-primario);padding:8px 0;border-bottom:1px solid var(--gris-borde);text-align:center">20</div>
 
         <div style="color:var(--texto-secundario);padding:8px 0;border-bottom:1px solid var(--gris-borde)">Carta de presentación personalizada</div>
         <div style="color:var(--verde);padding:8px 0;border-bottom:1px solid var(--gris-borde);text-align:center">✓</div>
@@ -1356,9 +1356,9 @@ function validarBeta() {
         </div>
         <div id="frioPlanLock" style="display:none;background:rgba(245,193,66,0.08);border:1px solid rgba(245,193,66,0.3);border-radius:10px;padding:14px;margin-bottom:16px">
           <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--amarillo);font-weight:600;margin-bottom:6px">
-            🔒 Disponible en plan Estándar o Pro
+            🔒 Disponible solo en el plan Pro
           </div>
-          <div style="font-size:12px;color:var(--texto-secundario);line-height:1.6">Los correos en frío te permiten contactar empresas que NO publican vacantes. Actualiza tu plan para usar esta función.</div>
+          <div style="font-size:12px;color:var(--texto-secundario);line-height:1.6">Los correos en frío te permiten contactar empresas que NO publican vacantes. Son una función exclusiva del plan Pro (hasta 10 al día). Mejora a Pro para usarla.</div>
           <button onclick="cambiarTab('planes')" style="margin-top:10px;background:var(--amarillo);color:#000;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:600;font-size:12px">Ver planes</button>
         </div>
         <div style="background:rgba(245,230,66,0.06);border:1px solid rgba(245,230,66,0.2);border-radius:10px;padding:14px 16px;margin-bottom:18px;font-size:13px;color:var(--texto-secundario);line-height:1.6">
@@ -3426,14 +3426,12 @@ async function registrar() {
 
 function actualizarPlanLockFrio() {
   if (!currentUser) return;
-  const plan = (currentUser.plan || 'basico').toLowerCase();
+  const plan = (currentUser.plan || 'basico').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const esPro = (plan === 'pro') || (currentUser.rol === 'admin');
   const lockDiv = document.getElementById('frioPlanLock');
   if (lockDiv) {
-    if (plan === 'basico' || plan === 'básico') {
-      lockDiv.style.display = 'block';
-    } else {
-      lockDiv.style.display = 'none';
-    }
+    // Los correos en frío son exclusivos del plan Pro: bloquear en los demás.
+    lockDiv.style.display = esPro ? 'none' : 'block';
   }
 }
 
@@ -4166,7 +4164,7 @@ function candTab(tab) {
     const plan = getPlan();
     const maxFrio = plan.max_frio || 0;
     if (maxFrio === 0) {
-      showToast('⚠ Tu plan no incluye correos en frío. Mejora a Estándar o Pro.', true);
+      showToast('⚠ Los correos en frío son exclusivos del plan Pro. Mejora a Pro para usarlos.', true);
       candTab('busqueda');
       return;
     }
@@ -5473,6 +5471,7 @@ async function abrirEmailModal(email, empresa, cargo, nombre, esParaEmpresa) {
   // Guardar empresa y cargo para usarlos al enviar
   window._lastJobEmpresa = empresa || '';
   window._lastJobCargo = cargo || '';
+  window._esFrio = false; // este modal es para un correo normal (postulación)
 
   // Si no hay email, mostrar campo vacío con mensaje sutil
   if (!email || email === 'undefined' || email === '') {
@@ -5558,7 +5557,8 @@ async function enviarEmail() {
         empresa_nombre: empresaReal,
         cargo: cargoReal,
         asunto: subject,
-        mensaje: body
+        mensaje: body,
+        esFrio: (window._esFrio === true)
       })
     });
     if (res.success) {
@@ -6191,12 +6191,13 @@ function mostrarLimiteAlcanzado(maxDiario) {
 async function ejecutarCorreosFrio() {
   if (!currentUser) { openAuth('register'); return; }
 
-  // VERIFICAR PLAN - Correos en frío solo Estándar y Pro
-  const plan = (currentUser.plan || 'basico').toLowerCase();
-  if (plan === 'basico' || plan === 'básico') {
-    showToast('🔒 Correos en frío disponibles solo en plan Estándar o Pro');
+  // VERIFICAR PLAN - Correos en frío EXCLUSIVOS del plan Pro
+  const plan = (currentUser.plan || 'basico').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const esPro = (plan === 'pro') || (currentUser.rol === 'admin');
+  if (!esPro) {
+    showToast('🔒 Los correos en frío son exclusivos del plan Pro');
     setTimeout(() => {
-      if (confirm('Los correos en frío están disponibles en planes Estándar ($19.99) y Pro ($29.99).\n\n¿Deseas actualizar tu plan?')) {
+      if (confirm('Los correos en frío están disponibles solo en el plan Pro ($29.99).\n\n¿Deseas actualizar tu plan?')) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         cambiarTab('planes');
       }
@@ -6301,6 +6302,9 @@ function renderEmpresasFrio(empresas, nombre, area) {
 }
 
 async function abrirEmailFrio(email, empresa, area, nombre) {
+  window._esFrio = true; // este modal es para un correo EN FRÍO (exclusivo Pro)
+  window._lastJobEmpresa = empresa || '';
+  window._lastJobCargo = area || '';
   document.getElementById('modalTo').value = email;
   document.getElementById('modalSubject').value = `Presentación profesional — ${area} — ${nombre}`;
   document.getElementById('emailModal').classList.add('open');
@@ -6478,7 +6482,7 @@ function mostrarPlanesRegistro() {
             <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700">Estándar</div>
             <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--verde)">$19.99<span style="font-size:11px;color:var(--texto-secundario)">/mes</span></div>
           </div>
-          <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:12px">6 búsquedas/día · 240 ofertas · 25 postulaciones/día · correos en frío</div>
+          <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:12px">6 búsquedas/día · 240 ofertas · 25 postulaciones/día</div>
           <button onclick="elegirPlanRegistro('Estándar','19.99')" class="btn-full">Elegir Estándar</button>
         </div>
 
@@ -6487,7 +6491,7 @@ function mostrarPlanesRegistro() {
             <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700">Pro</div>
             <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--verde)">$29.99<span style="font-size:11px;color:var(--texto-secundario)">/mes</span></div>
           </div>
-          <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:12px">10 búsquedas/día · 400 ofertas · 35 postulaciones/día · 20 correos en frío</div>
+          <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:12px">10 búsquedas/día · 400 ofertas · 35 postulaciones/día · 10 correos en frío</div>
           <button onclick="elegirPlanRegistro('Pro','29.99')" class="btn-full">Elegir Pro</button>
         </div>
       </div>
@@ -6676,8 +6680,8 @@ if (typeof window !== 'undefined') {
 // ======= UTILS =======
 const PLANES = {
   'basico':        { nombre:'Básico $9.99',          min:8,   max:12,   precio:'9.99',   max_frio:0,   tipo:'candidato' },
-  'estandar':      { nombre:'Estándar $19.99',        min:15,  max:25,   precio:'19.99',  max_frio:10,  tipo:'candidato' },
-  'pro':           { nombre:'Pro $29.99',             min:20,  max:35,   precio:'29.99',  max_frio:20,  tipo:'candidato' },
+  'estandar':      { nombre:'Estándar $19.99',        min:15,  max:25,   precio:'19.99',  max_frio:0,   tipo:'candidato' },
+  'pro':           { nombre:'Pro $29.99',             min:20,  max:35,   precio:'29.99',  max_frio:10,  tipo:'candidato' },
   'emp_basico':    { nombre:'Empleador Básico $49',   min:0,   max:20,   precio:'49',     max_frio:0,   tipo:'empleador', busquedas:10,  correos_mes:20  },
   'emp_pro':       { nombre:'Empleador Pro $149',     min:0,   max:200,  precio:'149',    max_frio:0,   tipo:'empleador', busquedas:999, correos_mes:200 },
   'emp_enterprise':{ nombre:'Empleador Enterprise $399', min:0, max:9999, precio:'399',  max_frio:0,   tipo:'empleador', busquedas:999, correos_mes:9999 }
