@@ -6303,17 +6303,15 @@ function elegirPlanRegistro(plan, precio) {
   cerrarPlanesRegistro();
   abrirPago(plan, precio, true);
 }
-// Tras pagar en el registro: marca pago, cierra pago y pide verificar correo
+// Tras pagar en el registro: marca pago, cierra el modal de pago, ENTRA al panel
+// y muestra el "verificar correo" encima (el usuario ya queda dentro del panel).
 function continuarTrasPagoRegistro() {
   marcarPagoOk();
   cerrarPago();
-  window.__flujoRegistro = true;
-  try { mostrarVerificacionEmail(); } catch(e){}
-  // Si el modal no apareció (correo ya verificado antes), entra directo al panel.
-  if (!document.getElementById('modalVerifEmail')) {
-    window.__flujoRegistro = false;
-    try { showPage('candidato'); } catch(e){}
-  }
+  window.__flujoRegistro = false; // ya lo metemos al panel directamente
+  try { showPage('candidato'); } catch(e){}
+  // Mostrar la verificación de correo sobre el panel (no bloquea el acceso).
+  setTimeout(() => { try { mostrarVerificacionEmail(); } catch(e){} }, 300);
 }
 
 function abrirPago(plan, precio, esRegistro) {
@@ -6402,6 +6400,20 @@ async function verificarRetornoPayphone() {
 
   // Limpiar la URL para que no se reprocese al recargar.
   try { history.replaceState({}, '', window.location.pathname); } catch(e){}
+
+  // IMPORTANTE: PayPhone recarga la página al volver. La restauración de sesión
+  // corre en otro listener async y puede no haber terminado todavía. Si aún no
+  // hay usuario, lo recuperamos aquí para no quedar "deslogueados" tras pagar.
+  if (!currentUser) {
+    try {
+      const saved = await getFromStorage('talento_user');
+      if (saved && saved.email) {
+        currentUser = saved;
+        userTipo = saved.tipo;
+        try { setLoggedInUI(); } catch(e){}
+      }
+    } catch(e){}
+  }
 
   let pendiente = {};
   try { pendiente = JSON.parse(localStorage.getItem('pp_pendiente') || '{}'); } catch(e){}
