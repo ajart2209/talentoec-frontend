@@ -3550,7 +3550,21 @@ function detectarAreasLocal(texto) {
     'Traducción e Idiomas': ['traductor','traductora','interprete','traduccion','interpretacion','idiomas','profesor de ingles','docente de ingles'],
     'Eventos y Protocolo': ['organizacion de eventos','organizador de eventos','planificador de eventos','protocolo','wedding planner','produccion de eventos','catering'],
     'Aviación y Aeronáutica': ['piloto','aeronautica','aviacion','tripulante de cabina','azafata','aeromoza','controlador aereo','despachador de vuelo','mecanico de aviacion'],
-    'Biología y Ciencias': ['biologo','biologia','biotecnologia','microbiologia','bioquimica','biomedica','genetica','ecologia']
+    'Biología y Ciencias': ['biologo','biologia','biotecnologia','microbiologia','bioquimica','biomedica','genetica','ecologia'],
+    // ── Salud especializada (muy buscada en Ecuador) ──
+    'Optometría': ['optometra','optometria','optometrista','optico','optica','salud visual','examen visual','lentes de contacto','agudeza visual'],
+    'Obstetricia': ['obstetra','obstetriz','obstetricia','partera','parteria','materno infantil','control prenatal','ginecobstetricia'],
+    'Odontología': ['odontologo','odontologa','odontologia','dentista','dental','auxiliar de odontologia','higienista dental','ortodoncia','endodoncia'],
+    'Laboratorio Clínico': ['laboratorio clinico','laboratorista','tecnologo medico','analisis clinico','toma de muestras','flebotomia','hematologia'],
+    'Imagenología y Radiología': ['radiologo','radiologia','imagenologia','tecnologo en imagenes','rayos x','ecografia','tomografia','resonancia magnetica'],
+    'Terapia y Rehabilitación': ['fisioterapeuta','fisioterapia','terapia fisica','terapia ocupacional','terapia de lenguaje','rehabilitacion','terapeuta respiratorio','fonoaudiologo'],
+    // ── Técnicas y servicios muy demandadas ──
+    'Refrigeración y Climatización': ['refrigeracion','climatizacion','aire acondicionado','tecnico en refrigeracion','hvac','camaras frigorificas'],
+    'Call Center Bilingüe': ['call center bilingue','agente bilingue','bilingue ingles','customer service ingles','bpo','representante bilingue'],
+    'Aduanas y Comercio': ['aduana','aduanero','agente afianzado de aduana','agente de aduana','tramites aduaneros','aforador','desaduanizacion'],
+    'Energías Renovables': ['energias renovables','energia solar','paneles solares','fotovoltaico','energia eolica','eficiencia energetica','energia limpia'],
+    'Geología y Minería': ['geologo','geologia','geofisica','minero','mineria','perforacion','exploracion minera','geotecnia'],
+    'Enfermería': ['enfermero','enfermera','licenciada en enfermeria','auxiliar de enfermeria','cuidados de enfermeria','enfermeria']
   };
   const encontradas = [];
   // Normaliza quitando tildes y ñ→n para comparar parejo en ambos lados
@@ -5190,11 +5204,11 @@ function relevanciaBolsa(vac, query) {
   const UMBRELLA = {
     'tecnologia':['Desarrollo de Software','Bases de Datos','Ingeniería de Sistemas','Diseño Web y Multimedia','Diseño UX/UI','Telecomunicaciones','Ciencia de Datos','Ciberseguridad'],
     'creatividad':['Diseño Gráfico','Diseño Web y Multimedia','Diseño UX/UI','Diseño Industrial','Diseño de Modas','Diseño de Interiores','Audiovisual y Fotografía','Música y Arte'],
-    'tecnico':['Mecánica Automotriz','Electricidad','Construcción','Ingeniería Mecánica','Telecomunicaciones'],
+    'tecnico':['Mecánica Automotriz','Electricidad','Construcción','Ingeniería Mecánica','Telecomunicaciones','Refrigeración y Climatización'],
     'negocios':['Marketing y Ventas','Contabilidad y Finanzas','Administración','Banca y Seguros','Atención al Cliente','Comercio Exterior','Economía','Finanzas e Inversiones','Gestión de Proyectos'],
     'finanzas':['Contabilidad y Finanzas','Finanzas e Inversiones','Banca y Seguros','Economía'],
-    'salud':['Salud y Medicina','Psicología','Nutrición y Bienestar','Farmacia','Veterinaria','Biología y Ciencias'],
-    'ingenieria':['Ingeniería Industrial','Ingeniería Mecánica','Ingeniería Química','Ingeniería de Sistemas','Construcción','Arquitectura','Ingeniería Ambiental','Seguridad Industrial y SSO','Industria Alimentaria']
+    'salud':['Salud y Medicina','Psicología','Nutrición y Bienestar','Farmacia','Veterinaria','Biología y Ciencias','Optometría','Obstetricia','Odontología','Laboratorio Clínico','Imagenología y Radiología','Terapia y Rehabilitación','Enfermería'],
+    'ingenieria':['Ingeniería Industrial','Ingeniería Mecánica','Ingeniería Química','Ingeniería de Sistemas','Construcción','Arquitectura','Ingeniería Ambiental','Seguridad Industrial y SSO','Industria Alimentaria','Energías Renovables','Geología y Minería']
   };
   const qn = String(query || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ñ/g, 'n');
   Object.keys(UMBRELLA).forEach(u => { if (qn.includes(u)) areasQuery = areasQuery.concat(UMBRELLA[u]); });
@@ -5209,12 +5223,12 @@ function relevanciaBolsa(vac, query) {
     const GRUPOS = [
       ['Diseño Gráfico','Diseño de Modas','Diseño Industrial','Diseño de Interiores','Audiovisual y Fotografía','Música y Arte','Marketing y Ventas','Periodismo y Comunicación','Eventos y Protocolo'],
       ['Desarrollo de Software','Bases de Datos','Ingeniería de Sistemas','Diseño Web y Multimedia','Diseño UX/UI','Telecomunicaciones','Ciencia de Datos','Ciberseguridad'],
-      ['Marketing y Ventas','Atención al Cliente','Telemarketing y Cobranzas','Eventos y Protocolo'],
-      ['Contabilidad y Finanzas','Finanzas e Inversiones','Economía','Banca y Seguros','Comercio Exterior'],
+      ['Marketing y Ventas','Atención al Cliente','Telemarketing y Cobranzas','Eventos y Protocolo','Call Center Bilingüe'],
+      ['Contabilidad y Finanzas','Finanzas e Inversiones','Economía','Banca y Seguros','Comercio Exterior','Aduanas y Comercio'],
       ['Administración','Recursos Humanos','Gestión de Proyectos'],
-      ['Salud y Medicina','Psicología','Nutrición y Bienestar','Farmacia','Veterinaria','Biología y Ciencias'],
-      ['Construcción','Arquitectura','Ingeniería Industrial','Ingeniería Mecánica','Ingeniería Química','Electricidad','Mecánica Automotriz','Ingeniería Ambiental','Seguridad Industrial y SSO','Topografía y Geodesia'],
-      ['Logística y Transporte','Comercio Exterior','Servicios Generales','Petróleo y Minería','Aviación y Aeronáutica'],
+      ['Salud y Medicina','Psicología','Nutrición y Bienestar','Farmacia','Veterinaria','Biología y Ciencias','Optometría','Obstetricia','Odontología','Laboratorio Clínico','Imagenología y Radiología','Terapia y Rehabilitación','Enfermería'],
+      ['Construcción','Arquitectura','Ingeniería Industrial','Ingeniería Mecánica','Ingeniería Química','Electricidad','Mecánica Automotriz','Ingeniería Ambiental','Seguridad Industrial y SSO','Topografía y Geodesia','Refrigeración y Climatización','Energías Renovables','Geología y Minería'],
+      ['Logística y Transporte','Comercio Exterior','Servicios Generales','Petróleo y Minería','Aviación y Aeronáutica','Aduanas y Comercio','Geología y Minería'],
       ['Gastronomía y Cocina','Trabajo Doméstico','Seguridad','Belleza y Estética','Limpieza y Mantenimiento','Servicios Generales','Limpieza Industrial','Turismo y Hotelería'],
       ['Educación','Trabajo Social','Deportes y Recreación','Psicología','Traducción e Idiomas'],
       ['Agricultura y Ganadería','Pesca y Acuacultura','Industria Alimentaria','Veterinaria','Biología y Ciencias']
