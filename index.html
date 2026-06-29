@@ -3501,7 +3501,7 @@ function detectarAreasLocal(texto) {
     'Limpieza y Mantenimiento': ['limpieza','mantenimiento','conserje','jardinero','jardineria','aseo'],
     // ── Técnicos ──
     'Mecánica Automotriz': ['mecanico','mecanica','automotriz','enderezador','pintor automotriz','vulcanizador','llantero'],
-    'Electricidad': ['electricista','electrico','instalaciones electricas','electronico','electronica'],
+    'Electricidad': ['electricidad','electricista','electrico','instalaciones electricas','electronico','electronica'],
     'Construcción': ['construccion','obra','arquitecto','civil','albañil','maestro mayor','maestro de obra','plomero','gasfitero','pintor','carpintero','soldador'],
     'Logística y Transporte': ['logistica','bodega','bodeguero','inventario','almacen','transporte','chofer','choferes','conductor','conductora','despachador','mensajero','repartidor','delivery','taxista','motorizado','motorizada','licencia tipo','licencia profesional','montacarguista','montacargas','furgon','camion','camionero','trailero','tractomula','distribucion','courier','encomiendas','grua'],
     'Agricultura y Ganadería': ['agricultor','agronomo','agropecuario','ganaderia','agricola','campo','cultivo','floricola','bananera'],
@@ -3516,7 +3516,7 @@ function detectarAreasLocal(texto) {
     // ── Turismo y otros ──
     'Turismo y Hotelería': ['turismo','hotel','hoteleria','recepcionista de hotel','guia turistico','camarera','housekeeping','agencia de viajes'],
     'Legal': ['abogado','abogada','juridico','legal','derecho','notaria'],
-    'Ingeniería Industrial': ['ingeniero industrial','produccion','procesos','calidad','manufactura','operario','operaria','operador de maquina','obrero','empacador','empacadora','ensamblador','linea de produccion','maquila','planta'],
+    'Ingeniería Industrial': ['ingenieria industrial','ingeniero industrial','produccion','procesos','calidad','manufactura','operario','operaria','operador de maquina','obrero','empacador','empacadora','ensamblador','linea de produccion','maquila','planta'],
     'Nutrición y Bienestar': ['nutricionista','nutricion','dietista','entrenador','entrenadora','gimnasio','fitness','instructor'],
     'Veterinaria': ['veterinario','veterinaria','mascota','animales','pecuario'],
     'Limpieza Industrial': ['limpieza industrial','lavanderia','planchado','desinfeccion','fumigacion'],
@@ -3527,12 +3527,30 @@ function detectarAreasLocal(texto) {
     'Farmacia': ['farmacia','farmaceutico','quimico farmaceutico','auxiliar de farmacia','dependiente de farmacia','regente'],
     'Servicios Generales': ['servicios generales','utility','mantenimiento general','ayudante general','peon','estibador','cargador'],
     'Periodismo y Comunicación': ['periodista','periodismo','comunicacion social','redactor','reportero','locutor','presentador','relaciones publicas','prensa'],
-    'Ingeniería Mecánica': ['ingeniero mecanico','mecanica industrial','mantenimiento industrial','tornero','fresador','matriceria','metalmecanica'],
-    'Ingeniería Química': ['ingeniero quimico','quimico','laboratorista','procesos quimicos','control de calidad','alimentos'],
+    'Ingeniería Mecánica': ['ingenieria mecanica','ingeniero mecanico','mecanica industrial','mantenimiento industrial','tornero','fresador','matriceria','metalmecanica'],
+    'Ingeniería Química': ['ingenieria quimica','ingeniero quimico','quimico','laboratorista','procesos quimicos','control de calidad','alimentos'],
     'Telemarketing y Cobranzas': ['cobranzas','recuperacion de cartera','gestor de cobranzas','call center cobranzas','gestor telefonico'],
     'Trabajo Social': ['trabajador social','trabajo social','promotor social','desarrollo comunitario','gestor social'],
     'Deportes y Recreación': ['entrenador deportivo','profesor de educacion fisica','deportes','recreacion','animador turistico','salvavidas','arbitro'],
-    'Música y Arte': ['musico','musica','cantante','artista','pintor artistico','escultor','actor','actriz','bailarin','bailarina','dj']
+    'Música y Arte': ['musico','musica','cantante','artista','pintor artistico','escultor','actor','actriz','bailarin','bailarina','dj'],
+    // ── Negocios y finanzas avanzadas ──
+    'Economía': ['economista','economia','analista economico','politica economica','macroeconomia','microeconomia','estudios economicos'],
+    'Finanzas e Inversiones': ['ingenieria financiera','ingeniero financiero','analista financiero','finanzas corporativas','riesgos financieros','riesgo crediticio','inversiones','portafolio de inversion','planificacion financiera','presupuestos','actuario','banca de inversion','valoracion financiera'],
+    'Gestión de Proyectos': ['gestion de proyectos','project manager','jefe de proyecto','coordinador de proyectos','pmo','pmp','scrum master','metodologias agiles','planificacion de proyectos'],
+    // ── Ingenierías e industria ──
+    'Ingeniería Ambiental': ['ingenieria ambiental','ingeniero ambiental','medio ambiente','gestion ambiental','impacto ambiental','sostenibilidad','sustentabilidad','manejo de residuos','recursos naturales','ambiental'],
+    'Seguridad Industrial y SSO': ['seguridad industrial','seguridad ocupacional','salud ocupacional','seguridad y salud en el trabajo','sso','riesgos laborales','prevencion de riesgos','prevencionista','higiene industrial','hse'],
+    'Industria Alimentaria': ['industria alimentaria','ingeniero en alimentos','ingenieria en alimentos','agroindustria','seguridad alimentaria','inocuidad','haccp','bpm','procesamiento de alimentos','control de calidad de alimentos'],
+    'Topografía y Geodesia': ['topografo','topografia','geodesia','geodesta','agrimensor','levantamiento topografico','estacion total','georreferenciacion'],
+    'Pesca y Acuacultura': ['acuacultura','acuicultura','camaronera','camaron','piscicultura','maricultura','pesca','planta empacadora de mariscos','larvas de camaron'],
+    // ── Tecnología avanzada ──
+    'Ciencia de Datos': ['ciencia de datos','cientifico de datos','data science','data scientist','machine learning','aprendizaje automatico','big data','inteligencia artificial','power bi','analitica de datos','modelos predictivos'],
+    'Ciberseguridad': ['ciberseguridad','seguridad informatica','seguridad de la informacion','pentesting','ethical hacking','hacking etico','analista de seguridad informatica','ciso','soc analyst'],
+    // ── Servicios profesionales ──
+    'Traducción e Idiomas': ['traductor','traductora','interprete','traduccion','interpretacion','idiomas','profesor de ingles','docente de ingles'],
+    'Eventos y Protocolo': ['organizacion de eventos','organizador de eventos','planificador de eventos','protocolo','wedding planner','produccion de eventos','catering'],
+    'Aviación y Aeronáutica': ['piloto','aeronautica','aviacion','tripulante de cabina','azafata','aeromoza','controlador aereo','despachador de vuelo','mecanico de aviacion'],
+    'Biología y Ciencias': ['biologo','biologia','biotecnologia','microbiologia','bioquimica','biomedica','genetica','ecologia']
   };
   const encontradas = [];
   // Normaliza quitando tildes y ñ→n para comparar parejo en ambos lados
@@ -4871,10 +4889,10 @@ async function buscarEmpleo() {
   const promVacantes = apiCall('/api/auth/vacantes/publicas?q=' + encodeURIComponent(query) + '&ciudad=' + encodeURIComponent(ciudad || ''))
     .then(r => { vacantesExclusivas = (r.vacantes || []).map(v => ({
       cargo: v.cargo, empresa: v.empresa, ciudad: v.ciudad,
-      salario: v.salario, fuente: 'TalentoEC', match: 95,
+      salario: v.salario, fuente: 'TalentoEC', match: relevanciaBolsa(v, query),
       email: '', descripcion: (v.modalidad ? v.modalidad + ' · ' : '') + v.descripcion,
       url: '', portales: [], exclusiva: true, vacante_id: v.id
-    })); })
+    })).filter(v => v.match > 0); })
     .catch(e => {});
 
   // Detectar si la búsqueda tiene varias áreas (separadas por coma) para repartir los 8 empleos
@@ -5157,6 +5175,64 @@ function portalesDeEmpleo(cargo, empresa, ciudad) {
     { nombre:'Indeed', ico:'💚', url:`https://ec.indeed.com/jobs?q=${enc}&l=${ciudadEnc}`, color:'#2557a7' },
     { nombre:'Google', ico:'🔍', url:`https://www.google.com/search?q=${googleQuery}&ibp=htl%3Bjobs`, color:'#4285f4' }
   ];
+}
+
+// Calcula qué tan relevante es una vacante de la bolsa frente a lo que el
+// usuario buscó. Devuelve 0 si NO coincide (no se debe mostrar), o un % real.
+// Estrategia: usa el MISMO diccionario de áreas de detectarAreasLocal (45 carreras)
+// para clasificar tanto la vacante como la búsqueda, y las hace coincidir por
+// área directa o por GRUPO de áreas relacionadas (match "donde tiene sentido").
+function relevanciaBolsa(vac, query) {
+  const areasVac = detectarAreasLocal((vac.cargo || '') + '. ' + (vac.descripcion || ''));
+  let areasQuery = detectarAreasLocal(String(query || ''));
+
+  // Nombres "amplios" que la IA puede usar y que no son palabra clave directa:
+  const UMBRELLA = {
+    'tecnologia':['Desarrollo de Software','Bases de Datos','Ingeniería de Sistemas','Diseño Web y Multimedia','Diseño UX/UI','Telecomunicaciones','Ciencia de Datos','Ciberseguridad'],
+    'creatividad':['Diseño Gráfico','Diseño Web y Multimedia','Diseño UX/UI','Diseño Industrial','Diseño de Modas','Diseño de Interiores','Audiovisual y Fotografía','Música y Arte'],
+    'tecnico':['Mecánica Automotriz','Electricidad','Construcción','Ingeniería Mecánica','Telecomunicaciones'],
+    'negocios':['Marketing y Ventas','Contabilidad y Finanzas','Administración','Banca y Seguros','Atención al Cliente','Comercio Exterior','Economía','Finanzas e Inversiones','Gestión de Proyectos'],
+    'finanzas':['Contabilidad y Finanzas','Finanzas e Inversiones','Banca y Seguros','Economía'],
+    'salud':['Salud y Medicina','Psicología','Nutrición y Bienestar','Farmacia','Veterinaria','Biología y Ciencias'],
+    'ingenieria':['Ingeniería Industrial','Ingeniería Mecánica','Ingeniería Química','Ingeniería de Sistemas','Construcción','Arquitectura','Ingeniería Ambiental','Seguridad Industrial y SSO','Industria Alimentaria']
+  };
+  const qn = String(query || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ñ/g, 'n');
+  Object.keys(UMBRELLA).forEach(u => { if (qn.includes(u)) areasQuery = areasQuery.concat(UMBRELLA[u]); });
+  areasQuery = [...new Set(areasQuery)];
+
+  if (areasVac.length && areasQuery.length) {
+    const setQ = new Set(areasQuery);
+    // 1) Coincidencia DIRECTA de área (la señal más fuerte)
+    const directas = areasVac.filter(a => setQ.has(a)).length;
+    if (directas > 0) return Math.min(96, 86 + directas * 4);
+    // 2) Coincidencia por GRUPO de áreas relacionadas
+    const GRUPOS = [
+      ['Diseño Gráfico','Diseño de Modas','Diseño Industrial','Diseño de Interiores','Audiovisual y Fotografía','Música y Arte','Marketing y Ventas','Periodismo y Comunicación','Eventos y Protocolo'],
+      ['Desarrollo de Software','Bases de Datos','Ingeniería de Sistemas','Diseño Web y Multimedia','Diseño UX/UI','Telecomunicaciones','Ciencia de Datos','Ciberseguridad'],
+      ['Marketing y Ventas','Atención al Cliente','Telemarketing y Cobranzas','Eventos y Protocolo'],
+      ['Contabilidad y Finanzas','Finanzas e Inversiones','Economía','Banca y Seguros','Comercio Exterior'],
+      ['Administración','Recursos Humanos','Gestión de Proyectos'],
+      ['Salud y Medicina','Psicología','Nutrición y Bienestar','Farmacia','Veterinaria','Biología y Ciencias'],
+      ['Construcción','Arquitectura','Ingeniería Industrial','Ingeniería Mecánica','Ingeniería Química','Electricidad','Mecánica Automotriz','Ingeniería Ambiental','Seguridad Industrial y SSO','Topografía y Geodesia'],
+      ['Logística y Transporte','Comercio Exterior','Servicios Generales','Petróleo y Minería','Aviación y Aeronáutica'],
+      ['Gastronomía y Cocina','Trabajo Doméstico','Seguridad','Belleza y Estética','Limpieza y Mantenimiento','Servicios Generales','Limpieza Industrial','Turismo y Hotelería'],
+      ['Educación','Trabajo Social','Deportes y Recreación','Psicología','Traducción e Idiomas'],
+      ['Agricultura y Ganadería','Pesca y Acuacultura','Industria Alimentaria','Veterinaria','Biología y Ciencias']
+    ];
+    const enGrupo = GRUPOS.some(g => areasVac.some(a => g.includes(a)) && areasQuery.some(a => g.includes(a)));
+    if (enGrupo) return 80;
+    return 0; // áreas distintas y sin relación → no mostrar
+  }
+
+  // Fallback: la búsqueda no mapeó a áreas → coincidencia por palabras del título
+  const norm = s => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ñ/g, 'n');
+  const stop = new Set(['de','la','el','los','las','en','y','para','con','por','un','una','del','al','que','o','a','su','tus','tu','mis','area','areas','principales']);
+  const palabras = [...new Set(norm(query).split(/[^a-z0-9]+/).filter(w => w.length >= 4 && !stop.has(w)))];
+  if (!palabras.length) return 0;
+  const cargo = norm(vac.cargo);
+  let hits = 0;
+  palabras.forEach(w => { if (cargo.includes(w)) hits++; });
+  return hits ? Math.min(92, 70 + hits * 8) : 0;
 }
 
 // Despliega/oculta los portales dentro de una tarjeta
