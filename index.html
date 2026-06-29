@@ -1792,7 +1792,7 @@ function validarBeta() {
       <div class="pp-success-icon">✅</div>
       <h3>¡Pago exitoso!</h3>
       <p>Tu plan ha sido activado. Ahora tienes acceso completo a todas las funciones de búsqueda  en Ecuador.</p>
-      <button class="btn-full" style="margin-top:20px" onclick="cerrarPagoExito()">Ir a mi dashboard →</button>
+      <button class="btn-full" id="ppSuccessBtn" style="margin-top:20px" onclick="cerrarPagoExito()">Ir a mi dashboard →</button>
     </div>
   </div>
 </div>
@@ -2362,6 +2362,11 @@ function mostrarVerificacionEmail() {
 function cerrarVerificacion() {
   const m = document.getElementById('modalVerifEmail');
   if (m) m.remove();
+  // Si veníamos del registro (pagó y luego verificó), entrar al panel.
+  if (window.__flujoRegistro) {
+    window.__flujoRegistro = false;
+    try { showPage('candidato'); } catch(e){}
+  }
 }
 
 async function enviarCodigoVerificacion() {
@@ -3354,13 +3359,20 @@ async function registrar() {
     showToast('✓ Cuenta creada. Verifica tu email para mayor seguridad.');
 
     setTimeout(() => {
-      const destino = (rol === 'admin') ? 'admin' : tipo;
-      showPage(destino);
       const cvN = document.getElementById('cvNombre');
       const cvE = document.getElementById('cvEmail');
       if (cvN) cvN.value = nombre;
       if (cvE) cvE.value = email;
-      // Mostrar modal de verificación (opcional al inicio)
+
+      // CANDIDATOS: pago obligatorio antes de entrar → mostrar los 3 planes.
+      // (Empleadores y admin entran directo; publican/gestionan gratis.)
+      if (!esAdmin && tipo === 'candidato') {
+        mostrarPlanesRegistro();
+        return;
+      }
+      const destino = (rol === 'admin') ? 'admin' : tipo;
+      showPage(destino);
+      // Mostrar modal de verificación (opcional para empleador)
       if (!esAdmin) mostrarVerificacionEmail();
     }, 600);
 
@@ -3927,6 +3939,11 @@ function showPage(page) {
   // Solo admin puede entrar a /admin
   if (page === 'admin' && currentUser && currentUser.rol !== 'admin') {
     showToast('⚠ Acceso restringido a administradores', true);
+    return;
+  }
+  // CANDADO DE PAGO: un candidato que aún no pagó no entra al panel;
+  // se le muestra la selección de plan (pago obligatorio).
+  if (page === 'candidato' && forzarPagoSiCandidato()) {
     return;
   }
   // Cargar datos del admin si entra a esa página
@@ -6175,7 +6192,131 @@ const PP_PLANES = {
   'Empleador Enterprise': { cents:39900, key:'emp_enterprise' }
 };
 
-function abrirPago(plan, precio) {
+// ============================================================================
+//  FLUJO DE PAGO OBLIGATORIO AL REGISTRARSE  (solo candidatos)
+//  Registro -> elegir plan + pagar -> recibo -> verificar correo -> panel.
+//  Empleadores y admin NO pasan por aquí (publican/gestionan gratis).
+// ============================================================================
+
+// ¿El candidato ya pagó? (admins y empleadores siempre pasan)
+function tienePagoOk() {
+  if (!currentUser) return false;
+  if (currentUser.rol === 'admin') return true;
+  if (currentUser.tipo === 'empleador') return true;
+  return localStorage.getItem('pago_ok_' + currentUser.email) === 'true';
+}
+function marcarPagoOk() {
+  if (currentUser && currentUser.email) {
+    localStorage.setItem('pago_ok_' + currentUser.email, 'true');
+  }
+}
+
+// Verifica en el backend si el candidato ya tiene un pago hecho (sirve cuando
+// entra desde otro dispositivo y no tiene la marca local) — evita cobrar 2 veces.
+async function verificarPagoBackend() {
+  try {
+    const r = await apiCall('/api/pagos/historial', { method: 'GET' });
+    if (r && Array.isArray(r.pagos) && r.pagos.some(p => p.estado === 'completado')) {
+      marcarPagoOk();
+      cerrarPlanesRegistro();
+      try { showToast('✓ Pago verificado, bienvenido de vuelta'); } catch(e){}
+      showPage('candidato');
+      return true;
+    }
+  } catch (e) {}
+  return false;
+}
+
+// Si es candidato y aún no pagó, lo lleva a elegir plan (bloquea el panel).
+// Devuelve true si BLOQUEÓ (no debe entrar al panel todavía).
+function forzarPagoSiCandidato() {
+  if (!currentUser) return false;
+  if (currentUser.rol === 'admin' || currentUser.tipo === 'empleador') return false;
+  if (tienePagoOk()) return false;
+  // No tiene marca local: revisa el backend por si ya pagó en otro dispositivo
+  verificarPagoBackend();
+  mostrarPlanesRegistro();
+  return true;
+}
+
+// Modal OBLIGATORIO con los 3 planes de candidato (al registrarse o si no ha pagado)
+function mostrarPlanesRegistro() {
+  if (document.getElementById('modalPlanesReg')) return; // ya está abierto
+  const modal = document.createElement('div');
+  modal.id = 'modalPlanesReg';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:10000;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto';
+  modal.innerHTML = `
+    <div style="background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:18px;max-width:520px;width:100%;padding:28px 22px;margin:auto">
+      <div style="text-align:center;margin-bottom:8px">
+        <div style="font-size:13px;color:var(--verde);font-weight:700;letter-spacing:1px">ÚLTIMO PASO</div>
+        <h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin:8px 0 6px">Elige tu plan para empezar</h2>
+        <p style="color:var(--texto-secundario);font-size:13px;margin:0 0 18px;line-height:1.5">Para activar tu cuenta y empezar a buscar empleo, elige el plan que más te convenga. Puedes cambiarlo después desde tu panel.</p>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="border:1px solid var(--gris-borde);border-radius:12px;padding:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700">Básico</div>
+            <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--verde)">$9.99<span style="font-size:11px;color:var(--texto-secundario)">/mes</span></div>
+          </div>
+          <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:12px">3 búsquedas/día · 120 ofertas · 12 postulaciones/día</div>
+          <button onclick="elegirPlanRegistro('Básico','9.99')" class="btn-full">Elegir Básico</button>
+        </div>
+
+        <div style="border:2px solid var(--verde);border-radius:12px;padding:16px;position:relative">
+          <div style="position:absolute;top:-10px;left:16px;background:var(--verde);color:var(--negro);font-size:10px;font-weight:700;padding:2px 10px;border-radius:20px">MÁS POPULAR</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700">Estándar</div>
+            <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--verde)">$19.99<span style="font-size:11px;color:var(--texto-secundario)">/mes</span></div>
+          </div>
+          <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:12px">6 búsquedas/día · 240 ofertas · 25 postulaciones/día · correos en frío</div>
+          <button onclick="elegirPlanRegistro('Estándar','19.99')" class="btn-full">Elegir Estándar</button>
+        </div>
+
+        <div style="border:1px solid var(--gris-borde);border-radius:12px;padding:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700">Pro</div>
+            <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--verde)">$29.99<span style="font-size:11px;color:var(--texto-secundario)">/mes</span></div>
+          </div>
+          <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:12px">10 búsquedas/día · 400 ofertas · 35 postulaciones/día · 20 correos en frío</div>
+          <button onclick="elegirPlanRegistro('Pro','29.99')" class="btn-full">Elegir Pro</button>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:16px">
+        <button onclick="salirDeRegistro()" style="background:none;border:none;color:var(--texto-secundario);font-size:12px;cursor:pointer;text-decoration:underline">Cancelar y salir</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+}
+function cerrarPlanesRegistro() {
+  const m = document.getElementById('modalPlanesReg');
+  if (m) m.remove();
+}
+// Salir del registro sin pagar (cierra sesión para no dejar a medias)
+function salirDeRegistro() {
+  cerrarPlanesRegistro();
+  try { cerrarSesion(); } catch(e) { try { showPage('landing'); } catch(_){} }
+}
+// El candidato eligió un plan en el registro -> abrir la Cajita en modo registro
+function elegirPlanRegistro(plan, precio) {
+  cerrarPlanesRegistro();
+  abrirPago(plan, precio, true);
+}
+// Tras pagar en el registro: marca pago, cierra pago y pide verificar correo
+function continuarTrasPagoRegistro() {
+  marcarPagoOk();
+  cerrarPago();
+  window.__flujoRegistro = true;
+  try { mostrarVerificacionEmail(); } catch(e){}
+  // Si el modal no apareció (correo ya verificado antes), entra directo al panel.
+  if (!document.getElementById('modalVerifEmail')) {
+    window.__flujoRegistro = false;
+    try { showPage('candidato'); } catch(e){}
+  }
+}
+
+function abrirPago(plan, precio, esRegistro) {
   // Para "que se cargue solo" al usuario correcto, hace falta sesión iniciada.
   if (!currentUser) {
     try { showToast('Primero inicia sesión para contratar tu plan.'); } catch(e){}
@@ -6206,7 +6347,8 @@ function abrirPago(plan, precio) {
   const clientTxId = 'TEC-' + Date.now() + '-' + Math.random().toString(36).slice(2,8);
   try {
     localStorage.setItem('pp_pendiente', JSON.stringify({
-      clientTxId, planKey: info.key, planLabel: plan, email: currentUser.email
+      clientTxId, planKey: info.key, planLabel: plan, email: currentUser.email,
+      flujo: esRegistro ? 'registro' : 'normal'
     }));
   } catch(e){}
 
@@ -6241,7 +6383,14 @@ function abrirPago(plan, precio) {
 }
 
 function cerrarPago() { document.getElementById('ppModal').classList.remove('open'); }
-function cerrarPagoExito() { cerrarPago(); if(currentUser) showPage('empleador'); }
+function cerrarPagoExito() {
+  cerrarPago();
+  if (currentUser) {
+    const destino = (currentUser.rol === 'admin') ? 'admin'
+                  : (currentUser.tipo === 'empleador') ? 'empleador' : 'candidato';
+    showPage(destino);
+  }
+}
 
 // Al volver de PayPhone, la URL trae ?id=...&clientTransactionId=...
 // Confirmamos contra el BACKEND (nunca solo en el navegador) y activamos el plan.
@@ -6269,11 +6418,25 @@ async function verificarRetornoPayphone() {
         try { await saveToStorage('talento_user', currentUser); } catch(e){}
         try { updateLimitBar(); } catch(e){}
       }
+      // El pago quedó hecho: marcar al candidato como "ya pagó".
+      try { marcarPagoOk(); } catch(e){}
       // Mostrar pantalla de éxito.
       document.getElementById('ppModal').classList.add('open');
       document.getElementById('ppPayView').style.display = 'none';
       document.getElementById('ppSuccess').className = 'pp-success visible';
       try { localStorage.removeItem('pp_pendiente'); } catch(e){}
+
+      // Si veníamos del REGISTRO: el botón continúa a verificar correo.
+      const btnExito = document.getElementById('ppSuccessBtn');
+      if (btnExito) {
+        if (pendiente.flujo === 'registro') {
+          btnExito.textContent = 'Continuar →';
+          btnExito.setAttribute('onclick', 'continuarTrasPagoRegistro()');
+        } else {
+          btnExito.textContent = 'Ir a mi panel →';
+          btnExito.setAttribute('onclick', 'cerrarPagoExito()');
+        }
+      }
     } else {
       try { showToast('El pago no se completó o fue rechazado. No se hizo ningún cobro.'); } catch(e){}
     }
