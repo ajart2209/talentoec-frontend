@@ -1263,7 +1263,7 @@ function validarBeta() {
         <div style="font-size:12.5px;color:var(--texto-secundario);margin-bottom:16px">Buscamos en LinkedIn, Computrabajo, Multitrabajos, Indeed y más — en tiempo real. Cada búsqueda te trae hasta 8 ofertas reales, cada una con acceso a 5 portales de empleo.</div>
         <div id="cvDetectadoBanner" style="display:none;background:rgba(0,196,140,0.1);border:1px solid rgba(0,196,140,0.3);border-radius:8px;padding:12px 14px;margin-bottom:14px">
           <div style="font-size:12px;color:var(--verde);margin-bottom:8px">✦ Detectamos estas áreas en tu CV. Toca una para buscar:</div>
-          <div id="areasChips" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+          <div id="areasChipsBanner" style="display:flex;flex-wrap:wrap;gap:6px"></div>
         </div>
         <div class="field" style="position:relative">
           <label style="font-size:12px;font-weight:600">¿Qué tipo de trabajo buscas?</label>
@@ -3629,47 +3629,89 @@ function mostrarChipsAreas() {
   const banner = document.getElementById('cvDetectadoBanner');
   const input = document.getElementById('busquedaQuery');
   if (!cvData) { if (banner) banner.style.display = 'none'; return; }
-  // Fuente de áreas: usar la detección RANKEADA del diccionario (precisa y sin ruido).
-  // Solo si el diccionario no encuentra nada, caer a las áreas de la IA.
-  let areas = detectarAreasLocal(cvData.texto, { ranked: true, max: 6 });
+  // Fuente de áreas: detección RANKEADA del diccionario (precisa y sin ruido).
+  let areas = detectarAreasLocal(cvData.texto, { ranked: true, max: 8 });
   if (!areas.length && cvData.areasDetectadas && cvData.areasDetectadas.length) {
     areas = cvData.areasDetectadas;
   }
-  // Limpiar formato Markdown (** comillas) por si vienen de análisis viejos
   areas = areas.map(function(a){ return (typeof limpiarArea==='function') ? limpiarArea(a) : a; }).filter(Boolean);
+  areas = [...new Set(areas)]; // sin duplicados
   if (areas.length) cvData.areasDetectadas = areas;
   if (!areas.length) { if (banner) banner.style.display = 'none'; return; }
 
-  // Usar las 3-4 áreas principales (las más relevantes del CV)
-  const principales = areas.slice(0, 4);
+  // Selección de áreas (primera vez: las 4 principales). Se guarda entre renders.
+  if (!window._areasSel) window._areasSel = new Set(areas.slice(0, 4));
+  // Mantener solo las que siguen existiendo; nunca dejar la selección vacía.
+  window._areasSel = new Set([...window._areasSel].filter(function(a){ return areas.includes(a); }));
+  if (window._areasSel.size === 0) areas.slice(0, 4).forEach(function(a){ window._areasSel.add(a); });
 
-  // Rellenar el buscador con esas 3-4 áreas (la IA repartirá los 8 empleos entre ellas)
-  if (input && !input.value.trim()) { input.value = principales.join(', '); }
+  // El buscador refleja SIEMPRE las áreas marcadas
+  if (input) input.value = [...window._areasSel].join(', ');
 
-  // Mostrar el banner explicando que busca en esas áreas
   if (banner) {
     banner.style.display = 'block';
-    let html = '<div style="font-size:12px;color:var(--verde);margin-bottom:8px">✦ Buscaremos empleos en tus áreas principales:</div>';
+    let html = '<div style="font-size:12px;color:var(--verde);margin-bottom:8px">✦ Toca para elegir tus áreas (buscaremos empleos en las marcadas ✓):</div>';
     html += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
-    html += principales.map(function(a){
-      return '<span style="background:rgba(0,196,140,0.12);border:1px solid rgba(0,196,140,0.4);color:var(--verde);padding:5px 11px;border-radius:14px;font-size:11px;font-weight:600">' + escHtml(a) + '</span>';
+    html += areas.map(function(a){
+      const sel = window._areasSel.has(a);
+      const estilo = sel
+        ? 'background:rgba(0,196,140,0.18);border:1px solid rgba(0,196,140,0.6);color:var(--verde);'
+        : 'background:transparent;border:1px dashed rgba(0,196,140,0.4);color:var(--texto-secundario);';
+      return '<button type="button" onclick=\'toggleAreaBusqueda(' + escHtml(JSON.stringify(String(a))) + ')\' style="' + estilo + 'padding:5px 11px;border-radius:14px;font-size:11px;font-weight:600;cursor:pointer">' + (sel ? '✓ ' : '+ ') + escHtml(a) + '</button>';
     }).join('');
     html += '</div>';
-    // Mostrar las demás áreas como opción de cambiar
-    const otras = areas.slice(4, 9);
-    if (otras.length) {
-      html += '<div style="font-size:11px;color:var(--texto-secundario);margin:8px 0 5px">Otras áreas detectadas (toca para añadir):</div>';
-      html += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
-      html += otras.map(function(a){
-        return '<button onclick=\'agregarAreaBusqueda(' + escHtml(JSON.stringify(String(a))) + ')\' style="background:transparent;border:1px dashed rgba(0,196,140,0.4);color:var(--texto-secundario);padding:5px 11px;border-radius:14px;font-size:11px;cursor:pointer">+ ' + escHtml(a) + '</button>';
-      }).join('');
-      html += '</div>';
-    }
     banner.innerHTML = html;
   }
 }
 
-// Añade un área extra a la búsqueda (reemplaza la búsqueda con esa área enfocada)
+// Marca/desmarca un área de la búsqueda (no deja la selección vacía)
+function toggleAreaBusqueda(area) {
+  if (!window._areasSel) window._areasSel = new Set();
+  if (window._areasSel.has(area)) {
+    if (window._areasSel.size > 1) window._areasSel.delete(area);
+  } else {
+    window._areasSel.add(area);
+  }
+  mostrarChipsAreas();
+}
+
+// Pinta los chips de "Áreas detectadas en tu CV" (pestaña CV) usando la detección
+// RANKEADA del diccionario (no las de la IA). Son toggleables y alimentan cvArea.
+function pintarAreasCV() {
+  if (!cvData || !cvData.texto) return;
+  let areas = detectarAreasLocal(cvData.texto, { ranked: true, max: 6 });
+  if (!areas.length && cvData.areasDetectadas && cvData.areasDetectadas.length) areas = cvData.areasDetectadas;
+  areas = areas.map(function(a){ return (typeof limpiarArea==='function') ? limpiarArea(a) : a; }).filter(Boolean);
+  areas = [...new Set(areas)];
+  if (!areas.length) return;
+  cvData.areasDetectadas = areas;
+  const cont = document.getElementById('areasDetectadas');
+  const chips = document.getElementById('areasChips');
+  if (cont) cont.style.display = 'block';
+  // Selección del CV (por defecto: todas marcadas)
+  if (!window._areasCVSel) window._areasCVSel = new Set(areas);
+  window._areasCVSel = new Set([...window._areasCVSel].filter(function(a){ return areas.includes(a); }));
+  if (window._areasCVSel.size === 0) areas.forEach(function(a){ window._areasCVSel.add(a); });
+  if (chips) {
+    chips.innerHTML = areas.map(function(a){
+      const sel = window._areasCVSel.has(a);
+      const estilo = sel
+        ? 'background:rgba(0,196,140,0.15);border:1px solid rgba(0,196,140,0.4);color:var(--verde);'
+        : 'background:transparent;border:1px dashed rgba(0,196,140,0.4);color:var(--texto-secundario);';
+      return '<button type="button" onclick=\'toggleAreaCV(' + escHtml(JSON.stringify(String(a))) + ')\' style="' + estilo + 'padding:5px 12px;border-radius:14px;font-size:12px;font-weight:500;cursor:pointer">' + (sel ? '✓ ' : '') + escHtml(a) + '</button>';
+    }).join('');
+  }
+  const cvArea = document.getElementById('cvArea');
+  if (cvArea) cvArea.value = [...window._areasCVSel].join(', ');
+}
+function toggleAreaCV(area) {
+  if (!window._areasCVSel) window._areasCVSel = new Set();
+  if (window._areasCVSel.has(area)) { if (window._areasCVSel.size > 1) window._areasCVSel.delete(area); }
+  else window._areasCVSel.add(area);
+  pintarAreasCV();
+}
+
+// Añade un área extra a la búsqueda (compatibilidad; ahora se usa toggleAreaBusqueda)
 function agregarAreaBusqueda(area) {
   const input = document.getElementById('busquedaQuery');
   if (input) input.value = area;  // enfocar la búsqueda solo en esa área
@@ -4566,16 +4608,10 @@ function mostrarCVGuardado() {
     if (mejorarBtn) mejorarBtn.style.display = 'block';
   }
 
-  // Mostrar áreas detectadas si existen
-  if (cvData.areasDetectadas && cvData.areasDetectadas.length) {
-    const areasDet = document.getElementById('areasDetectadas');
-    const areasChips = document.getElementById('areasChips');
-    if (areasDet) areasDet.style.display = 'block';
-    if (areasChips) {
-      areasChips.innerHTML = cvData.areasDetectadas.map(a => 
-        '<span style="background:rgba(0,196,140,0.15);color:var(--verde);padding:5px 12px;border-radius:14px;font-size:12px;font-weight:500;border:1px solid rgba(0,196,140,0.3)">' + a + '</span>'
-      ).join('');
-    }
+  // Mostrar áreas detectadas (RANKEADAS del diccionario, toggleables)
+  if ((cvData.areasDetectadas && cvData.areasDetectadas.length) || (cvData.texto)) {
+    window._areasCVSel = null; // recalcular selección para este CV
+    pintarAreasCV();
   }
 
   // Si ya tiene carta, ocultar botón generar carta
@@ -4825,16 +4861,10 @@ ${area}, Ecuador, ${ciudad}, profesional, experiencia, tiempo completo, empresas
   }
   // removed: mejorarCVBtn hidden permanently
 
-  // Mostrar chips de áreas detectadas
-  if (areasDetectadas.length > 0) {
-    const areasDiv = document.getElementById('areasDetectadas');
-    const chipsDiv = document.getElementById('areasChips');
-    areasDiv.style.display = 'block';
-    chipsDiv.innerHTML = areasDetectadas.map(function(a) {
-      return '<span style="background:rgba(0,196,140,0.12);border:1px solid rgba(0,196,140,0.3);color:var(--verde);padding:6px 14px;border-radius:20px;font-size:12px;display:inline-block;margin:2px">✓ ' + a + '</span>';
-    }).join('');
-    // Set first area as default
-    if (areasDetectadas[0]) document.getElementById('cvArea').value = areasDetectadas[0];
+  // Mostrar chips de áreas detectadas (RANKEADAS del diccionario, toggleables)
+  if (areasDetectadas.length > 0 || (cvData && cvData.texto)) {
+    window._areasCVSel = null; // recalcular selección para este CV recién analizado
+    pintarAreasCV();
   }
   if (currentUser) {
     currentUser.cvData = cvData;
