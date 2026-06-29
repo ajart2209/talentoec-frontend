@@ -1995,11 +1995,33 @@ const BACKEND_URL = 'https://talentoec-backend-production.up.railway.app';
 const PAYPHONE_TOKEN    = 'MrRMBqCmA8oZx8gxt39fP_dhPKtmEJD7enQLFyMTQzm_7Hq4jm2C3DS-kr6ldiD1SANPGWNO_TMbyk7m3QZy0xTee99MXXGeJqwu6c-ry09PqD0QdB2NFz9dAFFySdesg4t6GtALH6n7Y10w_tQ4IkZRzjZu3WW5p6ClmdgYlinNZ4auxhP4uJCOz2nxB-vzeAvB-IuvhpItTPF-ZEYcHTLtcU9fvJ71tQt1hl7MbsXP9bTM-zFeDEK9CLY7XlyAi7lGIMk9ORU5y4zKjo_3n65j2t-NdsoDTVPf4JBVaSwfkYc76kFuBJlWvTNhLJS1rMQtEIOn7fOVKNLrBXYWDFTjOZE';
 const PAYPHONE_STORE_ID = 'f59120e7-d366-4b5f-97bf-f3c23dd0013b';
 
-// ⚙️ INTERRUPTOR: Bolsa de empleo pública.
-// Ponlo en true cuando tengas ~50 vacantes publicadas para que la
-// bolsa no se vea vacía. Mientras esté en false, la pestaña "Buscar
-// empleo" queda oculta y dirige a registrarse.
-const BOLSA_ACTIVA = false;
+// ⚙️ Bolsa de empleo pública. Se ABRE AUTOMÁTICAMENTE para todos cuando la base
+// llega a BOLSA_MIN_VACANTES vacantes aprobadas (acordado: 50). El backend lo decide
+// en /vacantes/contador. BOLSA_ACTIVA = true fuerza la apertura manualmente (override).
+const BOLSA_ACTIVA = false;          // override manual (forzar abierta sin importar el conteo)
+const BOLSA_MIN_VACANTES = 50;       // umbral acordado: gratis para todos a partir de aquí
+window._bolsaAbierta = false;        // lo setea verificarBolsaAbierta() al consultar el backend
+
+// ¿La bolsa está abierta para todos? (override manual O ya hay 50+ vacantes)
+function bolsaEstaAbierta() {
+  return BOLSA_ACTIVA === true || window._bolsaAbierta === true;
+}
+
+// Consulta cuántas vacantes hay en la base y abre la bolsa si llegó al umbral.
+// Es público (sin login) y no rompe nada si el backend no responde.
+async function verificarBolsaAbierta() {
+  try {
+    const res = await fetch(BACKEND_URL + '/api/auth/vacantes/contador');
+    const data = await res.json();
+    window._bolsaAbierta = (data && data.bolsaAbierta === true);
+  } catch (e) {
+    window._bolsaAbierta = false; // ante cualquier fallo, queda cerrada (seguro)
+  }
+  // Mostrar u ocultar la pestaña "Buscar empleo" según el resultado
+  const tabBolsa = document.getElementById('ntab-bolsa');
+  if (tabBolsa) tabBolsa.style.display = bolsaEstaAbierta() ? '' : 'none';
+  return window._bolsaAbierta;
+}
 
 // Helper para llamar al backend con manejo de errores
 // Detector de conexión: avisa cuando el usuario pierde o recupera internet
@@ -2539,11 +2561,13 @@ async function getFromStorage(key) {
 
 // ======= INIT =======
 window.addEventListener('load', async () => {
-  // Ocultar pestaña "Buscar empleo" hasta que la bolsa tenga masa crítica
-  if (!BOLSA_ACTIVA) {
+  // Ocultar pestaña "Buscar empleo" hasta que la bolsa tenga masa crítica (50 vacantes).
+  // Primero ocultamos por defecto; luego verificarBolsaAbierta() la muestra si corresponde.
+  if (!bolsaEstaAbierta()) {
     const tabBolsa = document.getElementById('ntab-bolsa');
     if (tabBolsa) tabBolsa.style.display = 'none';
   }
+  verificarBolsaAbierta(); // consulta el conteo real y abre la bolsa si llegó a 50
   // ── Detectar sesion de Google via Supabase ───────────────
   try {
     // Supabase maneja el token automaticamente del hash o codigo
@@ -3084,6 +3108,9 @@ async function responderPostulante(postId, tipo, vacanteId) {
 async function postularVacante(id, empresa, cargo, btn) {
   if (!currentUser) { openAuth('register'); showToast('Crea tu cuenta gratis para enviar tu CV 🎉'); return; }
 
+  // 🔒 Enviar la postulación requiere un plan activo (ver empleos es gratis)
+  if (bloqueoCorreoSinPlan()) return;
+
   // Verificar que tenga CV guardado — si no, mandarlo a crearlo
   const tieneCV = (cvData && cvData.texto && cvData.texto.length > 30) || (currentUser.cvData && currentUser.cvData.texto);
   if (!tieneCV) {
@@ -3469,16 +3496,16 @@ function limpiarArea(a) {
 }
 
 // Detecta áreas/aptitudes del texto del CV (sin IA, gratis)
-function detectarAreasLocal(texto) {
+function detectarAreasLocal(texto, opts) {
   if (!texto) return [];
   if (typeof texto !== 'string') texto = String(texto);  // robustez ante arrays/números
   // Quitar tildes del texto para que "médico" haga match con "medico" del mapa
   const t = texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ñ/g, 'n');
   const mapa = {
     // ── Tecnología ──
-    'Desarrollo de Software': ['programador','desarrollador','developer','software','react','javascript','python','java','node','frontend','backend','fullstack','full stack'],
+    'Desarrollo de Software': ['programador','desarrollador','developer','desarrollo de software','ingeniero de software','software developer','react','javascript','python','java','node','frontend','backend','fullstack','full stack'],
     'Bases de Datos': ['sql','postgresql','mysql','mongodb','base de datos','bases de datos','database'],
-    'Ingeniería de Sistemas': ['sistemas','informatica','computacion','redes','soporte tecnico','it'],
+    'Ingeniería de Sistemas': ['ingenieria de sistemas','ingeniero de sistemas','sistemas informaticos','informatica','computacion','redes','soporte tecnico','it'],
     'Diseño Gráfico': ['diseñador grafico','diseñadora grafica','diseño grafico','diseñador','diseñadora','diseño','design','photoshop','illustrator','indesign','corel','coreldraw','branding','identidad visual','artes graficas','publicidad grafica','logotipo','editorial','creativo'],
     // ── Negocios ──
     'Marketing y Ventas': ['marketing','ventas','vendedor','vendedora','comercial','publicidad','redes sociales','community manager','asesor comercial','ejecutivo de ventas','impulsador','impulsadora','perchador','mercaderista','promotor','promotora','televentas','preventa','fuerza de ventas'],
@@ -3493,10 +3520,10 @@ function detectarAreasLocal(texto) {
     'Educación': ['docente','profesor','profesora','maestro','maestra','educacion','pedagogia','enseñanza','tutor','parvularia','educadora'],
     // ── Oficios y servicios ──
     'Gastronomía y Cocina': ['cocinero','cocinera','chef','cocina','gastronomia','panadero','pastelero','mesero','mesera','barista','ayudante de cocina','bartender'],
-    'Trabajo Doméstico': ['empleada domestica','empleada','niñera','niñero','limpieza','aseo','conserje','domestico','cuidado de niños','cuidadora','cuidador'],
+    'Trabajo Doméstico': ['empleada domestica','empleado domestico','niñera','niñero','conserje','cuidado de niños','cuidadora','cuidador','trabajo domestico','servicio domestico'],
     'Seguridad': ['guardia','seguridad','vigilante','guardia de seguridad','monitoreo','custodio'],
     'Belleza y Estética': ['estilista','peluquero','peluquera','barbero','manicurista','cosmetologa','spa','estetica','maquillador','maquilladora'],
-    'Limpieza y Mantenimiento': ['limpieza','mantenimiento','conserje','jardinero','jardineria','aseo'],
+    'Limpieza y Mantenimiento': ['personal de limpieza','limpieza de oficinas','limpieza general','personal de mantenimiento','mantenimiento de edificios','mantenimiento de instalaciones','conserje','jardinero','jardineria'],
     // ── Técnicos ──
     'Mecánica Automotriz': ['mecanico','mecanica','automotriz','enderezador','pintor automotriz','vulcanizador','llantero'],
     'Electricidad': ['electricidad','electricista','electrico','instalaciones electricas','electronico','electronica'],
@@ -3514,13 +3541,13 @@ function detectarAreasLocal(texto) {
     // ── Turismo y otros ──
     'Turismo y Hotelería': ['turismo','hotel','hoteleria','recepcionista de hotel','guia turistico','camarera','housekeeping','agencia de viajes'],
     'Legal': ['abogado','abogada','juridico','legal','derecho','notaria'],
-    'Ingeniería Industrial': ['ingenieria industrial','ingeniero industrial','produccion','procesos','calidad','manufactura','operario','operaria','operador de maquina','obrero','empacador','empacadora','ensamblador','linea de produccion','maquila','planta'],
+    'Ingeniería Industrial': ['ingenieria industrial','ingeniero industrial','jefe de produccion','linea de produccion','control de calidad','mejora de procesos','manufactura','operario','operaria','operador de maquina','obrero','empacador','empacadora','ensamblador','maquila','planta de produccion'],
     'Nutrición y Bienestar': ['nutricionista','nutricion','dietista','entrenador','entrenadora','gimnasio','fitness','instructor'],
     'Veterinaria': ['veterinario','veterinaria','mascota','animales','pecuario'],
     'Limpieza Industrial': ['limpieza industrial','lavanderia','planchado','desinfeccion','fumigacion'],
     'Petróleo y Minería': ['petroleo','petrolero','minería','minero','perforacion','oil','gas','refineria','campo petrolero','geologo'],
     'Telecomunicaciones': ['telecomunicaciones','telecom','fibra optica','antenas','instalador de internet','tecnico de redes','cnt','claro','movistar'],
-    'Recursos Humanos': ['recursos humanos','rrhh','talento humano','reclutamiento','reclutador','reclutadora','seleccion de personal','nomina','bienestar laboral','generalista de rrhh'],
+    'Recursos Humanos': ['recursos humanos','rrhh','talento humano','reclutamiento','reclutador','reclutadora','seleccion de personal','bienestar laboral','generalista de rrhh','gestion del talento'],
     'Comercio Exterior': ['comercio exterior','importaciones','exportaciones','aduana','aduanero','agente afianzado','logistica internacional','incoterms'],
     'Farmacia': ['farmacia','farmaceutico','quimico farmaceutico','auxiliar de farmacia','dependiente de farmacia','regente'],
     'Servicios Generales': ['servicios generales','utility','mantenimiento general','ayudante general','peon','estibador','cargador'],
@@ -3528,7 +3555,7 @@ function detectarAreasLocal(texto) {
     'Ingeniería Mecánica': ['ingenieria mecanica','ingeniero mecanico','mecanica industrial','mantenimiento industrial','tornero','fresador','matriceria','metalmecanica'],
     'Ingeniería Química': ['ingenieria quimica','ingeniero quimico','quimico','laboratorista','procesos quimicos','control de calidad','alimentos'],
     'Telemarketing y Cobranzas': ['cobranzas','recuperacion de cartera','gestor de cobranzas','call center cobranzas','gestor telefonico'],
-    'Trabajo Social': ['trabajador social','trabajo social','promotor social','desarrollo comunitario','gestor social'],
+    'Trabajo Social': ['trabajador social','trabajadora social','trabajo social','promotor social','promotora social','desarrollo comunitario','gestor social','intervencion social','proyectos sociales','asistencia social'],
     'Deportes y Recreación': ['entrenador deportivo','profesor de educacion fisica','deportes','recreacion','animador turistico','salvavidas','arbitro'],
     'Música y Arte': ['musico','musica','cantante','artista','pintor artistico','escultor','actor','actriz','bailarin','bailarina','dj'],
     // ── Negocios y finanzas avanzadas ──
@@ -3564,7 +3591,6 @@ function detectarAreasLocal(texto) {
     'Geología y Minería': ['geologo','geologia','geofisica','minero','mineria','perforacion','exploracion minera','geotecnia'],
     'Enfermería': ['enfermero','enfermera','licenciada en enfermeria','auxiliar de enfermeria','cuidados de enfermeria','enfermeria']
   };
-  const encontradas = [];
   // Normaliza quitando tildes y ñ→n para comparar parejo en ambos lados
   function norm(s){ return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ñ/g,'n'); }
   // Para palabras cortas (<=3 letras) usamos límite de palabra para evitar falsos positivos
@@ -3577,10 +3603,25 @@ function detectarAreasLocal(texto) {
     }
     return texto.includes(pal);
   }
+  // Cuenta cuántas palabras clave de cada área aparecen (para rankear por fuerza)
+  const puntajes = [];
   for (const [area, palabras] of Object.entries(mapa)) {
-    if (palabras.some(p => coincide(t, p))) encontradas.push(area);
+    let hits = 0;
+    for (const p of palabras) { if (coincide(t, p)) hits++; }
+    if (hits > 0) puntajes.push({ area, hits });
   }
-  return encontradas;
+  // Modo RANKEADO (para mostrar las áreas principales del CV sin ruido):
+  // prioriza las áreas con MÁS coincidencias y descarta las de una sola palabra
+  // cuando hay suficientes áreas fuertes. Devuelve como máximo opts.max áreas.
+  if (opts && opts.ranked) {
+    puntajes.sort((a, b) => b.hits - a.hits);
+    const fuertes = puntajes.filter(p => p.hits >= 2);
+    const base = (fuertes.length >= 3) ? fuertes : puntajes;
+    const max = opts.max || 6;
+    return base.slice(0, max).map(p => p.area);
+  }
+  // Modo normal (compatibilidad): devuelve TODAS las áreas con al menos 1 coincidencia
+  return puntajes.map(p => p.area);
 }
 
 // Rellena el buscador con las 3-4 ÁREAS PRINCIPALES (la IA reparte los 8 empleos entre ellas)
@@ -3588,7 +3629,12 @@ function mostrarChipsAreas() {
   const banner = document.getElementById('cvDetectadoBanner');
   const input = document.getElementById('busquedaQuery');
   if (!cvData) { if (banner) banner.style.display = 'none'; return; }
-  let areas = (cvData.areasDetectadas && cvData.areasDetectadas.length) ? cvData.areasDetectadas : detectarAreasLocal(cvData.texto);
+  // Fuente de áreas: usar la detección RANKEADA del diccionario (precisa y sin ruido).
+  // Solo si el diccionario no encuentra nada, caer a las áreas de la IA.
+  let areas = detectarAreasLocal(cvData.texto, { ranked: true, max: 6 });
+  if (!areas.length && cvData.areasDetectadas && cvData.areasDetectadas.length) {
+    areas = cvData.areasDetectadas;
+  }
   // Limpiar formato Markdown (** comillas) por si vienen de análisis viejos
   areas = areas.map(function(a){ return (typeof limpiarArea==='function') ? limpiarArea(a) : a; }).filter(Boolean);
   if (areas.length) cvData.areasDetectadas = areas;
@@ -3894,8 +3940,8 @@ function requireAuth(page) {
   else { openAuth('register'); }
 }
 function irBuscarEmpleo() {
-  if (!BOLSA_ACTIVA) {
-    // Aún sin masa crítica de vacantes: dirigir al flujo de búsqueda con IA o registro
+  if (!bolsaEstaAbierta()) {
+    // Aún sin masa crítica de vacantes (menos de 50): dirigir al flujo con IA o registro
     if (currentUser && currentUser.tipo === 'candidato') {
       showPage('candidato');
       setTimeout(() => { if (typeof candTab === 'function') candTab('busqueda'); }, 120);
@@ -3958,7 +4004,9 @@ async function cargarBolsa() {
         </div>
         <div style="font-size:12.5px;color:var(--texto-secundario);white-space:pre-line;max-height:120px;overflow:hidden;line-height:1.6">${escHtml(v.descripcion)}</div>
         <div class="card-actions">
-          <button class="btn-sm-green" onclick='postularBolsa(${escHtml(JSON.stringify(String(v.id)))},${escHtml(JSON.stringify(String(v.empresa||"")))},${escHtml(JSON.stringify(String(v.cargo||"")))},this)'>📄 Enviar mi CV</button>
+          ${puedeEnviarPostulacion()
+            ? `<button class="btn-sm-green" onclick='postularBolsa(${escHtml(JSON.stringify(String(v.id)))},${escHtml(JSON.stringify(String(v.empresa||"")))},${escHtml(JSON.stringify(String(v.cargo||"")))},this)'>📄 Enviar mi CV</button>`
+            : `<button class="btn-sm-outline" style="opacity:.9" onclick='bloqueoCorreoSinPlan()'>🔒 Postular requiere un plan</button>`}
         </div>
       </div>`).join('');
   } catch(e) {
@@ -5089,10 +5137,14 @@ function renderJobCards(jobs) {
       </div>`}
       <div class="card-actions">
         ${exclusiva
-          ? `<button class="btn-sm-green" onclick='postularVacante(${escHtml(JSON.stringify(String(j.vacante_id)))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))},this)'>📄 Enviar mi CV</button>`
+          ? (puedeEnviarPostulacion()
+              ? `<button class="btn-sm-green" onclick='postularVacante(${escHtml(JSON.stringify(String(j.vacante_id)))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))},this)'>📄 Enviar mi CV</button>`
+              : `<button class="btn-sm-outline" style="opacity:.9" onclick='bloqueoCorreoSinPlan()'>🔒 Postular requiere un plan</button>`)
           : `${tieneUrl ? `<button class="btn-sm-green" onclick='abrirOferta(${escHtml(JSON.stringify(urlOk))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))},this)'>🔗 Postular directo</button>` : ''}
              <button class="btn-sm-green" onclick='confirmarPostulacion(${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))},this)'>✅ Ya postulé</button>`}
-        ${!exclusiva && j.email && j.email!=='' && j.email!=='undefined' ? `<button class="btn-sm-outline" onclick='abrirEmailModal(${escHtml(JSON.stringify(String(j.email)))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))},${escHtml(JSON.stringify(currentUser?.nombre||'Candidato'))},true)'>✉ Correo</button>` : ''}
+        ${!exclusiva && j.email && j.email!=='' && j.email!=='undefined' ? (puedeEnviarPostulacion()
+          ? `<button class="btn-sm-outline" onclick='abrirEmailModal(${escHtml(JSON.stringify(String(j.email)))},${escHtml(JSON.stringify(String(j.empresa||'')))},${escHtml(JSON.stringify(String(j.cargo||'')))},${escHtml(JSON.stringify(currentUser?.nombre||'Candidato'))},true)'>✉ Correo</button>`
+          : `<button class="btn-sm-outline" style="opacity:.9" onclick='bloqueoCorreoSinPlan()'>🔒 Correo requiere un plan</button>`) : ''}
       </div>
     </div>`;}).join('');
 }
@@ -5468,6 +5520,8 @@ function verPerfil(nombre) { showToast('Perfil completo próximamente'); }
 
 // ======= EMAIL =======
 async function abrirEmailModal(email, empresa, cargo, nombre, esParaEmpresa) {
+  // 🔒 Enviar correo de postulación requiere plan (admin/empleador pasan)
+  if (bloqueoCorreoSinPlan()) return;
   // Guardar empresa y cargo para usarlos al enviar
   window._lastJobEmpresa = empresa || '';
   window._lastJobCargo = cargo || '';
@@ -6389,6 +6443,23 @@ function marcarPagoOk() {
     localStorage.setItem('pago_ok_' + currentUser.email, 'true');
   }
 }
+
+// 🔒 Ver empleos es GRATIS para todos. Pero ENVIAR la postulación (correo) requiere un
+// plan activo. Esta función bloquea el envío para quien no tenga plan y lo manda a elegir uno.
+// Devuelve true si BLOQUEÓ (no debe enviarse). Admin/empleador/candidato que pagó pasan.
+function bloqueoCorreoSinPlan() {
+  if (tienePagoOk()) return false; // tiene plan (o es admin/empleador) → permitido
+  if (!currentUser) {
+    openAuth('register');
+    showToast('Crea tu cuenta y elige un plan para postular 🎉');
+    return true;
+  }
+  showToast('🔒 Necesitas un plan para enviar tu postulación. Ver empleos es gratis.', true);
+  setTimeout(() => { if (typeof mostrarPlanesRegistro === 'function') mostrarPlanesRegistro(); }, 600);
+  return true;
+}
+// Para los botones: ¿muestro el botón de enviar normal o uno bloqueado?
+function puedeEnviarPostulacion() { return tienePagoOk(); }
 
 // Verifica en el backend si el candidato ya tiene un pago hecho (sirve cuando
 // entra desde otro dispositivo y no tiene la marca local) — evita cobrar 2 veces.
