@@ -2248,7 +2248,24 @@ let correosCount = 0;
 
 // ======= STORAGE =======
 async function saveToStorage(key, val) {
-  try { await window.storage.set(key, JSON.stringify(val)); } catch(e) {}
+  // Guardar en localStorage REAL del navegador: esto sí persiste cuando la
+  // página se recarga (p.ej. cuando PayPhone te regresa tras pagar).
+  // Para 'talento_user' guardamos una copia LIGERA (sin el CV en base64) para
+  // no exceder el límite de localStorage.
+  try {
+    let toSave = val;
+    if (key === 'talento_user' && val && typeof val === 'object') {
+      toSave = { ...val };
+      if (toSave.cvData && typeof toSave.cvData === 'object') {
+        const cv = { ...toSave.cvData };
+        delete cv.archivoOriginal; // el archivo pesado no va en localStorage
+        toSave.cvData = cv;
+      }
+    }
+    localStorage.setItem(key, JSON.stringify(toSave));
+  } catch(e) {}
+  // Intento secundario en window.storage si el entorno lo soporta (objeto completo).
+  try { if (typeof window !== 'undefined' && window.storage && window.storage.set) await window.storage.set(key, JSON.stringify(val)); } catch(e) {}
 }
 // Devuelve la fecha actual de Ecuador (GMT-5) como string YYYY-MM-DD
 function fechaEcuador() {
@@ -2539,7 +2556,19 @@ async function hashPassword(pass) {
 }
 
 async function getFromStorage(key) {
-  try { const r = await window.storage.get(key); return r ? JSON.parse(r.value) : null; } catch(e) { return null; }
+  // Preferir window.storage (objeto completo) si el entorno lo soporta;
+  // si no devuelve nada, leer del localStorage REAL (lo normal en el sitio).
+  try {
+    if (typeof window !== 'undefined' && window.storage && window.storage.get) {
+      const r = await window.storage.get(key);
+      if (r && r.value) return JSON.parse(r.value);
+    }
+  } catch(e) {}
+  try {
+    const v = localStorage.getItem(key);
+    if (v != null) return JSON.parse(v);
+  } catch(e) {}
+  return null;
 }
 
 // ======= INIT =======
@@ -2574,8 +2603,46 @@ window.addEventListener('load', async () => {
     }
     // El servidor manda: trae los contadores reales (reseteados por fecha)
     sincronizarStatsBackend();
+    // Y refresca los datos (plan, etc.) desde la NUBE por si cambiaron.
+    refrescarSesionDesdeNube();
+  } else if (localStorage.getItem('talento_token')) {
+    // No hay sesión local (¿borraron caché?) pero SÍ hay token:
+    // reconstruir la sesión completa desde la nube (Supabase).
+    await refrescarSesionDesdeNube();
   }
 });
+
+// Reconstruye/actualiza la sesión desde el backend (fuente de verdad en la nube).
+// Mientras exista el token, los datos del usuario (plan, email, CV) se recuperan
+// desde Supabase aunque se haya borrado el objeto local.
+async function refrescarSesionDesdeNube() {
+  if (!localStorage.getItem('talento_token')) return false;
+  try {
+    const r = await apiCall('/api/auth/me', { method: 'GET' });
+    if (r && r.usuario && r.usuario.email) {
+      const u = r.usuario;
+      currentUser = Object.assign({}, currentUser || {}, {
+        id: u.id, nombre: u.nombre, email: u.email,
+        tipo: u.tipo, rol: u.rol, plan: u.plan, empresa: u.empresa,
+        telefono: u.telefono || (currentUser && currentUser.telefono) || null,
+        stats: u.stats || (currentUser && currentUser.stats) || {}
+      });
+      if (u.cvData) {
+        currentUser.cvData = u.cvData;
+        cvData = u.cvData;
+        try { mostrarCVGuardado(); } catch(e){}
+      }
+      userTipo = u.tipo;
+      try { setLoggedInUI(); } catch(e){}
+      try { await saveToStorage('talento_user', currentUser); } catch(e){}
+      try { updateLimitBar(); } catch(e){}
+      return true;
+    }
+  } catch(e) {
+    // Si el token expiró, apiCall ya maneja el 401 y cierra sesión.
+  }
+  return false;
+}
 
 // ======= VACANTES (bolsa de empleo propia) =======
 function irEmpleadores() {
@@ -6413,6 +6480,10 @@ async function verificarRetornoPayphone() {
         try { setLoggedInUI(); } catch(e){}
       }
     } catch(e){}
+  }
+  // Si aún no hay sesión local, recuperarla desde la NUBE con el token.
+  if (!currentUser) {
+    try { await refrescarSesionDesdeNube(); } catch(e){}
   }
 
   let pendiente = {};
