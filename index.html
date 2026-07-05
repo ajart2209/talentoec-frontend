@@ -1761,7 +1761,8 @@ function validarBeta() {
 
 <!-- ===== AUTH MODAL ===== -->
 <div class="modal-bg" id="authModal">
-  <div class="modal">
+  <div class="modal" style="position:relative">
+    <button type="button" onclick="closeAuth()" aria-label="Cerrar" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--texto-secundario);font-size:22px;cursor:pointer;line-height:1;padding:4px">✕</button>
     <h2 id="authTitle">Crear cuenta</h2>
     <p class="modal-sub" id="authSub">Únete a TalentoEC gratis</p>
     <div class="auth-tabs">
@@ -1809,7 +1810,8 @@ function validarBeta() {
 
 <!-- ===== PAYPHONE MODAL ===== -->
 <div class="modal-bg" id="ppModal">
-  <div class="pp-modal">
+  <div class="pp-modal" style="position:relative">
+    <button type="button" onclick="cerrarPago()" aria-label="Cerrar" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--texto-secundario);font-size:22px;cursor:pointer;line-height:1;padding:4px;z-index:5">✕</button>
     <div id="ppPayView">
       <div class="pp-header">
         <h2>Pago seguro con PayPhone</h2>
@@ -1841,7 +1843,8 @@ function validarBeta() {
 
 <!-- EMAIL MODAL -->
 <div class="modal-bg" id="emailModal">
-  <div class="email-modal-inner">
+  <div class="email-modal-inner" style="position:relative">
+    <button type="button" onclick="cerrarEmail()" aria-label="Cerrar" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--texto-secundario);font-size:22px;cursor:pointer;line-height:1;padding:4px">✕</button>
     <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:4px">Enviar correo automático</h2>
     <p style="font-size:12px;color:var(--texto-secundario);margin-bottom:18px">Redactamos este mensaje personalizado</p>
     <div class="field"><label>Para</label><input type="email" id="modalTo" placeholder="email@empresa.com"></div>
@@ -7380,9 +7383,10 @@ function cerrarSugerencias() {
 }
 
 // Close modals on background click
-document.getElementById('authModal').addEventListener('click', e => { if(e.target===e.currentTarget)closeAuth(); });
-document.getElementById('ppModal').addEventListener('click', e => { if(e.target===e.currentTarget)cerrarPago(); });
-document.getElementById('emailModal').addEventListener('click', e => { if(e.target===e.currentTarget)cerrarEmail(); });
+// ⚠️ Los modales con FORMULARIOS (registro/login, pago, correo) NO se cierran al
+// hacer clic afuera — un toque accidental hacía perder todo lo escrito (o el pago
+// a medio camino). Se cierran solo con su botón ✕ / Cancelar.
+// (Los visores de solo lectura sí conservan el clic-afuera porque no se pierde nada.)
 </script>
 <script>
 // Register Service Worker for PWA
