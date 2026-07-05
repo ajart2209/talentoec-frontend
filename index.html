@@ -1829,7 +1829,10 @@ function validarBeta() {
         <div id="ppBox" style="min-height:60px"></div>
         <div id="ppBoxAviso" style="font-size:12px;color:var(--rojo);text-align:center;margin-top:10px;display:none"></div>
         <div class="pp-security">Procesado por PayPhone · Pago cifrado · Tus datos de tarjeta no pasan por TalentoEC</div>
-        <div style="text-align:center;margin-top:12px"><button onclick="cerrarPago()" style="background:none;border:none;color:var(--texto-secundario);font-size:12px;cursor:pointer">Cancelar</button></div>
+        <div style="text-align:center;margin-top:12px;display:flex;gap:16px;justify-content:center">
+          <button onclick="volverAPlanes()" style="background:none;border:none;color:var(--verde);font-size:12px;cursor:pointer;font-weight:600">← Cambiar de plan</button>
+          <button onclick="cerrarPago()" style="background:none;border:none;color:var(--texto-secundario);font-size:12px;cursor:pointer">Cancelar</button>
+        </div>
       </div>
     </div>
     <div class="pp-success" id="ppSuccess">
@@ -6717,6 +6720,9 @@ function abrirPago(plan, precio, esRegistro) {
   const info = PP_PLANES[plan];
   if (!info) { try{ showToast('Plan no reconocido.'); }catch(e){} return; }
 
+  // Recordar de dónde vino, para el botón "← Cambiar de plan"
+  window._pagoEsRegistro = (esRegistro === true);
+
   document.getElementById('ppPlanName').textContent = 'Plan ' + plan;
   document.getElementById('ppPlanPrice').textContent = '$' + precio;
   document.getElementById('ppModal').classList.add('open');
@@ -6774,6 +6780,17 @@ function abrirPago(plan, precio, esRegistro) {
 }
 
 function cerrarPago() { document.getElementById('ppModal').classList.remove('open'); }
+
+// ← "Cambiar de plan": cierra el pago y regresa a la selección de planes
+// (al modal de planes si venías del registro, o a la sección de planes si no).
+function volverAPlanes() {
+  cerrarPago();
+  if (window._pagoEsRegistro && typeof mostrarPlanesRegistro === 'function') {
+    mostrarPlanesRegistro();
+  } else {
+    verPlanes();
+  }
+}
 function cerrarPagoExito() {
   cerrarPago();
   if (currentUser) {
@@ -7387,6 +7404,19 @@ function cerrarSugerencias() {
 // hacer clic afuera — un toque accidental hacía perder todo lo escrito (o el pago
 // a medio camino). Se cierran solo con su botón ✕ / Cancelar.
 // (Los visores de solo lectura sí conservan el clic-afuera porque no se pierde nada.)
+
+// Tecla ESCAPE: comportamiento amable por modal (no "salirse de todo"):
+// - En el PAGO → vuelve a la selección de planes (por si te equivocaste de plan).
+// - En registro/login o correo → cierra solo ese modal.
+document.addEventListener('keydown', function(e){
+  if (e.key !== 'Escape') return;
+  const pp = document.getElementById('ppModal');
+  const auth = document.getElementById('authModal');
+  const em = document.getElementById('emailModal');
+  if (pp && pp.classList.contains('open')) { volverAPlanes(); return; }
+  if (auth && auth.classList.contains('open')) { closeAuth(); return; }
+  if (em && em.classList.contains('open')) { cerrarEmail(); return; }
+});
 </script>
 <script>
 // Register Service Worker for PWA
