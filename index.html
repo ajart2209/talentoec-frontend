@@ -4638,21 +4638,40 @@ async function handleFile(input) {
 }
 
 function mostrarCVCargado(nombre, longitud) {
+  const palabras = Math.round(longitud / 6);
+
+  // 1) Transformar la CAJA de subida para que se vea que YA cargó
+  const box = document.querySelector('.upload-box');
+  if (box) {
+    box.style.borderColor = 'var(--verde)';
+    box.style.background = 'rgba(0,196,140,0.05)';
+    box.innerHTML = `
+      <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt" style="display:none" onchange="handleFile(this)">
+      <div style="font-size:36px;margin-bottom:10px">✅</div>
+      <h3 style="color:var(--verde)">CV cargado: ${escHtml(nombre)}</h3>
+      <p style="margin:6px 0 4px;color:var(--texto-secundario)">~${palabras} palabras leídas correctamente</p>
+      <p style="margin:0;font-size:12px;color:var(--texto-secundario)">(toca aquí si quieres cambiar el archivo)</p>
+    `;
+  }
+
+  // 2) Aviso con el SIGUIENTE PASO + botón directo de "Analizar y guardar"
   let info = document.getElementById('cvLoadedInfo');
   if (!info) {
     info = document.createElement('div');
     info.id = 'cvLoadedInfo';
-    info.style.cssText = 'background:rgba(0,196,140,0.08);border:1px solid rgba(0,196,140,0.3);border-radius:10px;padding:14px 16px;margin-top:14px;display:flex;align-items:center;gap:12px';
-    const upload = document.querySelector('.upload-zone');
-    if (upload && upload.parentNode) upload.parentNode.insertBefore(info, upload.nextSibling);
+    info.style.cssText = 'background:rgba(0,196,140,0.08);border:1px solid rgba(0,196,140,0.3);border-radius:10px;padding:14px 16px;margin-top:14px';
+    const anchor = document.querySelector('.upload-box');
+    if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(info, anchor.nextSibling);
   }
-  const palabras = Math.round(longitud / 6);
   info.innerHTML = `
-    <span style="background:var(--verde);color:var(--negro);width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">✓</span>
-    <div style="flex:1">
-      <div style="font-size:13px;font-weight:600;color:var(--verde)">${nombre}</div>
-      <div style="font-size:11px;color:var(--texto-secundario);margin-top:2px">~${palabras} palabras detectadas · Listo para analizar</div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+      <span style="background:var(--verde);color:var(--negro);width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">✓</span>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;color:var(--verde)">${escHtml(nombre)} — cargado</div>
+        <div style="font-size:11px;color:var(--texto-secundario);margin-top:2px">Siguiente paso: completa tus datos de abajo (nombre, email, teléfono) y presiona el botón</div>
+      </div>
     </div>
+    <button class="btn-full" onclick="guardarYAnalizar()" style="background:var(--verde)">📊 Analizar y guardar mi CV →</button>
   `;
 }
 
@@ -5334,9 +5353,29 @@ function generalizarCargo(cargo) {
   return c || (cargo||'').toLowerCase().trim();
 }
 
+// NÚCLEO del cargo (1-2 palabras): para Multitrabajos y Computrabajo, que tienen
+// poco inventario y búsqueda estricta — un término largo como "desarrollador full
+// stack react" devuelve 0; el núcleo "desarrollador" sí trae ofertas.
+// Quita tecnologías/stack y deja el OFICIO.
+function nucleoCargo(cargo) {
+  const TECH = ['react','angular','vue','svelte','node','nodejs','javascript','typescript',
+    'python','java','php','laravel','django','flask','ruby','rails','go','golang','rust',
+    'kotlin','swift','flutter','ios','android','sql','mysql','postgresql','postgres',
+    'mongodb','nosql','aws','azure','gcp','docker','kubernetes','devops','fullstack',
+    'full','stack','frontend','backend','front','back','end','wordpress','shopify',
+    'magento','net','dotnet','html','css','sass','git','api','apis','rest',
+    'js','ts','jsx','tsx','vuejs','reactjs','nextjs','next','nuxt','express','spring','boot'];
+  let palabras = generalizarCargo(cargo).split(/\s+/).filter(Boolean);
+  const sinTech = palabras.filter(function(p){ return TECH.indexOf(p) === -1; });
+  // Si al quitar tech queda algo, usar eso; si no, quedarse con la primera palabra
+  const base = sinTech.length ? sinTech : palabras.slice(0, 1);
+  return base.slice(0, 2).join(' ').trim() || (cargo||'').toLowerCase().trim();
+}
+
 function portalesDeEmpleo(cargo, empresa, ciudad) {
-  const limpio = generalizarCargo(cargo);
-  const slug = limpio.replace(/\s+/g,'-');
+  const limpio = generalizarCargo(cargo);         // término medio (LinkedIn/Indeed/Google)
+  const nucleo = nucleoCargo(cargo);              // término corto (Multitrabajos/Computrabajo)
+  const slug = nucleo.replace(/\s+/g,'-');
   const enc = encodeURIComponent(limpio);
   const ciudadEnc = encodeURIComponent(ciudad||'Ecuador');
   const googleQuery = encodeURIComponent(limpio + ' empleo ' + (ciudad || 'Ecuador'));
@@ -5423,16 +5462,14 @@ function togglePortales(btn) {
 
 // Buscar oferta - 4 portales con formatos correctos
 function buscarOfertaReal(cargo, empresa, ciudad, portales) {
-  // Limpiar cargo - quitar tildes y caracteres especiales
-  const cargoLimpio = cargo
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s]/g, '')
-    .trim();
+  // Generalizar el cargo (quita seniority, licencias y ruido) para que los
+  // portales SÍ devuelvan resultados. Antes iba el cargo crudo y términos
+  // largos tipo "desarrollador full stack react" daban 0 en los portales.
+  const cargoLimpio = generalizarCargo(cargo);
 
-  // Formato slug para Computrabajo (separado por guiones)
-  const cargoSlug = cargoLimpio.replace(/\s+/g, '-');
+  // Núcleo corto (1-2 palabras, sin tecnologías) para Computrabajo,
+  // que con términos largos devuelve 0 resultados.
+  const cargoSlug = nucleoCargo(cargo).replace(/\s+/g, '-');
 
   // Codificación URL estándar
   const cargoEnc = encodeURIComponent(cargoLimpio);
@@ -6530,7 +6567,7 @@ function renderCorreos() {
 // y la clave interna del plan que se activará al confirmarse el pago.
 const PP_PLANES = {
   'Básico':               { cents:999,   key:'basico' },
-  'Estándar':             { cents:100,   key:'estandar' },  // ⚠️ PRUEBA $1 — revertir a 1999 tras probar
+  'Estándar':             { cents:1999,  key:'estandar' },
   'Pro':                  { cents:2999,  key:'pro' },
   'Empleador Básico':     { cents:4900,  key:'emp_basico' },
   'Empleador Pro':        { cents:14900, key:'emp_pro' },
@@ -6584,9 +6621,37 @@ async function verificarPagoBackend() {
   try {
     const r = await apiCall('/api/pagos/historial', { method: 'GET' });
     _pagoConsultado = true;
-    if (r && Array.isArray(r.pagos) && r.pagos.some(p => p.estado === 'completado')) {
-      marcarPagoOk();
-      return true;
+    if (r && Array.isArray(r.pagos)) {
+      // Vigencia: el plan dura 30 días desde el ÚLTIMO pago completado.
+      const completados = r.pagos.filter(p => p.estado === 'completado');
+      if (completados.length) {
+        const ultimo = completados
+          .map(p => new Date(p.completado_en || p.creado_en || 0).getTime())
+          .filter(t => isFinite(t) && t > 0)
+          .sort((a, b) => b - a)[0];
+        const DIA = 24 * 60 * 60 * 1000;
+        if (!ultimo) { marcarPagoOk(); return true; } // sin fechas legibles: no bloquear
+        const vence = ultimo + 30 * DIA;
+        window._planVence = vence;
+        if (Date.now() <= vence) {
+          marcarPagoOk();
+          // Aviso amable si vence en 5 días o menos
+          const diasRestantes = Math.ceil((vence - Date.now()) / DIA);
+          if (diasRestantes <= 5) {
+            setTimeout(() => showToast('⏳ Tu plan vence en ' + diasRestantes + ' día' + (diasRestantes === 1 ? '' : 's') + '. Renuévalo para no perder acceso.'), 1200);
+          }
+          return true;
+        }
+        // VENCIDO: quitar la marca local y pedir renovación
+        if (currentUser && currentUser.email) {
+          localStorage.removeItem('pago_ok_' + currentUser.email);
+        }
+        setTimeout(() => {
+          showToast('⏳ Tu plan venció. Renuévalo para seguir postulando (ver empleos es gratis).', true);
+          if (typeof mostrarPlanesRegistro === 'function') mostrarPlanesRegistro();
+        }, 800);
+        return false;
+      }
     }
   } catch (e) {}
   return false;
