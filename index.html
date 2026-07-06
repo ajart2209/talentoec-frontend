@@ -1277,6 +1277,8 @@ function validarBeta() {
         <button class="btn-sm-outline" onclick="editarCV()">Editar</button>
       </div>
 
+      <div id="analisisContador" style="font-size:12px;color:var(--texto-secundario);margin:0 0 10px;text-align:right"></div>
+
       <div class="section-box" id="uploadSection">
         <div class="section-box-title">Sube o pega tu CV</div>
         <div class="upload-box" onclick="document.getElementById('fileInput').click()"
@@ -4326,6 +4328,7 @@ function candTab(tab) {
   if (tab === 'cv') {
     // SIEMPRE sincronizar la vista: si hay CV guardado, banner ✓; si no, caja de subir.
     sincronizarVistaCV();
+    actualizarContadorAnalisis();
     setTimeout(() => {
       if (typeof vigilarCambiosCV === 'function') vigilarCambiosCV();
       // Si ya hay un análisis guardado, desactivar el botón
@@ -4768,10 +4771,45 @@ function handleDrop(e) {
 function editarCV() {
   document.getElementById('cvSavedBanner').style.display = 'none';
   document.getElementById('uploadSection').style.display = 'block';
+  // Restaurar la caja de subida LIMPIA (si antes se transformó con el nombre del
+  // archivo anterior, confundía al querer cambiarlo). El CV guardado se conserva
+  // hasta que se analice y guarde uno nuevo.
+  const box = document.querySelector('.upload-box');
+  if (box) {
+    box.style.borderColor = '';
+    box.style.background = '';
+    box.innerHTML = `
+      <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt" style="display:none" onchange="handleFile(this)">
+      <div style="font-size:36px;margin-bottom:12px">📄</div>
+      <h3>Sube tu nuevo CV</h3>
+      <p style="margin:6px 0 4px">PDF, Word o TXT</p>
+      <p style="margin:0 0 12px;font-size:11px;color:var(--texto-secundario)">Tu CV actual se conserva hasta que guardes el nuevo</p>
+      <div style="display:flex;gap:6px;justify-content:center">
+        <span class="fmt-badge">PDF</span><span class="fmt-badge">DOCX</span><span class="fmt-badge">TXT</span>
+      </div>`;
+  }
+  const info = document.getElementById('cvLoadedInfo');
+  if (info) info.remove();
   if (cvData.texto) document.getElementById('cvText').value = cvData.texto;
   if (cvData.nombre) document.getElementById('cvNombre').value = cvData.nombre;
   if (cvData.email) document.getElementById('cvEmail').value = cvData.email;
 }
+// Muestra al usuario cuántos análisis de CV le quedan este mes (fuente: SERVIDOR;
+// respaldo local si no hay conexión). Amarillo cuando queda 1, rojo cuando 0.
+async function actualizarContadorAnalisis() {
+  const el = document.getElementById('analisisContador');
+  if (!el || !currentUser) return;
+  let usados = analisisUsadosEsteMes(), max = LIMITE_ANALISIS_MES;
+  try {
+    const r = await apiCall('/api/auth/analisis-cv', { method: 'GET' });
+    if (r && typeof r.usados === 'number') { usados = r.usados; max = r.max || max; }
+  } catch (e) { /* sin conexión: respaldo local */ }
+  const quedan = Math.max(0, max - usados);
+  const color = quedan === 0 ? 'var(--rojo)' : (quedan === 1 ? 'var(--amarillo)' : 'var(--verde)');
+  el.innerHTML = '🔎 Análisis de CV con IA este mes: <b style="color:' + color + '">' + Math.min(usados, max) + ' de ' + max + '</b>' +
+    (quedan === 0 ? ' · se reinicia el próximo mes' : ' · te queda' + (quedan === 1 ? '' : 'n') + ' ' + quedan);
+}
+
 // Sincroniza la vista del CV con la realidad: si HAY CV guardado, muestra el
 // banner "✓ CV guardado" (y oculta la caja de subir); si NO hay, muestra la caja.
 // Se llama SIEMPRE que se entra al panel — así nunca más aparece "sube tu CV"
@@ -4908,12 +4946,26 @@ async function guardarYAnalizar() {
     if (campoTel) { campoTel.focus(); campoTel.style.borderColor = 'var(--rojo)'; }
     return;
   }
-  // Límite de 3 análisis por mes
+  // Límite de 3 análisis por mes — validado en SERVIDOR (imborrable).
+  // El chequeo local queda como respaldo rápido y para cuando no hay conexión.
   const usados = analisisUsadosEsteMes();
   if (usados >= LIMITE_ANALISIS_MES) {
     showToast('⚠ Llegaste al límite de ' + LIMITE_ANALISIS_MES + ' análisis de CV este mes. Tu CV guardado sigue activo. El límite se reinicia el próximo mes.', true);
+    actualizarContadorAnalisis();
     return;
   }
+  try {
+    const rc = await fetch(BACKEND_URL + '/api/auth/analisis-cv/consumir', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '') }
+    });
+    const dc = await rc.json().catch(() => ({}));
+    if (rc.status === 429) {
+      showToast('⚠ ' + (dc.error || 'Llegaste al límite de análisis de este mes.'), true);
+      actualizarContadorAnalisis();
+      return;
+    }
+  } catch (e) { /* sin conexión al contador del servidor: el respaldo local ya validó */ }
   cvData = { texto, nombre, email, telefono, ciudad, area, fecha: new Date().toLocaleDateString('es-EC') };
   document.getElementById('cvAnalysis').style.display = 'block';
   document.getElementById('analysisStatus').textContent = 'Analizando tu CV...';
@@ -5054,6 +5106,7 @@ ${area}, Ecuador, ${ciudad}, profesional, experiencia, tiempo completo, empresas
   marcarBotonAnalizar(true);
   // Registrar el análisis usado y avisar cuántos quedan
   const usadosAhora = registrarAnalisisCV();
+  actualizarContadorAnalisis();
   const restantes = LIMITE_ANALISIS_MES - usadosAhora;
   if (restantes > 0) {
     setTimeout(() => showToast('✓ Análisis ' + usadosAhora + ' de ' + LIMITE_ANALISIS_MES + ' este mes · Te quedan ' + restantes), 1200);
