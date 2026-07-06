@@ -4142,9 +4142,22 @@ async function cargarBolsa() {
     if (modalidad) params.set('modalidad', modalidad);
     const res = await fetch(BACKEND_URL + '/api/auth/bolsa?' + params.toString());
     const data = await res.json();
-    const vacs = data.vacantes || [];
+    let vacs = data.vacantes || [];
+    // Ocultar las vacantes a las que YA postulaste (persiste entre sesiones)
+    const totalAntes = vacs.length;
+    vacs = vacs.filter(v => !yaPostulado(v.empresa, v.cargo));
+    const ocultas = totalAntes - vacs.length;
     if (!vacs.length) {
       count.textContent = '';
+      if (ocultas > 0) {
+        cont.innerHTML = `
+          <div style="text-align:center;padding:60px 20px">
+            <div style="font-size:48px;margin-bottom:14px">✅</div>
+            <h3 style="font-family:'Syne',sans-serif;font-size:19px;margin-bottom:8px">Ya postulaste a todas estas vacantes</h3>
+            <p style="color:var(--texto-secundario);font-size:13px;max-width:420px;margin:0 auto">¡Buen trabajo! Vuelve pronto — las empresas publican nuevas vacantes constantemente.</p>
+          </div>`;
+        return;
+      }
       cont.innerHTML = `
         <div style="text-align:center;padding:60px 20px">
           <div style="font-size:48px;margin-bottom:14px">📭</div>
@@ -4219,6 +4232,8 @@ function goHome() { showPage('landing'); }
 function showPage(page) {
   // Despertar el servidor apenas el usuario navega (gana segundos antes de cargar datos)
   if (['empleador','candidato','admin'].includes(page) && typeof despertarServidor === 'function') despertarServidor();
+  // Al entrar al panel del candidato: reflejar el CV guardado (si existe)
+  if (page === 'candidato') setTimeout(() => { if (typeof sincronizarVistaCV === 'function') sincronizarVistaCV(); }, 150);
   if (page === 'admin') setTimeout(() => { if (typeof cargarVacantesAdmin === 'function') cargarVacantesAdmin('pendiente'); }, 400);
   // Protección de páginas - requieren login
   const paginasProtegidas = ['candidato', 'empleador', 'perfil', 'admin'];
@@ -4309,6 +4324,8 @@ function candTab(tab) {
   });
   // Al entrar al tab CV: vigilar cambios y reflejar si ya está analizado
   if (tab === 'cv') {
+    // SIEMPRE sincronizar la vista: si hay CV guardado, banner ✓; si no, caja de subir.
+    sincronizarVistaCV();
     setTimeout(() => {
       if (typeof vigilarCambiosCV === 'function') vigilarCambiosCV();
       // Si ya hay un análisis guardado, desactivar el botón
@@ -4755,6 +4772,22 @@ function editarCV() {
   if (cvData.nombre) document.getElementById('cvNombre').value = cvData.nombre;
   if (cvData.email) document.getElementById('cvEmail').value = cvData.email;
 }
+// Sincroniza la vista del CV con la realidad: si HAY CV guardado, muestra el
+// banner "✓ CV guardado" (y oculta la caja de subir); si NO hay, muestra la caja.
+// Se llama SIEMPRE que se entra al panel — así nunca más aparece "sube tu CV"
+// cuando el CV ya está guardado (pasaba al volver al día siguiente).
+function sincronizarVistaCV() {
+  const tiene = cvData && cvData.texto && cvData.texto.length > 30;
+  if (tiene) {
+    mostrarCVGuardado();
+  } else {
+    const banner = document.getElementById('cvSavedBanner');
+    const upload = document.getElementById('uploadSection');
+    if (banner) banner.style.display = 'none';
+    if (upload) upload.style.display = 'block';
+  }
+}
+
 function mostrarCVGuardado() {
   if (!cvData || !cvData.texto) return;
   const banner = document.getElementById('cvSavedBanner');
@@ -5266,8 +5299,17 @@ async function restaurarResultados() {
   } catch(e) {}
 }
 
+// ¿Ya postulé a este empleo? (por la pareja empresa+cargo, en cualquiera de las vías:
+// correo enviado, "✅ Ya postulé", o CV enviado a vacante exclusiva). Persiste entre sesiones.
+function yaPostulado(empresa, cargo) {
+  const norm = (s) => (s || '').toLowerCase().trim().replace(/[^a-z0-9áéíóúñ]/g, '');
+  const k = norm(empresa) + '|' + norm(cargo);
+  if (k === '|') return false;
+  return (correosEnviados || []).some(c => (norm(c.empresa) + '|' + norm(c.cargo || c.subject)) === k);
+}
+
 function renderJobCards(jobs) {
-  // Filtrar trabajos ya postulados (por email O por empresa)
+  // Filtrar trabajos ya postulados (por email O por empresa O por empresa+cargo)
   const normalizar = (s) => (s || '').toLowerCase().trim().replace(/[^a-z0-9]/g, '');
 
   const enviadosEmails = correosEnviados.map(c => (c.to || '').toLowerCase());
@@ -5277,6 +5319,11 @@ function renderJobCards(jobs) {
 
   const jobsOriginales = jobs.length;
   jobs = jobs.filter(j => {
+    // Ya marcado "✅ Ya postulé" (o CV enviado) a esta empresa+cargo → NO volver a mostrar
+    if (yaPostulado(j.empresa, j.cargo)) {
+      console.log('🚫 Filtrado por postulación previa:', j.empresa, '-', j.cargo);
+      return false;
+    }
     const jobEmail = (j.email || j.contacto_email || '').toLowerCase();
     const jobEmpresaNorm = normalizar(j.empresa || '');
 
@@ -5436,7 +5483,16 @@ function nucleoCargo(cargo) {
   const sinTech = palabras.filter(function(p){ return TECH.indexOf(p) === -1; });
   // Si al quitar tech queda algo, usar eso; si no, quedarse con la primera palabra
   const base = sinTech.length ? sinTech : palabras.slice(0, 1);
-  return base.slice(0, 2).join(' ').trim() || (cargo||'').toLowerCase().trim();
+  // Portales locales: UNA palabra (el oficio) trae más resultados que "arquitecto estructural"
+  // o "contador tributario". Solo se conservan 2 palabras en profesiones compuestas
+  // que pierden sentido partidas.
+  const COMPUESTOS = ['recursos humanos','talento humano','trabajadora social','trabajador social',
+    'comercio exterior','seguridad industrial','salud ocupacional','community manager',
+    'product owner','scrum master','call center','atencion cliente','servicio cliente',
+    'qa tester','obra civil'];
+  let out = base.slice(0, 2).join(' ').trim();
+  if (out.split(' ').length === 2 && COMPUESTOS.indexOf(out) === -1) out = base[0];
+  return out || (cargo||'').toLowerCase().trim();
 }
 
 function portalesDeEmpleo(cargo, empresa, ciudad) {
