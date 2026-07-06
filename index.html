@@ -633,44 +633,6 @@ if (window.pdfjsLib) {
 </head>
 <body>
 <!-- BETA ACCESS GATE -->
-<div id="betaGate" style="position:fixed;inset:0;background:#0A0F0D;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px">
-  <div style="max-width:420px;width:100%;background:linear-gradient(135deg,rgba(0,196,140,0.08),rgba(245,230,66,0.04));border:1px solid rgba(0,196,140,0.3);border-radius:20px;padding:36px 28px;text-align:center">
-    <div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:#00C48C;margin-bottom:8px">TalentoEC</div>
-    <div style="font-size:10px;color:#666;letter-spacing:3px;margin-bottom:28px">BY PROYECTART</div>
-    <div style="background:rgba(245,193,66,0.12);border:1px solid rgba(245,193,66,0.3);border-radius:12px;padding:14px;margin-bottom:24px">
-      <div style="font-size:12px;color:#F5C142;font-weight:600;margin-bottom:4px">🔒 BETA PRIVADA</div>
-      <div style="font-size:11px;color:#999;line-height:1.5">Estamos en pruebas. Ingresa la clave de acceso para continuar.</div>
-    </div>
-    <input id="betaPass" type="password" placeholder="Clave de acceso" style="width:100%;background:#1a1a1a;border:1px solid #333;color:#fff;padding:14px;border-radius:10px;font-size:14px;font-family:inherit;margin-bottom:14px;box-sizing:border-box" onkeydown="if(event.key==='Enter')validarBeta()">
-    <div id="betaError" style="font-size:12px;color:#ff6b6b;margin-bottom:14px;display:none">Clave incorrecta</div>
-    <button onclick="validarBeta()" style="width:100%;background:linear-gradient(90deg,#00C48C,#F5C142);color:#000;border:none;padding:14px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Syne',sans-serif">Ingresar</button>
-    <div style="margin-top:20px;font-size:11px;color:#666;line-height:1.6">¿No tienes clave? Escríbenos:<br><a href="https://wa.me/593982238005?text=Hola%2C%20quiero%20acceso%20a%20TalentoEC" target="_blank" style="color:#00C48C;text-decoration:none">💬 WhatsApp +593 98 223 8005</a></div>
-  </div>
-</div>
-
-<script>
-(function(){
-  // Si ya tiene acceso, ocultar gate
-  if (localStorage.getItem('betaAccess') === 'granted') {
-    document.getElementById('betaGate').style.display = 'none';
-  }
-})();
-
-function validarBeta() {
-  const pass = document.getElementById('betaPass').value;
-  // CLAVE DE ACCESO BETA - cambiar cuando quieras
-  if (pass === 'Proyectart2026') {
-    localStorage.setItem('betaAccess', 'granted');
-    document.getElementById('betaGate').style.display = 'none';
-  } else {
-    document.getElementById('betaError').style.display = 'block';
-    document.getElementById('betaPass').value = '';
-    document.getElementById('betaPass').focus();
-  }
-}
-</script>
-
-
 <nav>
   <div class="logo" onclick="goHome()" style="flex-direction:column;align-items:flex-start;gap:0">
     <div style="display:flex;align-items:center;gap:8px">TalentoEC <span class="logo-badge">ECUADOR</span></div>
@@ -3595,9 +3557,11 @@ function actualizarPlanLockFrio() {
 // Convierte Markdown básico (de la IA) en HTML con formato real
 function formatearMarkdown(texto) {
   if (!texto) return '';
-  // Escapar HTML primero (seguridad)
+  // Seguridad: neutralizar solo lo que abre etiquetas/scripts (< >). Las comillas
+  // y el & se dejan tal cual para que el usuario los LEA normales (no como &quot;
+  // o &amp;). Como no reintroducimos < >, no hay riesgo de inyección.
   let html = String(texto)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    .replace(/</g, '&lt;').replace(/>/g, '&gt;');
   // Encabezados ## y ###
   html = html.replace(/^###\s+(.+)$/gm, '<div style="font-weight:700;font-size:14px;margin:14px 0 6px;color:var(--verde)">$1</div>');
   html = html.replace(/^##\s+(.+)$/gm, '<div style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:16px;margin:18px 0 8px;color:var(--texto-primario)">$1</div>');
@@ -4843,7 +4807,7 @@ function mostrarCVGuardado() {
     const mejorarBtn = document.getElementById('mejorarCVBtn');
     if (analysisEl) analysisEl.style.display = 'block';
     if (statusEl) statusEl.textContent = '✓ Análisis completado';
-    if (contentEl) contentEl.textContent = cvData.analysis;
+    if (contentEl) contentEl.innerHTML = (typeof formatearMarkdown === 'function') ? formatearMarkdown(cvData.analysis) : String(cvData.analysis || '');
     if (mejorarBtn) mejorarBtn.style.display = 'block';
   }
 
@@ -6297,45 +6261,7 @@ function exportarUsuarios() {
   const lista = window._adminUsersList || Object.values(JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}'));
   if (!lista.length) { showToast('⚠ No hay usuarios para exportar', true); return; }
 
-  // Modal para elegir mes
-  // Marcar como postulado cuando el usuario abre el modal de buscar
-  if (empresa && cargo) {
-    correosEnviados.push({
-      to: '',
-      subject: cargo,
-      empresa: empresa,
-      cargo: cargo,
-      fecha: new Date().toLocaleString('es-EC'),
-      estado: 'Postulado'
-    });
-    guardarCorreosEnviados();
-
-    // Registrar en backend
-    apiCall('/api/auth/registrar-correo', {
-      method: 'POST',
-      body: JSON.stringify({
-        destinatario_email: '',
-        destinatario_nombre: empresa,
-        empresa: empresa,
-        cargo: cargo,
-        asunto: 'Postulación: ' + cargo,
-        cuerpo: 'Postulación directa al portal de empleos'
-      })
-    }).catch(e => {});
-
-    // Eliminar visualmente el trabajo
-    setTimeout(() => {
-      document.querySelectorAll('.job-card').forEach(card => {
-        if (card.textContent.includes(empresa) && card.textContent.includes(cargo)) {
-          card.style.transition = 'all 0.4s ease';
-          card.style.opacity = '0';
-          card.style.transform = 'translateX(20px)';
-          setTimeout(() => card.remove(), 400);
-        }
-      });
-    }, 1500);
-  }
-
+  // Modal para elegir período y formato
   const modal = document.createElement('div');
   modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
 
@@ -6356,9 +6282,10 @@ function exportarUsuarios() {
       <p style="color:var(--texto-secundario);font-size:13px;margin-bottom:18px">Elige qué exportar y el formato</p>
 
       <div class="field">
-        <label>📅 Filtrar por mes</label>
+        <label>📅 Filtrar por período</label>
         <select id="expMes" style="width:100%">
           <option value="todos">Todos los meses (${lista.length} usuarios)</option>
+          <option value="hoy">Solo HOY (${lista.filter(u => u.creado && new Date(u.creado).toLocaleDateString('en-CA') === new Date().toLocaleDateString('en-CA')).length} usuarios)</option>
           ${mesesOrdenados.map(m => {
             const [ano, mes] = m.split('-');
             const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -6398,8 +6325,11 @@ function ejecutarExportar(formato) {
   const mes = document.getElementById('expMes').value;
   const lista = window._adminUsersList || Object.values(JSON.parse(localStorage.getItem('talento_usuarios_db') || '{}'));
 
-  // Filtrar por mes
-  const filtrados = mes === 'todos' ? lista : lista.filter(u => {
+  // Filtrar por período (todos / solo hoy / mes específico)
+  const hoyStr = new Date().toLocaleDateString('en-CA');
+  const filtrados = mes === 'todos' ? lista
+    : mes === 'hoy' ? lista.filter(u => u.creado && new Date(u.creado).toLocaleDateString('en-CA') === hoyStr)
+    : lista.filter(u => {
     if (!u.creado) return false;
     const f = new Date(u.creado);
     const userMes = f.getFullYear() + '-' + String(f.getMonth() + 1).padStart(2, '0');
@@ -6407,21 +6337,23 @@ function ejecutarExportar(formato) {
   });
 
   if (!filtrados.length) {
-    showToast('⚠ No hay usuarios en ese mes', true);
+    showToast('⚠ No hay usuarios en ese período', true);
     return;
   }
 
-  const fechaArchivo = mes === 'todos' ? 'todos' : mes;
+  const fechaArchivo = mes === 'todos' ? 'todos' : (mes === 'hoy' ? hoyStr : mes);
   // Precios por plan
   const precios = { basico: 9.99, estandar: 19.99, pro: 29.99, emp_basico: 49, emp_pro: 149, emp_enterprise: 399 };
+  // Comisión REAL de PayPhone: ~6% (validada con pago real: $1.00 → $0.94)
+  const FACTOR_NETO = 0.94;
 
-  const headers = ['Nombre', 'Email', 'Tipo', 'Rol', 'Plan', 'Búsquedas', 'Correos', 'Fecha registro', 'Pago $', 'Ganancia neta $'];
+  const headers = ['Nombre', 'Email', 'Tipo', 'Rol', 'Plan', 'Búsquedas', 'Correos', 'Fecha registro', 'Pago $', 'Neto tras PayPhone ~6% $'];
   const filas = filtrados.map(u => {
     const plan = u.plan || 'basico';
     const esAdmin = u.rol === 'admin';
     // Admins NO pagan
     const pago = esAdmin ? 0 : (precios[plan] || 0);
-    const ganancia = (!esAdmin && pago > 0) ? (pago * 0.65).toFixed(2) : 0;
+    const ganancia = (!esAdmin && pago > 0) ? (pago * FACTOR_NETO).toFixed(2) : 0;
     return [
       u.nombre || '',
       u.email || '',
@@ -6441,13 +6373,20 @@ function ejecutarExportar(formato) {
     if (u.rol === 'admin') return s;
     return s + (precios[u.plan] || 0);
   }, 0);
-  const totalGanancia = totalPago * 0.65;
+  const totalGanancia = totalPago * FACTOR_NETO;
 
   // Agregar fila de totales
   filas.push(['', '', '', '', '', '', '', 'TOTAL:', totalPago.toFixed(2), totalGanancia.toFixed(2)]);
 
   if (formato === 'csv') {
-    const csv = headers.join(',') + '\n' + filas.map(row => row.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join('\n');
+    // Anti-inyección de fórmulas: si una celda empieza con = + - @, Excel la
+    // ejecutaría como fórmula. Prefijar con apóstrofo la neutraliza.
+    const celdaCSV = (c) => {
+      let s = String(c ?? '');
+      if (/^[=+\-@]/.test(s)) s = "'" + s;
+      return '"' + s.replace(/"/g, '""') + '"';
+    };
+    const csv = headers.join(',') + '\n' + filas.map(row => row.map(celdaCSV).join(',')).join('\n');
     descargarArchivo('usuarios_' + fechaArchivo + '.csv', csv, 'text/csv');
   } else {
     // XLSX (Excel)
@@ -6464,13 +6403,16 @@ function ejecutarExportar(formato) {
 }
 
 function generarExcel(headers, filas) {
+  // Escapar cada celda: evita que un nombre con < > & " rompa la tabla del Excel
+  const esc = (c) => String(c ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   // Excel-compatible HTML format
   let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
   html += '<head><meta charset="UTF-8"><style>table{border-collapse:collapse}th{background:#00C48C;color:white;font-weight:bold;padding:8px;border:1px solid #ccc}td{padding:6px;border:1px solid #ccc}</style></head>';
   html += '<body><table>';
-  html += '<tr>' + headers.map(h => '<th>' + h + '</th>').join('') + '</tr>';
+  html += '<tr>' + headers.map(h => '<th>' + esc(h) + '</th>').join('') + '</tr>';
   filas.forEach(row => {
-    html += '<tr>' + row.map(c => '<td>' + c + '</td>').join('') + '</tr>';
+    html += '<tr>' + row.map(c => '<td>' + esc(c) + '</td>').join('') + '</tr>';
   });
   html += '</table></body></html>';
   return html;
