@@ -8,7 +8,17 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TalentoEC">
-<meta name="description" content="TalentoEC by Proyectart. Encuentra trabajo en Ecuador con tecnología avanzada. Subí tu CV y nosotros buscamos por vos.">
+<meta name="description" content="TalentoEC by Proyectart. Encuentra trabajo en Ecuador con inteligencia artificial. Sube tu CV y nosotros buscamos por ti en LinkedIn, Computrabajo, Multitrabajos y más.">
+<!-- Open Graph: cómo se ve el link al compartirlo en WhatsApp, Facebook, Instagram, etc. -->
+<meta property="og:title" content="TalentoEC — Encuentra trabajo en Ecuador con IA">
+<meta property="og:description" content="Sube tu CV y nosotros buscamos empleo por ti en LinkedIn, Computrabajo, Multitrabajos y más. Postulaciones automáticas con carta personalizada.">
+<meta property="og:url" content="https://talentoec.com">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_EC">
+<meta property="og:site_name" content="TalentoEC">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="TalentoEC — Encuentra trabajo en Ecuador con IA">
+<meta name="twitter:description" content="Sube tu CV y nosotros buscamos empleo por ti en los principales portales del Ecuador.">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%2300C48C'/%3E%3Ctext x='90' y='115' font-family='Arial,sans-serif' font-size='90' font-weight='bold' fill='%230A0F0D' text-anchor='middle'%3ETE%3C/text%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -462,6 +472,34 @@ nav{z-index:100}
   .kpi-hlabel{font-size:10px}.kpi-hval{font-size:10.5px}
   .kpi-bignum{padding:10px 12px}.kpi-bignum-val{font-size:26px}
   .kpi-head{font-size:10.5px;letter-spacing:.08em}
+}
+
+/* ═══ MÓVIL: correcciones críticas (celulares 320-768px) ═══ */
+@media(max-width:768px){
+  /* iPhone: si un input tiene letra <16px, Safari hace ZOOM automático al tocarlo */
+  input,select,textarea{font-size:16px !important}
+  /* Los PLANES (pantalla de venta): de 3 columnas aplastadas a 1 por fila */
+  .planes-grid{grid-template-columns:1fr}
+  /* Pasos "cómo funciona": 1 por fila */
+  .steps{grid-template-columns:1fr;padding:0 20px 40px}
+  /* Tarjetas del panel: 1 por fila */
+  .dash-cards{grid-template-columns:1fr}
+  /* Filtros de búsqueda: 2 por fila (4 no caben) */
+  .filters-grid{grid-template-columns:repeat(2,1fr)}
+  /* Barra superior: pestañas deslizables en vez de desbordadas */
+  nav{padding:0 10px}
+  .nav-center{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .nav-center::-webkit-scrollbar{display:none}
+  .ntab{white-space:nowrap;font-size:12px;padding:8px 9px}
+  .logo{font-size:15px}
+  /* Modales cómodos en pantalla chica */
+  .modal{padding:24px 18px}
+  .email-modal-inner{padding:20px 14px}
+  .pp-modal{max-width:96%}
+  /* Toast: arriba del botón de WhatsApp (chocaban abajo-derecha) y sin desbordar */
+  .toast{bottom:88px;left:16px;right:16px;max-width:none;text-align:center}
+  /* Textos largos (emails, cargos) no desbordan las tarjetas */
+  .job-card,.candidate-card,.dash-card,.section-box{overflow-wrap:break-word;word-break:break-word}
 }
 .kpi-leg{display:flex;gap:14px;flex-wrap:wrap;font-size:10px;color:var(--texto-secundario);padding:6px 16px 0}
 .kpi-dot{width:9px;height:9px;border-radius:2.5px;display:inline-block;margin-right:5px;vertical-align:-1px}
@@ -1254,6 +1292,14 @@ function validarBeta() {
           </div>
         </div>
         <textarea id="cvText" style="display:none"></textarea>
+        <!-- Opción de PEGAR el CV (el título lo promete; antes no existía) -->
+        <div style="text-align:center;margin-top:10px">
+          <button type="button" onclick="togglePegarCV()" style="background:none;border:none;color:var(--verde);font-size:12px;cursor:pointer;text-decoration:underline">📋 ¿No tienes el archivo? Pega el texto de tu CV</button>
+        </div>
+        <div id="cvPasteArea" style="display:none;margin-top:10px">
+          <textarea id="cvPasteText" placeholder="Pega aquí el texto completo de tu CV (experiencia, estudios, habilidades...)" style="width:100%;min-height:140px;background:var(--gris-panel);border:1px solid var(--gris-borde);border-radius:10px;color:var(--texto);padding:12px;font-size:13px;resize:vertical"></textarea>
+          <button type="button" class="btn-full" onclick="usarTextoPegado()" style="margin-top:8px">✓ Usar este texto como mi CV</button>
+        </div>
         <div class="form-row" style="margin-top:14px">
           <div class="field"><label>Nombre completo</label><input type="text" id="cvNombre" placeholder="Juan Pérez"></div>
           <div class="field"><label>Email de contacto</label><input type="email" id="cvEmail" placeholder="juan@gmail.com"></div>
@@ -4635,6 +4681,27 @@ async function handleFile(input) {
   } else {
     showToast('⚠ Formato no soportado. Usa PDF, Word o TXT.', true);
   }
+}
+
+// Mostrar/ocultar el área para PEGAR el CV como texto
+function togglePegarCV() {
+  const area = document.getElementById('cvPasteArea');
+  if (area) area.style.display = (area.style.display === 'none') ? 'block' : 'none';
+}
+// Usar el texto pegado como CV (con validación de largo mínimo)
+function usarTextoPegado() {
+  const t = (document.getElementById('cvPasteText')?.value || '').trim();
+  if (t.length < 100) {
+    showToast('El texto es muy corto para ser un CV. Pega tu experiencia, estudios y habilidades (mínimo unas líneas).', true);
+    return;
+  }
+  document.getElementById('cvText').value = t;
+  cvData = cvData || {};
+  cvData.texto = t;
+  const area = document.getElementById('cvPasteArea');
+  if (area) area.style.display = 'none';
+  mostrarCVCargado('Texto pegado', t.length);
+  showToast('✓ Texto cargado como tu CV');
 }
 
 function mostrarCVCargado(nombre, longitud) {
