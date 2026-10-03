@@ -5637,31 +5637,23 @@ async function guardarYAnalizar() {
   let areasDetectadas = [];
 
   try {
-    const res = await fetch(BACKEND_URL + '/api/claude/messages', {
+    // El servidor arma el análisis (la clave de la IA nunca sale de ahí), valida el
+    // cupo del mes y lo descuenta SOLO si la IA respondió. El mismo CV otra vez sale gratis.
+    const res = await fetch(BACKEND_URL + '/api/claude/analizar-cv', {
       method:'POST',
       headers:{
         'Content-Type':'application/json',
         'Authorization': 'Bearer ' + (localStorage.getItem('talento_token') || '')
       },
-      body: JSON.stringify({
-        model:'claude-haiku-4-5-20251001', max_tokens:850,
-        messages:[{role:'user',content:`Analiza este CV para el mercado laboral de Ecuador. Responde en español, breve y concreto (viñetas cortas), con emojis en los títulos:
-
-1. 📋 RESUMEN DEL PERFIL (2-3 líneas)
-2. 💼 HABILIDADES CLAVE (6-8 habilidades)
-3. ⭐ PUNTOS FUERTES (3 fortalezas)
-4. 📈 ÁREAS DE MEJORA (2-3 sugerencias)
-5. 🇪🇨 COMPATIBILIDAD MERCADO ECUADOR (puntuación /10)
-6. 🔍 PALABRAS CLAVE para búsqueda
-7. 🎯 EMPRESAS ECUATORIANAS ideales
-8. 💡 ÁREAS PROFESIONALES: Lista las áreas profesionales en las que este candidato tiene experiencia o puede trabajar, separadas por coma. Ejemplo: Contabilidad / Auditoría, Administración de Empresas
-
-CV:
-${texto.slice(0, 6000)}`}]
-      })
+      body: JSON.stringify({ texto: texto.slice(0, 20000) })
     });
     const data = await res.json().catch(() => ({}));
-    analysis = res.ok ? (textoDeRespuesta(data) || '') : '';
+    analysis = (res.ok && data && typeof data.texto === 'string') ? data.texto : '';
+    if (res.status === 429 && data && data.limite) {
+      showToast('⚠ ' + (data.error || 'Llegaste al límite de análisis de CV este mes.'), true);
+    }
+    window.__analisisConsumido = !!(data && data.consumido);
+    window.__analisisDesdeMemoria = !!(data && data.desdeMemoria);
 
     // Áreas que sugiere la IA (en la misma línea del título o en la siguiente)
     const areasMatch = analysis.match(/ÁREAS PROFESIONALES[*_\s]*:?[*_\s]*([^\n]*)\n?([^\n]*)/i);
@@ -5673,10 +5665,7 @@ ${texto.slice(0, 6000)}`}]
         .filter(function(a){ return a && a.length > 2 && a.length < 60; })
         .slice(0, 6);
     }
-    // El análisis salió bien: recién ahora se descuenta 1 del cupo del mes
-    if (analysis) {
-      try { await apiCall('/api/auth/analisis-cv/consumir', { method: 'POST', body: '{}' }); } catch (e) {}
-    }
+    // (el servidor ya descontó el análisis al responder bien)
   } catch(e) {}
 
   // Áreas del CV: primero el diccionario (preciso, sin IA). Si no reconoce la
@@ -5714,11 +5703,13 @@ ${texto.slice(0, 6000)}`}]
   window.__cvTextoAnalizado = texto;
   marcarBotonAnalizar(true);
   // Registrar el análisis usado (solo si la IA respondió) y avisar cuántos quedan
-  const usadosAhora = analisisOk ? registrarAnalisisCV() : analisisUsadosEsteMes();
+  const usadosAhora = (analisisOk && !window.__analisisDesdeMemoria) ? registrarAnalisisCV() : analisisUsadosEsteMes();
   actualizarContadorAnalisis();
   const restantes = LIMITE_ANALISIS_MES - usadosAhora;
   if (!analisisOk) {
     // no se gastó análisis: nada que avisar
+  } else if (window.__analisisDesdeMemoria) {
+    setTimeout(() => showToast('ℹ Este CV ya estaba analizado: no se gastó ningún análisis'), 1200);
   } else if (restantes > 0) {
     setTimeout(() => showToast('✓ Análisis ' + usadosAhora + ' de ' + LIMITE_ANALISIS_MES + ' este mes · Te quedan ' + restantes), 1200);
   } else {
@@ -6979,7 +6970,7 @@ INSTRUCCIONES:
 - IMPORTANTE: NO uses asteriscos (**) ni guiones (---) ni símbolos markdown. Usa solo texto plano con saltos de línea, mayúsculas para títulos, y emojis cuando corresponda
 
 CV ORIGINAL:
-${cvData.texto}
+${String(cvData.texto).slice(0, 6000)}
 
 Responde SOLO con el CV mejorado, sin explicaciones adicionales.`}]
       })
