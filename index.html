@@ -27,7 +27,7 @@
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%2300C48C'/%3E%3Ctext x='90' y='115' font-family='Arial,sans-serif' font-size='90' font-weight='bold' fill='%230A0F0D' text-anchor='middle'%3ETE%3C/text%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TalentoEC — Conectando Ecuador</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Anton&family=Permanent+Marker&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&family=Archivo:wdth,wght@100..125,400..700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Anton&family=Permanent+Marker&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&family=Archivo:wdth,wght@100..125,400..700&display=swap" rel="stylesheet">
 <script>
 (function(){try{var t=localStorage.getItem('tec-tema');if(t==='burger'||t==='motorex')document.documentElement.setAttribute('data-tema',t);}catch(e){}})();
 </script>
@@ -38,26 +38,27 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --verde:#00C48C;--verde-rgb:0,196,140;--verde-dark:#00996E;--verde-light:#E0FFF5;
+  --verde:#1BD07F;--verde-rgb:27,208,127;--verde-dark:#0E8F57;--verde-light:#E0FFF5;
   --negro:#0A0F0D;--gris-oscuro:#1A221E;--gris-medio:#2E3D37;
   --gris-borde:#334039;--texto-primario:#F0FFF8;--texto-secundario:#7A9E8E;
   --amarillo:#F5E642;--rojo:#FF4D6D;--azul:#3B82F6;
+  --f-tit:'Plus Jakarta Sans',system-ui,sans-serif;--f-ui:'Plus Jakarta Sans',system-ui,sans-serif;
 }
-body{font-family:'DM Sans',sans-serif;background:var(--negro);color:var(--texto-primario);min-height:100vh;overflow-x:hidden}
+body{font-family:var(--f-ui);background:var(--negro);color:var(--texto-primario);min-height:100vh;overflow-x:hidden}
 
 /* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:60px;background:rgba(10,15,13,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--gris-borde)}
-.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--texto-primario);display:flex;align-items:center;gap:8px;cursor:pointer}
+.logo{font-family:var(--f-tit);font-weight:800;font-size:20px;color:var(--texto-primario);display:flex;align-items:center;gap:8px;cursor:pointer}
 .logo-badge{background:var(--verde);color:var(--negro);font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;letter-spacing:.05em}
 .nav-center{display:flex;gap:4px}
 .nav-right{display:flex;align-items:center;gap:10px}
-.ntab{background:transparent;border:1px solid transparent;color:var(--texto-secundario);padding:7px 14px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
+.ntab{background:transparent;border:1px solid transparent;color:var(--texto-secundario);padding:7px 14px;border-radius:8px;font-family:var(--f-ui);font-size:13px;cursor:pointer;transition:all .2s}
 .ntab:hover,.ntab.active{background:var(--gris-oscuro);border-color:var(--gris-borde);color:var(--texto-primario)}
 .btn-nav-login{background:transparent;border:1px solid var(--gris-borde);color:var(--texto-secundario);padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer;transition:all .2s}
 .btn-nav-login:hover{border-color:var(--verde);color:var(--verde)}
-.btn-nav-cta{background:var(--verde);border:none;color:var(--negro);padding:7px 16px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s}
-.btn-nav-cta:hover{background:#00e0a0}
-.user-avatar{width:32px;height:32px;border-radius:50%;background:var(--verde);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--negro);cursor:pointer}
+.btn-nav-cta{background:var(--verde);border:none;color:var(--negro);padding:7px 16px;border-radius:8px;font-family:var(--f-tit);font-weight:700;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-nav-cta:hover{filter:brightness(1.1)}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:var(--verde);display:flex;align-items:center;justify-content:center;font-family:var(--f-tit);font-weight:700;font-size:13px;color:var(--negro);cursor:pointer}
 
 /* PAGES */
 .page{display:none;padding-top:60px;min-height:100vh}
@@ -68,59 +69,59 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .hero-tag{display:inline-flex;align-items:center;gap:8px;background:var(--gris-oscuro);border:1px solid var(--gris-borde);padding:5px 14px;border-radius:20px;font-size:11px;color:var(--verde);margin-bottom:24px;letter-spacing:.05em}
 .hero-tag::before{content:'';width:6px;height:6px;background:var(--verde);border-radius:50%;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-h1.hero-title{font-family:'Syne',sans-serif;font-size:clamp(38px,5.5vw,66px);font-weight:800;line-height:1.05;margin-bottom:20px}
+h1.hero-title{font-family:var(--f-tit);font-size:clamp(38px,5.5vw,66px);font-weight:800;line-height:1.05;margin-bottom:20px}
 h1.hero-title span{color:var(--verde)}
 .hero-sub{font-size:16px;color:var(--texto-secundario);line-height:1.7;max-width:560px;margin-bottom:36px}
 .hero-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:50px}
-.btn-primary{background:var(--verde);color:var(--negro);border:none;padding:13px 26px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s}
-.btn-primary:hover{background:#00e0a0;transform:translateY(-1px)}
+.btn-primary{background:var(--verde);color:var(--negro);border:none;padding:13px 26px;border-radius:10px;font-family:var(--f-tit);font-weight:700;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
 .btn-secondary{background:transparent;color:var(--texto-primario);border:1px solid var(--gris-borde);padding:13px 26px;border-radius:10px;font-size:14px;cursor:pointer;transition:all .2s}
 .btn-secondary:hover{border-color:var(--verde);color:var(--verde)}
 .stats-row{display:flex;gap:36px;padding:24px 0;border-top:1px solid var(--gris-borde)}
-.stat-num{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--verde)}
+.stat-num{font-family:var(--f-tit);font-size:26px;font-weight:800;color:var(--verde)}
 .stat-label{font-size:11px;color:var(--texto-secundario);margin-top:2px}
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:0 40px 60px;max-width:860px;margin:0 auto}
 .step-card{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:14px;padding:24px;transition:border-color .2s}
 .step-card:hover{border-color:var(--verde)}
-.step-num{font-family:'Syne',sans-serif;font-size:42px;font-weight:800;color:var(--gris-borde);line-height:1;margin-bottom:12px}
-.step-card h3{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;margin-bottom:8px}
+.step-num{font-family:var(--f-tit);font-size:42px;font-weight:800;color:var(--gris-borde);line-height:1;margin-bottom:12px}
+.step-card h3{font-family:var(--f-tit);font-size:15px;font-weight:600;margin-bottom:8px}
 .step-card p{font-size:13px;color:var(--texto-secundario);line-height:1.6}
 
 /* PLANES */
 .planes-section{padding:20px 40px 60px;max-width:860px;margin:0 auto}
 .section-label{font-size:11px;letter-spacing:.12em;color:var(--verde);text-transform:uppercase;margin-bottom:12px}
-.section-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;margin-bottom:32px}
+.section-title{font-family:var(--f-tit);font-size:28px;font-weight:700;margin-bottom:32px}
 .planes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .plan-card{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:16px;padding:28px;transition:all .2s;position:relative}
 .plan-card.destacado{border-color:var(--verde);background:rgba(var(--verde-rgb),.06)}
-.plan-badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--verde);color:var(--negro);font-size:10px;font-weight:700;padding:3px 12px;border-radius:20px;white-space:nowrap;font-family:'Syne',sans-serif}
-.plan-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:var(--texto-secundario);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em}
-.plan-price{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;margin-bottom:4px}
+.plan-badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--verde);color:var(--negro);font-size:10px;font-weight:700;padding:3px 12px;border-radius:20px;white-space:nowrap;font-family:var(--f-tit)}
+.plan-name{font-family:var(--f-tit);font-size:14px;font-weight:600;color:var(--texto-secundario);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em}
+.plan-price{font-family:var(--f-tit);font-size:36px;font-weight:800;margin-bottom:4px}
 .plan-price span{font-size:14px;font-weight:400;color:var(--texto-secundario)}
 .plan-desc{font-size:12px;color:var(--texto-secundario);margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--gris-borde)}
 .plan-features{list-style:none;margin-bottom:24px}
 .plan-features li{font-size:13px;color:var(--texto-secundario);padding:5px 0;display:flex;align-items:center;gap:8px}
 .plan-features li::before{content:'✓';color:var(--verde);font-weight:700;font-size:12px}
-.btn-plan{width:100%;background:transparent;border:1px solid var(--gris-borde);color:var(--texto-primario);padding:11px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:600;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-plan{width:100%;background:transparent;border:1px solid var(--gris-borde);color:var(--texto-primario);padding:11px;border-radius:8px;font-family:var(--f-tit);font-weight:600;font-size:13px;cursor:pointer;transition:all .2s}
 .btn-plan:hover,.plan-card.destacado .btn-plan{background:var(--verde);border-color:var(--verde);color:var(--negro)}
 
 /* ========== AUTH MODAL ========== */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:300;align-items:center;justify-content:center}
 .modal-bg.open{display:flex}
 .modal{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:20px;padding:36px;width:90%;max-width:440px;max-height:90vh;overflow-y:auto}
-.modal h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:6px}
+.modal h2{font-family:var(--f-tit);font-size:22px;font-weight:700;margin-bottom:6px}
 .modal .modal-sub{font-size:13px;color:var(--texto-secundario);margin-bottom:24px}
 .auth-tabs{display:flex;gap:0;margin-bottom:24px;background:var(--gris-medio);border-radius:10px;padding:4px}
-.auth-tab{flex:1;padding:8px;border-radius:7px;border:none;background:transparent;color:var(--texto-secundario);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
+.auth-tab{flex:1;padding:8px;border-radius:7px;border:none;background:transparent;color:var(--texto-secundario);font-family:var(--f-ui);font-size:13px;cursor:pointer;transition:all .2s}
 .auth-tab.active{background:var(--negro);color:var(--texto-primario);font-weight:500}
 .field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
 .field label{font-size:12px;color:var(--texto-secundario)}
-.field input,.field select,.field textarea{background:var(--negro);border:1px solid var(--gris-borde);color:var(--texto-primario);padding:10px 14px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s;width:100%}
+.field input,.field select,.field textarea{background:var(--negro);border:1px solid var(--gris-borde);color:var(--texto-primario);padding:10px 14px;border-radius:8px;font-family:var(--f-ui);font-size:14px;outline:none;transition:border-color .2s;width:100%}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--verde)}
 .field select option{background:var(--gris-oscuro)}
 .field textarea{resize:vertical;min-height:90px}
-.btn-full{width:100%;background:var(--verde);color:var(--negro);border:none;padding:13px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;margin-top:4px}
-.btn-full:hover{background:#00e0a0}
+.btn-full{width:100%;background:var(--verde);color:var(--negro);border:none;padding:13px;border-radius:10px;font-family:var(--f-tit);font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;margin-top:4px}
+.btn-full:hover{filter:brightness(1.1)}
 .btn-full:disabled{background:var(--gris-medio);color:var(--texto-secundario);cursor:not-allowed}
 .divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--texto-secundario);font-size:12px}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--gris-borde)}
@@ -136,22 +137,22 @@ h1.hero-title span{color:var(--verde)}
 /* ========== CANDIDATO DASHBOARD ========== */
 .dashboard{max-width:760px;margin:0 auto;padding:36px 32px}
 .dash-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px}
-.dash-welcome{font-family:'Syne',sans-serif;font-size:24px;font-weight:700}
+.dash-welcome{font-family:var(--f-tit);font-size:24px;font-weight:700}
 .dash-sub{font-size:13px;color:var(--texto-secundario);margin-top:4px}
 .plan-pill{background:rgba(var(--verde-rgb),.12);border:1px solid rgba(var(--verde-rgb),.25);color:var(--verde);font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px}
 .dash-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
 .dash-card{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:12px;padding:18px}
-.dash-card-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--verde)}
+.dash-card-num{font-family:var(--f-tit);font-size:28px;font-weight:800;color:var(--verde)}
 .dash-card-label{font-size:12px;color:var(--texto-secundario);margin-top:4px}
 .section-box{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:14px;padding:24px;margin-bottom:20px}
-.section-box-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.section-box-title{font-family:var(--f-tit);font-size:15px;font-weight:600;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
 .step-indicators{display:flex;gap:8px;margin-bottom:24px}
 .step-ind{flex:1;padding:7px;border-radius:8px;border:1px solid var(--gris-borde);text-align:center;font-size:11px;color:var(--texto-secundario);transition:all .2s}
 .step-ind.done{border-color:var(--verde);color:var(--verde);background:rgba(var(--verde-rgb),.08)}
 .step-ind.current{border-color:var(--verde);color:var(--verde);font-weight:500}
 .upload-box{border:2px dashed var(--gris-borde);border-radius:14px;padding:40px 24px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:20px}
 .upload-box:hover{border-color:var(--verde);background:rgba(var(--verde-rgb),.04)}
-.upload-box h3{font-family:'Syne',sans-serif;font-size:15px;margin-bottom:8px}
+.upload-box h3{font-family:var(--f-tit);font-size:15px;margin-bottom:8px}
 .upload-box p{font-size:13px;color:var(--texto-secundario)}
 .fmt-badge{background:var(--gris-medio);border:1px solid var(--gris-borde);color:var(--texto-secundario);font-size:10px;padding:3px 9px;border-radius:5px}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -168,14 +169,14 @@ h1.hero-title span{color:var(--verde)}
 .job-card{background:var(--negro);border:1px solid var(--gris-borde);border-radius:12px;padding:18px;margin-bottom:12px;transition:border-color .2s}
 .job-card:hover{border-color:var(--verde)}
 .job-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
-.job-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:600}
+.job-title{font-family:var(--f-tit);font-size:15px;font-weight:600}
 .job-company{font-size:12px;color:var(--texto-secundario);margin-top:3px}
 .match-badge{background:rgba(var(--verde-rgb),.15);border:1px solid rgba(var(--verde-rgb),.3);color:var(--verde);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px}
 .tag{background:var(--gris-medio);border:1px solid var(--gris-borde);color:var(--texto-secundario);font-size:10px;padding:3px 9px;border-radius:5px}
 .tags-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
 .card-actions{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--gris-borde)}
-.btn-sm-green{background:var(--verde);color:var(--negro);border:none;padding:8px 16px;border-radius:7px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:all .2s}
-.btn-sm-green:hover{background:#00e0a0}
+.btn-sm-green{background:var(--verde);color:var(--negro);border:none;padding:8px 16px;border-radius:7px;font-family:var(--f-tit);font-weight:700;font-size:12px;cursor:pointer;transition:all .2s}
+.btn-sm-green:hover{filter:brightness(1.1)}
 .btn-sm-outline{background:transparent;color:var(--texto-secundario);border:1px solid var(--gris-borde);padding:8px 16px;border-radius:7px;font-size:12px;cursor:pointer;transition:all .2s}
 .btn-sm-outline:hover{border-color:var(--verde);color:var(--verde)}
 .cv-saved-banner{background:rgba(var(--verde-rgb),.1);border:1px solid rgba(var(--verde-rgb),.25);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
@@ -186,11 +187,11 @@ h1.hero-title span{color:var(--verde)}
 .emp-layout{max-width:980px;margin:0 auto;padding:36px 32px}
 .emp-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px}
 .search-bar-wrap{display:flex;gap:10px;margin-bottom:20px}
-.search-bar-wrap input{flex:1;background:var(--gris-oscuro);border:1px solid var(--gris-borde);color:var(--texto-primario);padding:13px 18px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+.search-bar-wrap input{flex:1;background:var(--gris-oscuro);border:1px solid var(--gris-borde);color:var(--texto-primario);padding:13px 18px;border-radius:10px;font-family:var(--f-ui);font-size:14px;outline:none;transition:border-color .2s}
 .search-bar-wrap input:focus{border-color:var(--verde)}
 .search-bar-wrap input::placeholder{color:var(--texto-secundario)}
-.btn-search{background:var(--verde);color:var(--negro);border:none;padding:13px 22px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s;white-space:nowrap}
-.btn-search:hover{background:#00e0a0}
+.btn-search{background:var(--verde);color:var(--negro);border:none;padding:13px 22px;border-radius:10px;font-family:var(--f-tit);font-weight:700;font-size:13px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-search:hover{filter:brightness(1.1)}
 /* Advanced filters */
 .filters-panel{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:14px;padding:20px;margin-bottom:20px}
 .filters-title{font-size:12px;font-weight:500;color:var(--texto-secundario);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
@@ -208,7 +209,7 @@ h1.hero-title span{color:var(--verde)}
 .candidate-card{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:14px;padding:20px 22px;transition:border-color .2s;margin-bottom:14px}
 .candidate-card:hover{border-color:var(--verde)}
 .cc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
-.cc-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:700}
+.cc-name{font-family:var(--f-tit);font-size:16px;font-weight:700}
 .cc-role{font-size:12px;color:var(--texto-secundario);margin-top:3px}
 .cc-badges{display:flex;gap:8px;align-items:center}
 .cc-meta{display:flex;gap:18px;font-size:11px;color:var(--texto-secundario);margin-top:10px}
@@ -219,12 +220,12 @@ h1.hero-title span{color:var(--verde)}
 /* ========== PAYPHONE MODAL ========== */
 .pp-modal{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:20px;padding:0;width:90%;max-width:480px;overflow:hidden}
 .pp-header{background:linear-gradient(135deg,var(--verde),var(--verde-dark));padding:28px;text-align:center}
-.pp-header h2{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--negro);margin-bottom:4px}
+.pp-header h2{font-family:var(--f-tit);font-size:20px;font-weight:800;color:var(--negro);margin-bottom:4px}
 .pp-header p{font-size:13px;color:rgba(0,0,0,.6)}
 .pp-body{padding:28px}
 .pp-plan-summary{background:var(--negro);border:1px solid var(--gris-borde);border-radius:10px;padding:16px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center}
 .pp-plan-name{font-size:13px;color:var(--texto-secundario)}
-.pp-plan-price{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--verde)}
+.pp-plan-price{font-family:var(--f-tit);font-size:22px;font-weight:800;color:var(--verde)}
 .pp-methods{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
 .pp-method{border:1px solid var(--gris-borde);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;background:var(--negro)}
 .pp-method:hover,.pp-method.selected{border-color:var(--verde);background:rgba(var(--verde-rgb),.07)}
@@ -237,24 +238,24 @@ h1.hero-title span{color:var(--verde)}
 .pp-phone-prefix{background:var(--negro);border:1px solid var(--gris-borde);color:var(--texto-primario);padding:10px 12px;border-radius:8px;font-size:14px;width:70px;text-align:center}
 .pp-security{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--texto-secundario);margin-top:16px;padding-top:16px;border-top:1px solid var(--gris-borde)}
 .pp-security::before{content:'🔒';font-size:14px}
-.btn-pp-pay{width:100%;background:var(--verde);color:var(--negro);border:none;padding:15px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:800;font-size:15px;cursor:pointer;transition:all .2s;margin-top:16px}
-.btn-pp-pay:hover{background:#00e0a0}
+.btn-pp-pay{width:100%;background:var(--verde);color:var(--negro);border:none;padding:15px;border-radius:10px;font-family:var(--f-tit);font-weight:800;font-size:15px;cursor:pointer;transition:all .2s;margin-top:16px}
+.btn-pp-pay:hover{filter:brightness(1.1)}
 .pp-success{display:none;text-align:center;padding:40px 28px}
 .pp-success.visible{display:block}
 .pp-success-icon{font-size:48px;margin-bottom:16px}
-.pp-success h3{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:8px;color:var(--verde)}
+.pp-success h3{font-family:var(--f-tit);font-size:20px;font-weight:700;margin-bottom:8px;color:var(--verde)}
 .pp-success p{font-size:13px;color:var(--texto-secundario);line-height:1.6}
 
 /* EMAIL MODAL */
 .email-modal-inner{background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:20px;padding:28px;width:90%;max-width:540px;max-height:85vh;overflow-y:auto}
 .modal-actions{display:flex;gap:10px;margin-top:16px}
 .btn-cancel{flex:1;background:transparent;color:var(--texto-secundario);border:1px solid var(--gris-borde);padding:11px;border-radius:8px;font-size:13px;cursor:pointer}
-.btn-send{flex:2;background:var(--verde);color:var(--negro);border:none;padding:11px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer}
-.btn-send:hover{background:#00e0a0}
+.btn-send{flex:2;background:var(--verde);color:var(--negro);border:none;padding:11px;border-radius:8px;font-family:var(--f-tit);font-weight:700;font-size:13px;cursor:pointer}
+.btn-send:hover{filter:brightness(1.1)}
 .ai-note{font-size:11px;color:var(--texto-secundario);background:rgba(var(--verde-rgb),.08);border:1px solid rgba(var(--verde-rgb),.2);padding:9px 13px;border-radius:7px;margin-top:8px}
 
 /* TOAST */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--verde);color:var(--negro);padding:12px 20px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;transform:translateY(80px);opacity:0;transition:all .3s;z-index:999}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--verde);color:var(--negro);padding:12px 20px;border-radius:10px;font-family:var(--f-tit);font-weight:700;font-size:13px;transform:translateY(80px);opacity:0;transition:all .3s;z-index:999}
 .toast.show{transform:translateY(0);opacity:1}
 .toast.error{background:var(--rojo);color:#fff}
 
@@ -280,7 +281,7 @@ h1.hero-title span{color:var(--verde)}
 .limit-fill.warn{background:var(--amarillo)}
 .limit-fill.full{background:var(--rojo)}
 .tab-row{display:flex;gap:4px;margin-bottom:24px;background:var(--gris-oscuro);border-radius:10px;padding:4px;border:1px solid var(--gris-borde)}
-.tab-btn{flex:1;padding:8px;border-radius:7px;border:none;background:transparent;color:var(--texto-secundario);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
+.tab-btn{flex:1;padding:8px;border-radius:7px;border:none;background:transparent;color:var(--texto-secundario);font-family:var(--f-ui);font-size:13px;cursor:pointer;transition:all .2s}
 .tab-btn.active{background:var(--negro);color:var(--texto-primario);font-weight:500}
 
 /* Searchable dropdown */
@@ -288,7 +289,7 @@ h1.hero-title span{color:var(--verde)}
 .search-select-input {
   width:100%; background:var(--negro); border:1px solid var(--gris-borde);
   color:var(--texto-primario); padding:10px 14px; border-radius:8px;
-  font-family:'DM Sans',sans-serif; font-size:14px; outline:none;
+  font-family:var(--f-ui); font-size:14px; outline:none;
   cursor:pointer; transition:border-color .2s;
 }
 .search-select-input:focus { border-color:var(--verde); }
@@ -410,7 +411,7 @@ nav{z-index:100}
 .vform-hint{font-size:10.5px;color:var(--texto-secundario);font-weight:400}
 .vform-input, .vform-select, .vform-textarea{
   background:var(--negro);border:1.5px solid var(--gris-borde);border-radius:10px;
-  color:var(--texto-primario);font-family:'DM Sans',sans-serif;font-size:14px;
+  color:var(--texto-primario);font-family:var(--f-ui);font-size:14px;
   padding:12px 14px;width:100%;outline:none;transition:border-color .2s, box-shadow .2s}
 .vform-input::placeholder,.vform-textarea::placeholder{color:#5a6660}
 .vform-input:focus,.vform-select:focus,.vform-textarea:focus{
@@ -421,10 +422,10 @@ nav{z-index:100}
 .vform-counter.warn{color:var(--amarillo)}
 .vform-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 .vform-tool-btn{background:rgba(var(--verde-rgb),.1);border:1px solid rgba(var(--verde-rgb),.35);color:var(--verde);
-  font-size:11.5px;font-weight:600;padding:7px 13px;border-radius:8px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+  font-size:11.5px;font-weight:600;padding:7px 13px;border-radius:8px;cursor:pointer;transition:all .2s;font-family:var(--f-ui)}
 .vform-tool-btn:hover{background:rgba(var(--verde-rgb),.2);transform:translateY(-1px)}
 .vform-preview{position:sticky;top:84px}
-.vform-preview-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;
+.vform-preview-title{font-family:var(--f-tit);font-size:12px;font-weight:700;letter-spacing:.1em;
   color:var(--texto-secundario);margin-bottom:10px;display:flex;align-items:center;gap:8px}
 .vform-preview-title::after{content:'';flex:1;height:1px;background:var(--gris-borde)}
 .vform-tips{background:rgba(var(--verde-rgb),.04);border:1px dashed rgba(var(--verde-rgb),.3);border-radius:12px;
@@ -449,7 +450,7 @@ nav{z-index:100}
 /* ---- VACANTES EXCLUSIVAS ---- */
 .job-exclusiva{border-color:rgba(var(--verde-rgb),.5)!important;background:linear-gradient(135deg,rgba(var(--verde-rgb),.07),var(--gris-oscuro))}.job-verificada{border-color:rgba(66,153,245,.45)!important}.ia-badge{display:inline-block;font-size:10.5px;font-weight:600;color:var(--texto-secundario);background:rgba(255,255,255,.04);border:1px solid var(--gris-borde);border-radius:6px;padding:3px 8px;margin-bottom:10px}.job-sin-contacto{opacity:.6}.post-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:480px){.post-grid{grid-template-columns:1fr}}.auto-item{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1px solid var(--gris-borde);border-radius:8px;margin-bottom:6px;font-size:12.5px;cursor:pointer}.auto-item input{margin-top:3px;flex-shrink:0}.auto-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:linear-gradient(135deg,rgba(var(--verde-rgb),.10),rgba(66,153,245,.06));border:1px solid rgba(var(--verde-rgb),.35);border-radius:12px;padding:14px 16px;margin-bottom:16px}.verificada-badge{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;color:#4299F5;background:rgba(66,153,245,.1);border:1px solid rgba(66,153,245,.3);border-radius:6px;padding:4px 9px;margin-bottom:10px}
 .exclusiva-badge{display:inline-block;background:linear-gradient(90deg,var(--verde),var(--verde-dark));color:var(--negro);
-  font-family:'Syne',sans-serif;font-size:9.5px;font-weight:800;letter-spacing:.08em;
+  font-family:var(--f-tit);font-size:9.5px;font-weight:800;letter-spacing:.08em;
   padding:4px 10px;border-radius:6px;margin-bottom:10px}
 .admvac-filtro{background:transparent;border:1px solid var(--gris-borde);color:var(--texto-secundario);
   padding:6px 14px;border-radius:20px;font-size:12px;cursor:pointer;transition:all .2s}
@@ -464,13 +465,13 @@ nav{z-index:100}
 .kpi-panel:hover{transform:translateY(-3px);border-color:rgba(var(--verde-rgb),.35);
   box-shadow:0 10px 28px rgba(0,0,0,.45),0 0 24px rgba(var(--verde-rgb),.08)}
 .kpi-head{background:linear-gradient(135deg,var(--verde),var(--verde-dark));padding:9px 16px;
-  font-family:'Syne',sans-serif;font-size:11.5px;font-weight:800;letter-spacing:.12em;color:var(--negro);
+  font-family:var(--f-tit);font-size:11.5px;font-weight:800;letter-spacing:.12em;color:var(--negro);
   display:flex;justify-content:space-between;align-items:center}
 .kpi-head-ico{font-size:13px}
 .kpi-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:14px 14px 8px}
 .kpi-stat{background:var(--negro);border:1px solid var(--gris-borde);border-radius:9px;padding:11px 5px;text-align:center;transition:border-color .2s;min-width:0}
 .kpi-stat:hover{border-color:rgba(var(--verde-rgb),.4)}
-.kpi-num{font-family:'Syne',sans-serif;font-size:clamp(13px,4vw,19px);font-weight:800;color:var(--verde);line-height:1.15;overflow-wrap:break-word}
+.kpi-num{font-family:var(--f-tit);font-size:clamp(13px,4vw,19px);font-weight:800;color:var(--verde);line-height:1.15;overflow-wrap:break-word}
 .kpi-lbl{font-size:9.5px;color:var(--texto-secundario);margin-top:4px;line-height:1.35;overflow-wrap:break-word}
 @media(max-width:480px){
   .kpi-stats{gap:6px;padding:12px 10px 6px}
@@ -520,7 +521,7 @@ nav{z-index:100}
 /* barras horizontales comparativas */
 .kpi-hrow{display:grid;grid-template-columns:74px 1fr 64px;align-items:center;gap:10px;margin-bottom:14px}
 .kpi-hlabel{font-size:11px;color:var(--texto-secundario)}
-.kpi-hval{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;text-align:right}
+.kpi-hval{font-family:var(--f-tit);font-size:12px;font-weight:700;text-align:right}
 .kpi-htrack{background:var(--gris-medio);border-radius:6px;height:12px;overflow:hidden}
 .kpi-hfill{display:block;height:100%;width:0;border-radius:6px;transition:width 1s cubic-bezier(.2,.8,.3,1) .25s}
 .kpi-hfill.rojo{background:linear-gradient(90deg,#cc4040,var(--rojo))}
@@ -528,7 +529,7 @@ nav{z-index:100}
 .rv.in .kpi-hfill{width:var(--w)}
 .kpi-bignum{display:flex;justify-content:space-between;align-items:center;gap:14px;
   background:var(--negro);border:1px solid var(--gris-borde);border-radius:10px;padding:12px 18px;margin-top:6px}
-.kpi-bignum-val{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--verde)}
+.kpi-bignum-val{font-family:var(--f-tit);font-size:32px;font-weight:800;color:var(--verde)}
 /* anillos / dona */
 .kpi-seg{stroke-dasharray:0 100;transition:stroke-dasharray 1s ease;transition-delay:var(--sd,0ms)}
 .rv.in .kpi-seg{stroke-dasharray:var(--arc) 100}
@@ -631,7 +632,7 @@ nav{z-index:100}
 }
 
 /* ═══════════ LANDING · rediseño (tarjeta hero con foto, estilo referencia) ═══════════ */
-#page-landing{--lx-f:'Plus Jakarta Sans','DM Sans',system-ui,sans-serif;--lx-verde:rgb(var(--t-acento));--lx-panel:var(--t-panel);--lx-claro:rgb(var(--t-claro));--lx-suave:rgba(var(--t-claro),.62)}
+#page-landing{--lx-f:'Plus Jakarta Sans',system-ui,sans-serif;--lx-verde:rgb(var(--t-acento));--lx-panel:var(--t-panel);--lx-claro:rgb(var(--t-claro));--lx-suave:rgba(var(--t-claro),.62)}
 .lx-hero{position:relative;isolation:isolate;overflow:hidden;max-width:1180px;margin:16px auto 0;border-radius:30px;
   min-height:clamp(580px,80vh,730px);display:flex;flex-direction:column;justify-content:flex-end;
   padding:clamp(26px,4vw,48px);font-family:var(--lx-f);color:var(--lx-claro);
@@ -687,7 +688,7 @@ nav{z-index:100}
 @media (prefers-reduced-motion:reduce){.lx-hero-img,.lx-hola,.lx-titulo,.lx-hero-der,.lx-pasos{animation:none}}
 
 /* Barra superior: botón de registro como píldora blanca (igual que la referencia) */
-.btn-nav-cta{background:#fff;color:var(--t-sobre);border-radius:999px;padding:7px 18px;font-family:'Plus Jakarta Sans','DM Sans',sans-serif}
+.btn-nav-cta{background:#fff;color:var(--t-sobre);border-radius:999px;padding:7px 18px;font-family:'Plus Jakarta Sans',var(--f-ui)}
 .btn-nav-cta:hover{background:rgb(var(--t-claro))}
 .btn-nav-login{border-radius:999px}
 
@@ -986,6 +987,7 @@ nav{z-index:100}
   --t-dona:#1BD07F,#C6F86A,#EEFBDD,#0E8F57,#7CFFD4,#4D6B5B;
 }
 html[data-tema="burger"]{
+  --f-tit:'Barlow Condensed','Barlow',system-ui,sans-serif;--f-ui:'Barlow',system-ui,sans-serif;
   --verde:#F4AD5E;--verde-rgb:244,173,94;--verde-dark:#D4893E;--verde-light:#FFF1DF;
   --negro:#15110E;--gris-oscuro:#231D17;--gris-medio:#3A3129;--gris-borde:#41372D;
   --texto-primario:#F0EBE0;--texto-secundario:#B8AE9E;--amarillo:#FFC93C;--rojo:#E8452B;
@@ -994,6 +996,7 @@ html[data-tema="burger"]{
   --t-g1:#E8652B; --t-g2:#A8461C; --t-g3:#3A2414; --t-g4:#1F1A15;
 }
 html[data-tema="motorex"]{
+  --f-tit:'Archivo',system-ui,sans-serif;--f-ui:'Barlow',system-ui,sans-serif;
   --verde:#FF3B1F;--verde-rgb:255,59,31;--verde-dark:#C42A12;--verde-light:#FFE4DF;
   --negro:#0B0B0D;--gris-oscuro:#18181C;--gris-medio:#2C2C33;--gris-borde:#34343C;
   --texto-primario:#F2F2F2;--texto-secundario:#9A9AA5;--amarillo:#FFBE1E;--rojo:#FF3B1F;
@@ -1036,10 +1039,10 @@ html[data-tema="motorex"] .lx-hero::before{opacity:.6}
 @media(max-width:760px){html[data-tema="burger"] .lx-hero::before,html[data-tema="motorex"] .lx-hero::before{height:470px;bottom:auto}}
 
 /* ── Tipografías BURGER: Anton (títulos) · Permanent Marker (acentos) · Barlow (texto) ── */
-html[data-tema="burger"] body,html[data-tema="burger"] [style*="DM Sans"]{font-family:'Barlow',system-ui,sans-serif!important}
+html[data-tema="burger"] body,html[data-tema="burger"] [style*="--f-ui"]{font-family:'Barlow',system-ui,sans-serif!important}
 html[data-tema="burger"] #page-landing{--lx-f:'Barlow',system-ui,sans-serif}
 html[data-tema="burger"] :is(.lx-titulo,.lx-titulo-2,.lx-lema,.dx-card-cab h3,.cf-card h3,.dx-kpi-num,.pl-precio,.dx-promo-precio,.lx-pie-logo,.em-lista b,.lx-portales-lista li,.logo,.section-title,h1,h2,h3,.plan-price,.dash-title,.kpi-bignum-val,.pl-medidor-fila b),
-html[data-tema="burger"] [style*="Syne"]{font-family:'Anton',Impact,'Arial Narrow',sans-serif!important;font-weight:400!important;letter-spacing:.01em!important}
+html[data-tema="burger"] [style*="--f-tit"]{font-family:'Anton',Impact,'Arial Narrow',sans-serif!important;font-weight:400!important;letter-spacing:.01em!important}
 html[data-tema="burger"] :is(.lx-titulo,.lx-titulo-2,.cf-card h3,.dx-card-cab h3,.lx-lema){text-transform:uppercase;line-height:.98}
 html[data-tema="burger"] .lx-titulo{font-size:clamp(50px,6.4vw,96px)}
 html[data-tema="burger"] :is(.lx-hola,.lx-etiqueta,.dx-promo-chip,.pl-badge,.lx-num){font-family:'Permanent Marker',cursive!important;font-weight:400!important;letter-spacing:0!important;text-transform:none}
@@ -1048,10 +1051,10 @@ html[data-tema="burger"] .lx-etiqueta{font-size:20px}
 html[data-tema="burger"] :is(.lx-btn-pill,.lx-btn-verde,.lx-btn-lima,.pl-btn,.btn-nav-cta,.btn-primary,.btn-plan,.btn-full){font-family:'Barlow',sans-serif!important;font-weight:700!important;text-transform:uppercase;letter-spacing:.06em}
 
 /* ── Tipografías MOTOREX: Archivo extendido (títulos) · Barlow Condensed (etiquetas) · Barlow (texto) ── */
-html[data-tema="motorex"] body,html[data-tema="motorex"] [style*="DM Sans"]{font-family:'Barlow',system-ui,sans-serif!important}
+html[data-tema="motorex"] body,html[data-tema="motorex"] [style*="--f-ui"]{font-family:'Barlow',system-ui,sans-serif!important}
 html[data-tema="motorex"] #page-landing{--lx-f:'Barlow',system-ui,sans-serif}
 html[data-tema="motorex"] :is(.lx-titulo,.lx-titulo-2,.lx-lema,.dx-card-cab h3,.cf-card h3,.dx-kpi-num,.pl-precio,.dx-promo-precio,.lx-pie-logo,.em-lista b,.lx-portales-lista li,.logo,.section-title,h1,h2,h3,.plan-price,.dash-title,.kpi-bignum-val,.pl-medidor-fila b),
-html[data-tema="motorex"] [style*="Syne"]{font-family:'Archivo',system-ui,sans-serif!important;font-stretch:125%;font-weight:700!important;font-style:italic}
+html[data-tema="motorex"] [style*="--f-tit"]{font-family:'Archivo',system-ui,sans-serif!important;font-stretch:125%;font-weight:700!important;font-style:italic}
 html[data-tema="motorex"] :is(.lx-titulo,.lx-titulo-2,.cf-card h3,.dx-card-cab h3,.lx-lema){text-transform:uppercase;letter-spacing:-.01em!important;line-height:.95}
 html[data-tema="motorex"] .lx-titulo{font-size:clamp(40px,4.4vw,66px)}
 html[data-tema="motorex"] .lx-hero-izq{max-width:720px}
@@ -1099,15 +1102,160 @@ html[data-tema="motorex"] .lx-enfoque-texto{max-width:34ch}
   background:transparent;padding:0;transition:background .2s,transform .2s}
 .tema-btn i{width:20px;height:20px;border-radius:50%;display:block;box-shadow:inset 0 0 0 1px rgba(255,255,255,.25);transition:transform .2s}
 .tema-btn span{position:absolute;right:calc(100% + 10px);top:50%;transform:translateY(-50%);white-space:nowrap;pointer-events:none;
-  font:700 12px/1 'Plus Jakarta Sans','DM Sans',sans-serif;color:rgb(var(--t-claro));background:rgba(var(--t-fondo),.92);border:1px solid rgba(var(--t-claro),.14);
+  font:700 12px/1 'Plus Jakarta Sans',var(--f-ui);color:rgb(var(--t-claro));background:rgba(var(--t-fondo),.92);border:1px solid rgba(var(--t-claro),.14);
   padding:6px 10px;border-radius:8px;opacity:0;transition:opacity .2s}
 .tema-btn:hover span,.tema-btn:focus-visible span{opacity:1}
 .tema-btn:hover i{transform:scale(1.12)}
 .tema-btn[aria-pressed="true"]{background:rgba(var(--t-claro),.14);box-shadow:inset 0 0 0 2px rgb(var(--t-claro))}
 .tema-btn:focus-visible{outline:2px solid rgb(var(--t-acento));outline-offset:2px}
-html[data-tema] .tema-btn span{font-family:'Plus Jakarta Sans','DM Sans',sans-serif!important;text-transform:none;letter-spacing:0}
+html[data-tema] .tema-btn span{font-family:'Plus Jakarta Sans',var(--f-ui)!important;text-transform:none;letter-spacing:0}
 @media(max-width:760px){.tema-sel{flex-direction:row;right:84px;bottom:28px;padding:4px;gap:2px}.tema-btn{width:30px;height:30px}.tema-btn i{width:18px;height:18px}.tema-btn span{display:none}}
 @media print{.tema-sel{display:none}}
+
+/* ═══════════ PANELES v4: mismo estilo de la portada en toda la página (respeta los 3 temas) ═══════════ */
+button,input,select,textarea{font-family:inherit}
+body{font-family:var(--f-ui);background:rgb(var(--t-fondo))}
+nav{background:rgba(var(--t-fondo),.86);border-bottom-color:rgba(var(--t-claro),.08)}
+.logo{font-family:var(--f-tit);letter-spacing:-.02em}
+.ntab{border-radius:999px;font-weight:500}
+.ntab:hover,.ntab.active{background:rgba(var(--t-claro),.08);border-color:rgba(var(--t-claro),.12)}
+.btn-nav-login{border-radius:999px;border-color:rgba(var(--t-claro),.18);color:rgb(var(--t-claro));font-weight:600}
+.btn-nav-cta{border-radius:999px;background:rgb(var(--t-claro));color:rgb(var(--t-fondo))}
+.btn-nav-cta:hover{background:rgb(var(--t-acento));filter:none}
+
+/* Títulos y tarjetas */
+.page:not(#page-landing) :is(.dash-welcome){font-family:var(--f-tit);font-size:clamp(26px,3.4vw,34px);font-weight:800;letter-spacing:-.03em;line-height:1.1}
+.page:not(#page-landing) .dash-sub{font-size:14px;color:rgba(var(--t-claro),.6)}
+.dashboard{max-width:880px;padding:40px 28px 80px}
+.emp-layout{padding:40px 28px 80px}
+.plan-pill{border-radius:999px;padding:6px 14px;font-weight:700;letter-spacing:.04em;background:rgba(var(--t-acento),.12);border-color:rgba(var(--t-acento),.3);color:rgb(var(--t-acento))}
+.page:not(#page-landing) :is(.dash-card,.section-box,.filters-panel,.candidate-card),
+.page:not(#page-landing) .dashboard > div[style*="--gris-oscuro"],
+.page:not(#page-landing) .emp-layout > div[style*="--gris-oscuro"]{
+  background:var(--t-tarjeta)!important;border:1px solid rgba(var(--t-claro),.08)!important;border-radius:22px!important}
+.page:not(#page-landing) .dash-card{padding:20px 22px}
+.page:not(#page-landing) .dash-card-num{font-family:var(--f-tit);font-size:32px;letter-spacing:-.03em;color:rgb(var(--t-acento))}
+.page:not(#page-landing) .dash-card-label{font-size:12.5px;color:rgba(var(--t-claro),.6)}
+.page:not(#page-landing) .section-box{padding:26px}
+.page:not(#page-landing) .section-box-title{font-family:var(--f-tit);font-size:17px;font-weight:700}
+.page:not(#page-landing) .job-card{background:rgba(var(--t-fondo),.55);border:1px solid rgba(var(--t-claro),.08);border-radius:18px;padding:20px}
+.page:not(#page-landing) :is(.job-card,.candidate-card):hover{border-color:rgba(var(--t-acento),.55)}
+.page:not(#page-landing) .job-title{font-family:var(--f-tit);font-size:16px;font-weight:700}
+.match-badge,.badge-pro{border-radius:999px}
+.tag,.fmt-badge{border-radius:999px;background:rgba(var(--t-claro),.06);border-color:rgba(var(--t-claro),.1)}
+.limit-bar,#correosDiaBar{border-radius:999px}
+#correosDiaBar{background:linear-gradient(90deg,rgb(var(--t-acento)),rgb(var(--t-lima)))!important}
+
+/* Pestañas tipo píldora (en celular se deslizan de lado) */
+.tab-row{border-radius:999px;padding:5px;background:var(--t-tarjeta);border:1px solid rgba(var(--t-claro),.08);gap:4px}
+.tab-btn{border-radius:999px;padding:10px 14px;font-weight:600;font-size:13.5px;color:rgba(var(--t-claro),.62);white-space:nowrap}
+.tab-btn:hover{color:rgb(var(--t-claro))}
+.tab-btn.active{background:rgb(var(--t-claro));color:rgb(var(--t-fondo))!important;font-weight:700}
+
+/* Botones */
+.btn-full,.btn-primary,.btn-send,.btn-sm-green,.btn-search,.btn-pp-pay,.btn-plan{border-radius:999px!important}
+.btn-full,.btn-primary,.btn-send,.btn-sm-green,.btn-search,.btn-pp-pay{background:rgb(var(--t-acento));color:rgb(var(--t-fondo))}
+.btn-sm-outline,.btn-secondary,.btn-cancel,.btn-google{border-radius:999px!important;border-color:rgba(var(--t-claro),.16)}
+.btn-full:active,.btn-primary:active,.btn-send:active,.btn-sm-green:active{transform:scale(.98)}
+.btn-full:disabled{background:rgba(var(--t-claro),.08);color:rgba(var(--t-claro),.4)}
+.btn-buscar-grande{display:flex;align-items:center;justify-content:center;gap:10px;font-size:17px!important;padding:18px 24px!important;min-height:58px;
+  box-shadow:0 12px 34px -12px rgba(var(--t-acento),.7)}
+.btn-buscar-grande:hover{transform:translateY(-2px)}
+
+/* Campos */
+.field label{font-weight:600;color:rgba(var(--t-claro),.7)}
+.page:not(#page-landing) :is(.field input,.field select,.field textarea,.search-select-input,.filter-group select,.filter-group input,.search-bar-wrap input),
+.modal :is(.field input,.field select,.field textarea){
+  background:rgba(var(--t-fondo),.7);border:1px solid rgba(var(--t-claro),.12);border-radius:14px;padding:12px 15px;color:rgb(var(--t-claro))}
+:is(.field input,.field select,.field textarea,.search-select-input):focus{border-color:rgb(var(--t-acento))!important;box-shadow:0 0 0 3px rgba(var(--t-acento),.18)}
+.chip{border-radius:999px;padding:7px 14px;font-weight:600}
+.chip:hover,.chip.on{background:rgba(var(--t-acento),.16);border-color:rgba(var(--t-acento),.5);color:rgb(var(--t-acento))}
+.upload-box{border-radius:22px;border-color:rgba(var(--t-claro),.16)}
+.upload-box:hover{border-color:rgb(var(--t-acento));background:rgba(var(--t-acento),.05)}
+.cv-saved-banner{border-radius:18px}
+
+/* Ventanas (registro, pago, correo) */
+.modal,.pp-modal,.email-modal-inner{background:var(--t-tarjeta);border:1px solid rgba(var(--t-claro),.1);border-radius:26px;box-shadow:0 30px 80px -20px rgba(0,0,0,.7)}
+.modal h2{font-family:var(--f-tit);font-size:24px;font-weight:800;letter-spacing:-.02em}
+.auth-tabs{border-radius:999px;background:rgba(var(--t-fondo),.7);padding:5px}
+.auth-tab{border-radius:999px;font-weight:600;padding:10px}
+.auth-tab.active{background:rgb(var(--t-claro));color:rgb(var(--t-fondo))}
+.tipo-card{border-radius:18px;border-color:rgba(var(--t-claro),.12)}
+.tipo-card:hover,.tipo-card.selected{border-color:rgb(var(--t-acento));background:rgba(var(--t-acento),.08)}
+.profile-menu{border-radius:18px;background:var(--t-tarjeta);border-color:rgba(var(--t-claro),.1);box-shadow:0 20px 50px -10px rgba(0,0,0,.6)}
+.profile-menu-item{border-radius:12px}
+.toast{border-radius:999px;font-family:var(--f-ui);background:rgb(var(--t-acento));color:rgb(var(--t-fondo));bottom:150px;right:24px;max-width:calc(100vw - 48px)}
+.toast.error{background:var(--rojo);color:#fff}
+.user-avatar{background:rgb(var(--t-acento));color:rgb(var(--t-fondo))}
+
+.match-badge{white-space:nowrap;flex-shrink:0}
+.job-card-top{gap:12px}
+.empty-state .job-card,.empty-state .section-box{text-align:left}
+.pp-header{padding:28px 52px}
+/* Mis postulaciones */
+.mp-resumen{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.mp-kpi{background:var(--t-tarjeta);border:1px solid rgba(var(--t-claro),.08);border-radius:18px;padding:14px 16px;text-align:left;cursor:pointer;color:inherit;transition:border-color .2s}
+.mp-kpi b{display:block;font-family:var(--f-tit);font-size:26px;letter-spacing:-.03em;color:rgb(var(--t-claro))}
+.mp-kpi span{font-size:12px;color:rgba(var(--t-claro),.6)}
+.mp-kpi.on{border-color:rgb(var(--t-acento));box-shadow:inset 0 0 0 1px rgb(var(--t-acento))}
+.mp-kpi.on b{color:rgb(var(--t-acento))}
+.mp-barra{display:flex;gap:10px;margin-bottom:14px}
+.mp-barra input{flex:1;min-width:0;background:rgba(var(--t-fondo),.7);border:1px solid rgba(var(--t-claro),.12);border-radius:999px;padding:12px 18px;color:rgb(var(--t-claro));font-size:14px;outline:none}
+.mp-barra input:focus{border-color:rgb(var(--t-acento))}
+.mp-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center;background:var(--t-tarjeta);border:1px solid rgba(var(--t-claro),.08);border-radius:18px;padding:16px 18px;margin-bottom:10px}
+.mp-emp{font-family:var(--f-tit);font-weight:700;font-size:15.5px;overflow-wrap:anywhere}
+.mp-cargo{font-size:13px;color:rgba(var(--t-claro),.75);margin-top:2px;overflow-wrap:anywhere}
+.mp-meta{font-size:11.5px;color:rgba(var(--t-claro),.5);margin-top:6px;overflow-wrap:anywhere}
+.mp-der{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.mp-estado{appearance:none;-webkit-appearance:none;border:1px solid transparent;border-radius:999px;padding:8px 30px 8px 14px;font-size:12.5px;font-weight:700;cursor:pointer;outline:none;
+  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);
+  background-position:calc(100% - 16px) 52%,calc(100% - 11px) 52%;background-size:5px 5px;background-repeat:no-repeat}
+.mp-estado option{background:var(--t-tarjeta);color:rgb(var(--t-claro))}
+.mp-e-enviado{background-color:rgba(var(--t-claro),.08);color:rgb(var(--t-claro))}
+.mp-e-respondieron{background-color:rgba(59,130,246,.16);color:#7FB0FF}
+.mp-e-entrevista{background-color:rgba(var(--t-acento),.16);color:rgb(var(--t-acento))}
+.mp-e-contratado{background-color:rgba(var(--t-lima),.18);color:rgb(var(--t-lima))}
+.mp-e-descartado{background-color:rgba(255,77,109,.12);color:#FF8DA1}
+.mp-seg{font-size:12px;font-weight:600;color:rgb(var(--t-acento));text-decoration:none;white-space:nowrap}
+.mp-seg:hover{text-decoration:underline}
+.mp-vacio{text-align:center;padding:48px 20px;color:rgba(var(--t-claro),.6);background:var(--t-tarjeta);border:1px dashed rgba(var(--t-claro),.14);border-radius:22px}
+.mp-vacio b{display:block;font-family:var(--f-tit);font-size:18px;color:rgb(var(--t-claro));margin:10px 0 6px}
+
+
+/* Pantallas táctiles: todo botón del tamaño de un dedo (mín. 40 px) */
+@media (max-width:960px),(pointer:coarse){
+  .page button:not(.tema-btn):not(.ntab),.modal-bg button,.chip,.mp-seg{min-height:40px}
+  .chip{display:inline-flex;align-items:center}
+  .mp-seg{display:inline-flex;align-items:center}
+  .lx-pie-links button,.lx-pie-links a{display:inline-flex;align-items:center;min-height:40px}
+  .modal-bg button[onclick*="cerrar"],.modal-bg button[aria-label*="errar"]{min-width:40px}
+}
+
+/* Celular: los botones flotantes se esconden al bajar y vuelven al subir (no tapan nada) */
+@media (max-width:960px),(pointer:coarse){
+  .tema-sel,#waFlotante{transition:transform .28s ease,opacity .28s ease!important}
+  body.flot-oculto .tema-sel,body.flot-oculto #waFlotante{transform:translateY(160%)!important;opacity:0;pointer-events:none}
+}
+/* Celular */
+@media(max-width:640px){
+  .dashboard,.emp-layout{padding:24px 16px 120px}
+  .dash-header,.emp-header{flex-direction:column;gap:12px;align-items:flex-start}
+  .dash-cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .page:not(#page-landing) .dash-card{padding:14px 12px;border-radius:16px!important}
+  .page:not(#page-landing) .dash-card-num{font-size:24px}
+  .page:not(#page-landing) .dash-card-label{font-size:11px;line-height:1.3}
+  .page:not(#page-landing) .section-box{padding:18px 16px}
+  /* Pestañas: todas a la vista (en 2 filas), ninguna escondida a la derecha */
+  .tab-row{flex-wrap:wrap;border-radius:24px;justify-content:center}
+  .tab-btn{flex:1 1 auto;padding:10px 14px;font-size:13px}
+  .form-row{grid-template-columns:1fr}
+  .modal{padding:26px 20px;width:calc(100% - 24px)}
+  .mp-resumen{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .mp-item{grid-template-columns:1fr;gap:10px}
+  .mp-der{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:10px 16px}
+  .toast{left:16px;right:16px;bottom:84px;text-align:center}
+  .btn-buscar-grande{font-size:16px!important}
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1123,7 +1271,7 @@ if (window.pdfjsLib) {
 <nav>
   <div class="logo" onclick="goHome()" style="flex-direction:column;align-items:flex-start;gap:0">
     <div style="display:flex;align-items:center;gap:8px">TalentoEC <span class="logo-badge">ECUADOR</span></div>
-    <div style="font-size:9px;color:var(--texto-secundario);font-weight:400;font-family:'DM Sans',sans-serif;letter-spacing:.05em;margin-top:-2px">by Proyectart</div>
+    <div style="font-size:9px;color:var(--texto-secundario);font-weight:400;font-family:var(--f-ui);letter-spacing:.05em;margin-top:-2px">by Proyectart</div>
   </div>
   <div class="nav-center" id="navCenter">
     <button class="ntab active" onclick="showPage('landing')" id="ntab-landing">Inicio</button>
@@ -1251,7 +1399,7 @@ if (window.pdfjsLib) {
             <svg viewBox="0 0 640 206" width="100%" style="display:block" role="img" aria-label="Gráfica estimada: con TalentoEC revisas varias veces más ofertas al mes que buscando por tu cuenta">
               <line x1="20" y1="41" x2="620" y2="41" stroke="rgba(238,247,242,.07)" stroke-width="1" stroke-dasharray="3 5"/><line x1="20" y1="86" x2="620" y2="86" stroke="rgba(238,247,242,.07)" stroke-width="1" stroke-dasharray="3 5"/><line x1="20" y1="131" x2="620" y2="131" stroke="rgba(238,247,242,.07)" stroke-width="1" stroke-dasharray="3 5"/><line x1="20" y1="176" x2="620" y2="176" stroke="rgba(238,247,242,.07)" stroke-width="1" stroke-dasharray="0"/>
               <rect class="kpi-bar" style="--bd:0ms" x="35" y="148" width="22" height="28" rx="5" fill="#2B3530"/><rect class="kpi-bar" style="--bd:40ms" x="61" y="66" width="28" height="110" rx="6" fill="url(#kpiGrad)"/><rect class="kpi-bar" style="--bd:90ms" x="139" y="145" width="22" height="31" rx="5" fill="#2B3530"/><rect class="kpi-bar" style="--bd:130ms" x="165" y="54" width="28" height="122" rx="6" fill="url(#kpiGrad)"/><rect class="kpi-bar" style="--bd:180ms" x="243" y="147" width="22" height="29" rx="5" fill="#2B3530"/><rect class="kpi-bar" style="--bd:220ms" x="269" y="47" width="28" height="129" rx="6" fill="url(#kpiGrad)"/><rect class="kpi-bar" style="--bd:270ms" x="347" y="146" width="22" height="30" rx="5" fill="#2B3530"/><rect class="kpi-bar" style="--bd:310ms" x="373" y="39" width="28" height="137" rx="6" fill="url(#kpiGrad)"/><rect class="kpi-bar" style="--bd:360ms" x="451" y="148" width="22" height="28" rx="5" fill="#2B3530"/><rect class="kpi-bar" style="--bd:400ms" x="477" y="43" width="28" height="133" rx="6" fill="url(#kpiGrad)"/><rect class="kpi-bar" style="--bd:450ms" x="555" y="145" width="22" height="31" rx="5" fill="#2B3530"/><rect class="kpi-bar" style="--bd:490ms" x="581" y="36" width="28" height="140" rx="6" fill="url(#kpiGrad)"/>
-              <g font-family="Plus Jakarta Sans,DM Sans,sans-serif" font-size="13" font-weight="600" fill="rgba(238,247,242,.45)" text-anchor="middle"><text x="62" y="198">ENE</text><text x="166" y="198">FEB</text><text x="270" y="198">MAR</text><text x="374" y="198">ABR</text><text x="478" y="198">MAY</text><text x="582" y="198">JUN</text></g>
+              <g font-family="Plus Jakarta Sans,sans-serif" font-size="13" font-weight="600" fill="rgba(238,247,242,.45)" text-anchor="middle"><text x="62" y="198">ENE</text><text x="166" y="198">FEB</text><text x="270" y="198">MAR</text><text x="374" y="198">ABR</text><text x="478" y="198">MAY</text><text x="582" y="198">JUN</text></g>
               <defs><linearGradient id="kpiGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#C6F86A"/><stop offset="100%" stop-color="#1BD07F"/></linearGradient></defs>
             </svg>
           </div>
@@ -1314,7 +1462,7 @@ if (window.pdfjsLib) {
                   <mpath href="#kpiLinePath" xlink:href="#kpiLinePath"/>
                 </animateMotion>
               </circle>
-              <g font-family="Plus Jakarta Sans,DM Sans,sans-serif" font-size="9.5" font-weight="600" fill="rgba(238,247,242,.45)" text-anchor="middle">
+              <g font-family="Plus Jakarta Sans,sans-serif" font-size="9.5" font-weight="600" fill="rgba(238,247,242,.45)" text-anchor="middle">
                 <text x="20" y="132">Sem 1</text><text x="110" y="132">Sem 2</text><text x="200" y="132">Sem 3</text><text x="280" y="132">Sem 4</text>
               </g>
               <g font-family="Plus Jakarta Sans,sans-serif" font-size="10" font-weight="800" fill="#EEF7F2" text-anchor="middle">
@@ -1518,7 +1666,7 @@ if (window.pdfjsLib) {
 <div id="page-bolsa" class="page">
   <div class="dashboard">
     <div style="text-align:center;margin-bottom:24px">
-      <div style="font-family:'Syne',sans-serif;font-size:30px;font-weight:800;margin-bottom:6px">Empleos en <span style="color:var(--verde)">TalentoEC</span></div>
+      <div style="font-family:var(--f-tit);font-size:30px;font-weight:800;margin-bottom:6px">Empleos en <span style="color:var(--verde)">TalentoEC</span></div>
       <div style="font-size:13.5px;color:var(--texto-secundario)">Vacantes publicadas directamente por empresas ecuatorianas · postula con un clic</div>
     </div>
 
@@ -1581,7 +1729,7 @@ if (window.pdfjsLib) {
           <span style="font-size:11px;color:var(--texto-secundario);margin-left:8px" id="planNombreLabel">Plan Básico</span>
         </div>
         <div style="display:flex;align-items:baseline;gap:4px">
-          <span style="font-size:20px;font-weight:700;font-family:'Syne',sans-serif" id="correosDiaCount">0</span>
+          <span style="font-size:20px;font-weight:700;font-family:var(--f-tit)" id="correosDiaCount">0</span>
           <span style="font-size:12px;color:var(--texto-secundario)">/ <span id="correosDiaMax">20</span> máx.</span>
         </div>
       </div>
@@ -1599,6 +1747,7 @@ if (window.pdfjsLib) {
       <button class="tab-btn" onclick="candTab('busqueda')">Buscar trabajo</button>
       <button class="tab-btn" onclick="candTab('resultados')">Resultados</button>
       <button class="tab-btn" onclick="candTab('frio')" style="color:var(--amarillo)">🎯 Correos en frío</button>
+      <button class="tab-btn" onclick="candTab('postulaciones')">📋 Mis postulaciones</button>
     </div>
 
     <!-- TAB: CV -->
@@ -1698,7 +1847,7 @@ if (window.pdfjsLib) {
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
           <div style="display:flex;align-items:center;gap:8px">
             <div class="ai-dot"></div>
-            <span style="font-family:'Syne',sans-serif;font-size:14px;font-weight:600" id="mejorarStatus">Mejorando tu CV...</span>
+            <span style="font-family:var(--f-tit);font-size:14px;font-weight:600" id="mejorarStatus">Mejorando tu CV...</span>
           </div>
           <div id="descargarBtn" style="display:none;align-items:center;gap:6px">
             <span style="color:var(--verde);font-size:13px">✓</span>
@@ -1713,9 +1862,9 @@ if (window.pdfjsLib) {
       <div class="section-box" style="background:linear-gradient(135deg,rgba(var(--verde-rgb),0.06),var(--gris-oscuro));border-color:rgba(var(--verde-rgb),0.25)">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
           <span style="font-size:22px">🔍</span>
-          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700">Encuentra tu próximo empleo</div>
+          <div style="font-family:var(--f-tit);font-size:20px;font-weight:700">Encuentra tu próximo empleo</div>
         </div>
-        <div style="font-size:12.5px;color:var(--texto-secundario);margin-bottom:16px">Buscamos en LinkedIn, Computrabajo, Multitrabajos, Indeed y más — en tiempo real. Cada búsqueda te trae hasta 8 ofertas reales y postulas desde aquí, con tu CV y tu carta.</div>
+        <div style="font-size:12.5px;color:var(--texto-secundario);margin-bottom:16px">Buscamos ofertas públicas en internet, incluidos portales de empleo de Ecuador como Computrabajo, Multitrabajos o Indeed. Cada búsqueda te trae hasta 8 ofertas con enlace o correo verificable, y postulas desde aquí con tu CV y tu carta. Los resultados dependen de las vacantes publicadas ese día.</div>
         <div id="cvDetectadoBanner" style="display:none;background:rgba(var(--verde-rgb),0.1);border:1px solid rgba(var(--verde-rgb),0.3);border-radius:8px;padding:12px 14px;margin-bottom:14px">
           <div style="font-size:12px;color:var(--verde);margin-bottom:8px">✦ Detectamos estas áreas en tu CV. Toca una para buscar:</div>
           <div id="areasChipsBanner" style="display:flex;flex-wrap:wrap;gap:6px"></div>
@@ -1784,7 +1933,7 @@ if (window.pdfjsLib) {
             <span class="chip on" onclick="toggleChip(this)">Encuentra Empleo</span>
           </div>
         </div>
-        <button class="btn-full" onclick="buscarEmpleo()" style="font-size:15px;padding:14px">🔍 Buscar empleos ahora</button>
+        <button class="btn-full btn-buscar-grande" id="btnBuscarEmpleo" onclick="buscarEmpleo()">🔍 Buscar empleos ahora</button>
         <div style="text-align:center;font-size:11px;color:var(--texto-secundario);margin-top:8px" id="busqCupoInfo">Cada búsqueda usa 1 de tus búsquedas diarias</div>
       </div>
 
@@ -1794,7 +1943,7 @@ if (window.pdfjsLib) {
             <div class="spin" style="width:80px;height:80px;border:3px solid rgba(var(--verde-rgb),0.1);border-top-color:var(--verde);border-radius:50%;animation:spin 1.2s linear infinite"></div>
             <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:32px">🔍</div>
           </div>
-          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--verde);margin-bottom:8px">TalentoEC está trabajando</div>
+          <div style="font-family:var(--f-tit);font-size:20px;font-weight:700;color:var(--verde);margin-bottom:8px">TalentoEC está trabajando</div>
           <div style="font-size:13px;color:var(--texto-secundario);margin-bottom:24px;max-width:340px;margin-left:auto;margin-right:auto">Analizando tu CV y buscando las mejores oportunidades en Ecuador</div>
 
           <div id="candSearchSrcs" style="max-width:400px;margin:0 auto;text-align:left"></div>
@@ -1877,7 +2026,7 @@ if (window.pdfjsLib) {
           <label>Empresas a contactar hoy <span id="frioLimitLabel" style="color:var(--texto-secundario);font-size:10px;margin-left:4px"></span></label>
           <select id="frioNumero"></select>
         </div>
-        <button class="btn-full" onclick="ejecutarCorreosFrio()" style="background:var(--amarillo);color:var(--negro);font-family:'Syne',sans-serif;font-weight:700">
+        <button class="btn-full" onclick="ejecutarCorreosFrio()" style="background:var(--amarillo);color:var(--negro);font-family:var(--f-tit);font-weight:700">
           Buscar empresas y enviar correos en frío →
         </button>
       </div>
@@ -1889,6 +2038,17 @@ if (window.pdfjsLib) {
       </div>
 
       <div id="frioResultados"></div>
+    </div>
+
+    <!-- TAB: MIS POSTULACIONES -->
+    <div id="cand-tab-postulaciones" style="display:none">
+      <div class="section-box" style="margin-bottom:14px">
+        <div class="section-box-title" style="margin-bottom:6px">📋 Mis postulaciones</div>
+        <div style="font-size:13px;color:rgba(var(--t-claro),.6);line-height:1.6">Aquí quedan todas las empresas a las que enviaste tu CV. Cuando te respondan, cambia el estado para llevar la cuenta. Si pasa una semana sin respuesta, puedes escribirles un seguimiento.</div>
+      </div>
+      <div class="mp-resumen" id="mpResumen"></div>
+      <div class="mp-barra"><input type="search" id="mpBuscar" placeholder="Buscar empresa o cargo…" oninput="renderPostulaciones()" aria-label="Buscar en mis postulaciones"></div>
+      <div id="mpLista"></div>
     </div>
 
     <!-- TAB: RESULTADOS -->
@@ -1922,7 +2082,7 @@ if (window.pdfjsLib) {
     <!-- TAB: MIS VACANTES (publicación GRATIS) -->
     <div id="emp-tab-vacantes">
       <div style="background:linear-gradient(135deg,rgba(var(--verde-rgb),0.08),rgba(var(--verde-rgb),0.02));border:1px solid rgba(var(--verde-rgb),0.25);border-radius:14px;padding:18px 20px;margin-bottom:18px">
-        <div id="vacFormTitulo" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px">Publica tu vacante <span style="color:var(--verde)">GRATIS</span></div>
+        <div id="vacFormTitulo" style="font-family:var(--f-tit);font-size:16px;font-weight:700;margin-bottom:4px">Publica tu vacante <span style="color:var(--verde)">GRATIS</span></div>
         <div style="font-size:12px;color:var(--texto-secundario)">Tu oferta aparecerá destacada y en primer lugar en las búsquedas de los candidatos de TalentoEC. Pasa por una revisión rápida (menos de 24h) antes de publicarse.</div>
       </div>
 
@@ -2028,13 +2188,13 @@ if (window.pdfjsLib) {
         </div>
       </div>
 
-      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:12px">Tus vacantes publicadas</div>
+      <div style="font-family:var(--f-tit);font-size:15px;font-weight:700;margin-bottom:12px">Tus vacantes publicadas</div>
       <div id="misVacantesList"><div class="empty-state">Aún no has publicado vacantes</div></div>
     </div>
 
     <!-- TAB: MÉTRICAS (#5) -->
     <div id="emp-tab-metricas" style="display:none">
-      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:4px">📊 Métricas de tus vacantes</div>
+      <div style="font-family:var(--f-tit);font-size:18px;font-weight:700;margin-bottom:4px">📊 Métricas de tus vacantes</div>
       <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:18px">Mira el rendimiento de tus publicaciones: cuántas personas las vieron y cuántas postularon.</div>
       <div id="metricasResumen" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px"></div>
       <div id="metricasDetalle"></div>
@@ -2042,7 +2202,7 @@ if (window.pdfjsLib) {
 
     <!-- TAB: MI EMPRESA (#3) -->
     <div id="emp-tab-empresa" style="display:none">
-      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:4px">🏢 Perfil de tu empresa</div>
+      <div style="font-family:var(--f-tit);font-size:18px;font-weight:700;margin-bottom:4px">🏢 Perfil de tu empresa</div>
       <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:18px">Un perfil completo hace que tus vacantes se vean más profesionales y genera más confianza en los candidatos.</div>
       <div class="section-box" style="max-width:620px">
         <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;margin-bottom:18px">
@@ -2117,7 +2277,7 @@ if (window.pdfjsLib) {
       <div class="section-box-title">Mi plan actual</div>
       <div style="background:var(--negro);border-radius:10px;padding:16px;display:flex;justify-content:space-between;align-items:center">
         <div>
-          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--verde)" id="perfilPlanNombre">Básico</div>
+          <div style="font-family:var(--f-tit);font-size:18px;font-weight:700;color:var(--verde)" id="perfilPlanNombre">Básico</div>
           <div style="font-size:12px;color:var(--texto-secundario);margin-top:4px" id="perfilPlanDetalle"></div>
         </div>
         <button onclick="verPlanes()" class="btn-sm-green">Mejorar plan</button>
@@ -2160,7 +2320,7 @@ if (window.pdfjsLib) {
           <div class="tipo-desc">Busco empleo</div>
         </div>
         <div class="tipo-card" onclick="selectTipo('empleador',this)" style="position:relative">
-          <div style="position:absolute;top:6px;right:8px;background:var(--verde);color:var(--negro);padding:3px 8px;border-radius:10px;font-size:9px;font-weight:800;letter-spacing:1px;font-family:'Syne',sans-serif">GRATIS</div>
+          <div style="position:absolute;top:6px;right:8px;background:var(--verde);color:var(--negro);padding:3px 8px;border-radius:10px;font-size:9px;font-weight:800;letter-spacing:1px;font-family:var(--f-tit)">GRATIS</div>
           <div class="tipo-icon">🏢</div>
           <div class="tipo-label">Empleador</div>
           <div class="tipo-desc">Publico vacantes</div>
@@ -2229,7 +2389,7 @@ if (window.pdfjsLib) {
 <div class="modal-bg" id="emailModal">
   <div class="email-modal-inner" style="position:relative">
     <button type="button" onclick="cerrarEmail()" aria-label="Cerrar" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--texto-secundario);font-size:22px;cursor:pointer;line-height:1;padding:4px">✕</button>
-    <h2 id="emailModalTitulo" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:4px">Enviar correo automático</h2>
+    <h2 id="emailModalTitulo" style="font-family:var(--f-tit);font-size:18px;font-weight:700;margin-bottom:4px">Enviar correo automático</h2>
     <p id="emailModalSub" style="font-size:12px;color:var(--texto-secundario);margin-bottom:18px">Redactamos este mensaje personalizado</p>
     <div id="contactoAviso" class="ai-note" style="display:none;margin-bottom:12px"></div>
     <div class="field"><label>Para</label><input type="email" id="modalTo" placeholder="email@empresa.com"></div>
@@ -2311,7 +2471,7 @@ if (window.pdfjsLib) {
     <!-- MODERACIÓN DE VACANTES (ahora a lo ancho, debajo de las métricas) -->
     <div class="section-box" style="margin-top:20px">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
-        <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700">📢 Moderación de vacantes</div>
+        <div style="font-family:var(--f-tit);font-size:16px;font-weight:700">📢 Moderación de vacantes</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="admvac-filtro on" data-e="pendiente" onclick="cargarVacantesAdmin('pendiente')">⏳ Pendientes</button>
           <button class="admvac-filtro" data-e="aprobada" onclick="cargarVacantesAdmin('aprobada')">✅ Aprobadas</button>
@@ -2367,7 +2527,7 @@ if (window.pdfjsLib) {
   <div style="max-width:760px;margin:0 auto;padding:40px 32px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:32px">
       <div>
-        <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:700">Términos y Condiciones</div>
+        <div style="font-family:var(--f-tit);font-size:24px;font-weight:700">Términos y Condiciones</div>
         <div style="font-size:13px;color:var(--texto-secundario);margin-top:4px">Última actualización: abril 2026</div>
       </div>
       <button onclick="showPage('landing')" class="btn-sm-outline">← Volver</button>
@@ -2375,13 +2535,13 @@ if (window.pdfjsLib) {
 
     <div style="background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:14px;padding:28px;font-size:14px;line-height:1.8;color:var(--texto-secundario)">
 
-      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">1. Aceptación de los términos</h2>
+      <h2 style="font-family:var(--f-tit);font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">1. Aceptación de los términos</h2>
       <p style="margin:0 0 20px">Al registrarse y utilizar TalentoEC, usted acepta estos Términos y Condiciones en su totalidad. Si no está de acuerdo con alguno de estos términos, no debe utilizar nuestros servicios. TalentoEC es una plataforma de búsqueda de empleo desarrollada por Proyectart, con sede en Ecuador, operada bajo las leyes de la República del Ecuador.</p>
 
-      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">2. Descripción del servicio</h2>
+      <h2 style="font-family:var(--f-tit);font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">2. Descripción del servicio</h2>
       <p style="margin:0 0 20px">TalentoEC es una plataforma tecnológica que ayuda a candidatos ecuatorianos a encontrar empleo mediante búsqueda automatizada en internet y generación de correos de postulación. También permite a empresas encontrar candidatos para sus vacantes. El servicio opera en todo el territorio ecuatoriano.</p>
 
-      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">3. Registro y cuenta de usuario</h2>
+      <h2 style="font-family:var(--f-tit);font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">3. Registro y cuenta de usuario</h2>
       <p style="margin:0 0 8px">Para utilizar TalentoEC debe:</p>
       <ul style="margin:0 0 20px;padding-left:20px">
         <li style="margin-bottom:6px">Ser mayor de 18 años o tener autorización de su representante legal</li>
@@ -2390,7 +2550,7 @@ if (window.pdfjsLib) {
         <li style="margin-bottom:6px">Notificarnos inmediatamente si detecta uso no autorizado de su cuenta</li>
       </ul>
 
-      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">4. Planes y pagos</h2>
+      <h2 style="font-family:var(--f-tit);font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">4. Planes y pagos</h2>
       <p style="margin:0 0 8px">TalentoEC ofrece planes de suscripción mensual con los siguientes precios en dólares americanos (USD):</p>
       <ul style="margin:0 0 12px;padding-left:20px">
         <li style="margin-bottom:6px"><strong style="color:var(--texto-primario)">Plan Básico:</strong> $9.99/mes — para candidatos, 3 búsquedas diarias + 12 correos automáticos</li>
@@ -2402,10 +2562,10 @@ if (window.pdfjsLib) {
       </ul>
       <p style="margin:0 0 20px">Los pagos se procesan mediante PayPhone, plataforma de pagos ecuatoriana. Los precios incluyen IVA cuando corresponda según la normativa tributaria ecuatoriana vigente.</p>
 
-      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">5. Política de reembolsos</h2>
+      <h2 style="font-family:var(--f-tit);font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">5. Política de reembolsos</h2>
       <p style="margin:0 0 20px">TalentoEC ofrece reembolso completo dentro de los primeros 7 días calendario después del pago si el servicio no cumplió con lo ofrecido. Para solicitar un reembolso, contáctenos por WhatsApp o correo electrónico. No se realizan reembolsos parciales por días no utilizados del mes.</p>
 
-      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">6. Uso aceptable</h2>
+      <h2 style="font-family:var(--f-tit);font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">6. Uso aceptable</h2>
       <p style="margin:0 0 8px">Está prohibido utilizar TalentoEC para:</p>
       <ul style="margin:0 0 20px;padding-left:20px">
         <li style="margin-bottom:6px">Enviar correos masivos no solicitados (spam)</li>
@@ -2415,19 +2575,19 @@ if (window.pdfjsLib) {
         <li style="margin-bottom:6px">Interferir con el funcionamiento de la plataforma</li>
       </ul>
 
-      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">7. Protección de datos personales</h2>
+      <h2 style="font-family:var(--f-tit);font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">7. Protección de datos personales</h2>
       <p style="margin:0 0 20px">TalentoEC cumple con la Ley Orgánica de Protección de Datos Personales del Ecuador (LOPDP). Su información personal se utiliza únicamente para prestar el servicio contratado. No vendemos ni compartimos sus datos con terceros sin su consentimiento expreso. Puede solicitar la eliminación de sus datos en cualquier momento.</p>
 
-      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">8. Limitación de responsabilidad</h2>
+      <h2 style="font-family:var(--f-tit);font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">8. Limitación de responsabilidad</h2>
       <p style="margin:0 0 20px">TalentoEC es una herramienta de búsqueda y contacto. No garantizamos que el uso de la plataforma resulte en la obtención de empleo. No somos responsables por las decisiones de contratación de terceros, ni por el contenido de las ofertas de trabajo encontradas en sitios externos.</p>
 
-      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">9. Cancelación del servicio</h2>
+      <h2 style="font-family:var(--f-tit);font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">9. Cancelación del servicio</h2>
       <p style="margin:0 0 20px">Puede cancelar su suscripción en cualquier momento desde su cuenta. La cancelación tendrá efecto al finalizar el período de facturación actual. TalentoEC se reserva el derecho de suspender cuentas que violen estos términos sin previo aviso.</p>
 
-      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">10. Ley aplicable y jurisdicción</h2>
+      <h2 style="font-family:var(--f-tit);font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">10. Ley aplicable y jurisdicción</h2>
       <p style="margin:0 0 20px">Estos términos se rigen por las leyes de la República del Ecuador. Cualquier disputa será sometida a los tribunales competentes de la ciudad de Quito, Ecuador.</p>
 
-      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">11. Contacto</h2>
+      <h2 style="font-family:var(--f-tit);font-size:16px;font-weight:600;color:var(--texto-primario);margin:0 0 12px">11. Contacto</h2>
       <p style="margin:0">Para consultas sobre estos términos contáctenos en: <span style="color:var(--verde)">hola@talentoec.com</span> o a través de WhatsApp en el número publicado en nuestra plataforma.</p>
 
     </div>
@@ -2439,7 +2599,7 @@ if (window.pdfjsLib) {
 </div>
 
 <!-- WhatsApp flotante -->
-<a href="https://wa.me/593982238005?text=Hola,%20necesito%20ayuda%20con%20TalentoEC" target="_blank"
+<a id="waFlotante" aria-label="Escríbenos por WhatsApp" href="https://wa.me/593982238005?text=Hola,%20necesito%20ayuda%20con%20TalentoEC" target="_blank"
    style="position:fixed;bottom:20px;right:20px;background:#25D366;color:#fff;width:56px;height:56px;border-radius:50%;
    display:flex;align-items:center;justify-content:center;text-decoration:none;box-shadow:0 4px 16px rgba(37,211,102,0.4);
    z-index:998;transition:transform .2s;font-size:0"
@@ -2705,6 +2865,34 @@ function cargarCorreosEnviados() {
     correosEnviados = JSON.parse(localStorage.getItem(key) || '[]');
   }
 }
+// Trae de la nube (Supabase) todo lo enviado y lo une con lo marcado en este navegador.
+// Se llama al iniciar sesión, al volver a abrir la página y al entrar a "Mis postulaciones".
+async function cargarPostulacionesNube() {
+  if (!(currentUser && currentUser.email)) return;
+  try { cargarCorreosEnviados(); } catch (e) {}
+  if (!localStorage.getItem('talento_token')) return;
+  try {
+    const correosRes = await apiCall('/api/auth/mis-correos', { method: 'GET' });
+    if (correosRes && Array.isArray(correosRes.correos)) {
+      const nube = correosRes.correos.map(c => ({
+        id: c.id || null,
+        to: c.destinatario_email,
+        subject: c.cargo || c.empresa || '',
+        empresa: c.empresa,
+        cargo: c.cargo || '',
+        fecha: c.enviado_en,
+        estado: 'Enviado',
+        estadoNube: c.estado || ''
+      }));
+      // Conservar lo marcado solo en este navegador (p.ej. "✅ Ya postulé" o CV a vacante exclusiva)
+      const locales = Array.isArray(correosEnviados) ? correosEnviados : [];
+      const n = (x) => String(x || '').toLowerCase().trim().replace(/[^a-z0-9áéíóúñ]/g, '');
+      const enNube = new Set(nube.map(c => n(c.empresa) + '|' + n(c.cargo || c.subject)));
+      correosEnviados = nube.concat(locales.filter(c => c && !c.id && !enNube.has(n(c.empresa) + '|' + n(c.cargo || c.subject))));
+      try { guardarCorreosEnviados(); } catch (e) {}
+    }
+  } catch (err) { /* sin nube: queda lo guardado en este navegador */ }
+}
 function guardarCorreosEnviados() {
   if (currentUser && currentUser.email) {
     const key = 'correos_enviados_' + currentUser.email;
@@ -2812,7 +3000,7 @@ function mostrarVerificacionEmail() {
   modal.innerHTML = `
     <div style="background:var(--gris-oscuro);border:1px solid var(--verde);border-radius:16px;padding:28px;max-width:420px;width:100%;text-align:center">
       <div style="font-size:48px;margin-bottom:14px">📧</div>
-      <h3 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin:0 0 10px">Verifica tu email</h3>
+      <h3 style="font-family:var(--f-tit);font-size:20px;font-weight:700;margin:0 0 10px">Verifica tu email</h3>
       <p style="color:var(--texto-secundario);font-size:13px;margin:0 0 16px;line-height:1.6">
         Para mayor seguridad y desbloquear el envío masivo de correos, verifica tu email.
         <strong style="color:var(--verde)">Recibirás un código de 6 dígitos.</strong>
@@ -2901,7 +3089,7 @@ function mostrarOlvideContrasena() {
   modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
   modal.innerHTML = `
     <div style="background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:16px;padding:32px;max-width:400px;width:100%">
-      <h3 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin:0 0 8px">Recuperar contraseña</h3>
+      <h3 style="font-family:var(--f-tit);font-size:20px;font-weight:700;margin:0 0 8px">Recuperar contraseña</h3>
       <p style="color:var(--texto-secundario);font-size:13px;margin:0 0 20px">Te enviaremos un código a tu email para restablecer tu contraseña.</p>
 
       <div id="step1Recover">
@@ -3058,6 +3246,8 @@ window.addEventListener('load', async () => {
     }
     // El servidor manda: trae los contadores reales (reseteados por fecha)
     sincronizarStatsBackend();
+    // Postulaciones guardadas en este navegador (luego se completan con la nube)
+    try { cargarCorreosEnviados(); } catch (e) {}
     // Y refresca los datos (plan, etc.) desde la NUBE por si cambiaron.
     refrescarSesionDesdeNube();
   } else if (localStorage.getItem('talento_token')) {
@@ -3091,6 +3281,7 @@ async function refrescarSesionDesdeNube() {
       }
       userTipo = u.tipo;
       try { setLoggedInUI(); } catch(e){}
+      if (u.tipo === 'candidato' || u.rol === 'admin') { try { cargarPostulacionesNube(); } catch(e){} }
       try { await saveToStorage('talento_user', currentUser); } catch(e){}
       try { updateLimitBar(); } catch(e){}
       // Pre-verificar el pago (candidatos sin marca local) para que NO parpadee
@@ -3392,7 +3583,7 @@ async function verPostulantes(id) {
     cont.insertAdjacentHTML('afterbegin', `
       <div class="section-box" id="postulantesBox" style="margin-bottom:14px;border-color:rgba(var(--verde-rgb),.4)">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:17px">Postulantes — ${escHtml(r.cargo||'')}</div>
+          <div style="font-family:var(--f-tit);font-weight:700;font-size:17px">Postulantes — ${escHtml(r.cargo||'')}</div>
           <button class="btn-sm-outline" onclick="document.getElementById('postulantesBox').remove()">✕ Cerrar</button>
         </div>
         <div id="atsResumen" style="font-size:11px;color:var(--texto-secundario);margin-bottom:12px"></div>
@@ -3466,7 +3657,7 @@ function verCV(vacanteId, idx) {
   modal.innerHTML = `
     <div class="modal" style="max-width:640px;max-height:85vh;overflow-y:auto">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:18px">CV — ${escHtml(c.nombre||'Candidato')}</div>
+        <div style="font-family:var(--f-tit);font-weight:700;font-size:18px">CV — ${escHtml(c.nombre||'Candidato')}</div>
         <button class="btn-sm-outline" onclick="this.closest('.modal-bg').remove()">✕</button>
       </div>
       <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:14px">📧 ${escHtml(c.email||'')} ${c.telefono ? '· 📱 ' + escHtml(c.telefono) : ''}</div>
@@ -3682,7 +3873,7 @@ function revisarVacante(id) {
   modal.innerHTML = `
     <div class="modal" style="max-width:620px;max-height:88vh;overflow-y:auto">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:18px">🔍 Revisar vacante</div>
+        <div style="font-family:var(--f-tit);font-weight:700;font-size:18px">🔍 Revisar vacante</div>
         <button class="btn-sm-outline" onclick="this.closest('.modal-bg').remove()">✕</button>
       </div>
 
@@ -3691,7 +3882,7 @@ function revisarVacante(id) {
         ${alertas.map(a => '<div style="font-size:12px;color:var(--texto-secundario)">• ' + escHtml(a) + '</div>').join('')}
       </div>` : '<div style="background:rgba(var(--verde-rgb),.08);border:1px solid rgba(var(--verde-rgb),.3);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--verde)">✓ Sin señales de alerta automáticas detectadas</div>'}
 
-      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px">${escHtml(v.cargo)}</div>
+      <div style="font-family:var(--f-tit);font-weight:700;font-size:16px">${escHtml(v.cargo)}</div>
       <div style="font-size:13px;color:var(--texto-secundario);margin-bottom:12px">${escHtml(v.empresa)} · ${escHtml(v.ciudad)} · ${escHtml(v.modalidad)} · ${escHtml(v.salario)}</div>
 
       <div style="font-size:12px;font-weight:700;margin-bottom:4px">📝 Descripción completa:</div>
@@ -3926,8 +4117,8 @@ function formatearMarkdown(texto) {
     .replace(/</g, '&lt;').replace(/>/g, '&gt;');
   // Encabezados ## y ###
   html = html.replace(/^###\s+(.+)$/gm, '<div style="font-weight:700;font-size:14px;margin:14px 0 6px;color:var(--verde)">$1</div>');
-  html = html.replace(/^##\s+(.+)$/gm, '<div style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:16px;margin:18px 0 8px;color:var(--texto-primario)">$1</div>');
-  html = html.replace(/^#\s+(.+)$/gm, '<div style="font-family:\'Syne\',sans-serif;font-weight:700;font-size:18px;margin:10px 0 12px;color:var(--texto-primario)">$1</div>');
+  html = html.replace(/^##\s+(.+)$/gm, '<div style="font-family:var(--f-tit);font-weight:700;font-size:16px;margin:18px 0 8px;color:var(--texto-primario)">$1</div>');
+  html = html.replace(/^#\s+(.+)$/gm, '<div style="font-family:var(--f-tit);font-weight:700;font-size:18px;margin:10px 0 12px;color:var(--texto-primario)">$1</div>');
   // Negrita **texto**
   html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   // Viñetas que empiezan con - o ◆ o •
@@ -4458,25 +4649,7 @@ async function iniciarSesion() {
   correosCount = (currentUser.stats.fecha === fechaEcuador()) ? (currentUser.stats.correos || 0) : 0;
   sincronizarStatsBackend();
   // Cargar correos enviados del usuario DESDE LA NUBE (Supabase)
-  if (currentUser && currentUser.email) {
-    try {
-      const correosRes = await apiCall('/api/auth/mis-correos');
-      if (correosRes && correosRes.correos) {
-        correosEnviados = correosRes.correos.map(c => ({
-          to: c.destinatario_email,
-          subject: c.cargo || c.empresa || '',
-          empresa: c.empresa,
-          fecha: c.enviado_en,
-          estado: 'Enviado'
-        }));
-        console.log('✓ Correos enviados cargados desde nube:', correosEnviados.length);
-      }
-    } catch(err) {
-      // Fallback a localStorage si falla la nube
-      const correosKey = 'correos_enviados_' + currentUser.email;
-      correosEnviados = JSON.parse(localStorage.getItem(correosKey) || '[]');
-    }
-  }
+  await cargarPostulacionesNube();
 
   // Mapear cvData desde el backend (que usa snake_case) a formato frontend (camelCase)
   if (user.cvData) {
@@ -4583,7 +4756,7 @@ async function cargarBolsa() {
         cont.innerHTML = `
           <div style="text-align:center;padding:60px 20px">
             <div style="font-size:48px;margin-bottom:14px">✅</div>
-            <h3 style="font-family:'Syne',sans-serif;font-size:19px;margin-bottom:8px">Ya postulaste a todas estas vacantes</h3>
+            <h3 style="font-family:var(--f-tit);font-size:19px;margin-bottom:8px">Ya postulaste a todas estas vacantes</h3>
             <p style="color:var(--texto-secundario);font-size:13px;max-width:420px;margin:0 auto">¡Buen trabajo! Vuelve pronto — las empresas publican nuevas vacantes constantemente.</p>
           </div>`;
         return;
@@ -4591,7 +4764,7 @@ async function cargarBolsa() {
       cont.innerHTML = `
         <div style="text-align:center;padding:60px 20px">
           <div style="font-size:48px;margin-bottom:14px">📭</div>
-          <h3 style="font-family:'Syne',sans-serif;font-size:19px;margin-bottom:8px">Aún no hay vacantes${q || (ciudad && ciudad!=='Todas') ? ' con estos filtros' : ''}</h3>
+          <h3 style="font-family:var(--f-tit);font-size:19px;margin-bottom:8px">Aún no hay vacantes${q || (ciudad && ciudad!=='Todas') ? ' con estos filtros' : ''}</h3>
           <p style="color:var(--texto-secundario);font-size:13px;max-width:420px;margin:0 auto 18px">Las empresas están empezando a publicar. Vuelve pronto o ${currentUser && currentUser.tipo==='candidato' ? 'usa la búsqueda inteligente en tu panel para buscar en toda la web.' : 'crea tu cuenta para recibir avisos.'}</p>
           ${q || (ciudad && ciudad!=='Todas') || modalidad ? '<button class="btn-sm-outline" onclick="limpiarFiltrosBolsa()">Ver todos los empleos</button>' : ''}
         </div>`;
@@ -4775,8 +4948,8 @@ function verPlanes() {
 
 // ======= TABS =======
 function candTab(tab) {
-  ['cv','busqueda','resultados','frio'].forEach(t => {
-    document.getElementById('cand-tab-'+t).style.display = t===tab?'block':'none';
+  ['cv','busqueda','resultados','frio','postulaciones'].forEach(t => {
+    const el = document.getElementById('cand-tab-'+t); if (el) el.style.display = t===tab?'block':'none';
   });
   // Al entrar al tab CV: vigilar cambios y reflejar si ya está analizado
   if (tab === 'cv') {
@@ -4796,8 +4969,9 @@ function candTab(tab) {
   }
   // Restaurar última búsqueda guardada si entra a Resultados y está vacío
   if (tab === 'resultados') restaurarResultados();
+  if (tab === 'postulaciones') { mpFiltro = 'todas'; renderPostulaciones(); cargarPostulacionesNube().then(renderPostulaciones); }
   document.querySelectorAll('#page-candidato .tab-btn').forEach((b,i) => {
-    b.classList.toggle('active', ['cv','busqueda','resultados','frio'][i]===tab);
+    b.classList.toggle('active', ['cv','busqueda','resultados','frio','postulaciones'][i]===tab);
   });
 
   // Autocompletar búsqueda con CV cuando entra a tab búsqueda o frío
@@ -4947,7 +5121,7 @@ async function cargarMetricas() {
     ];
     resumen.innerHTML = cards.map(c => `
       <div style="background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:12px;padding:16px;text-align:center">
-        <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:${c.c}">${c.n}</div>
+        <div style="font-family:var(--f-tit);font-size:26px;font-weight:800;color:${c.c}">${c.n}</div>
         <div style="font-size:11px;color:var(--texto-secundario);margin-top:4px">${c.l}</div>
       </div>`).join('');
 
@@ -4957,7 +5131,7 @@ async function cargarMetricas() {
       return;
     }
     detalle.innerHTML = `
-      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:10px">Rendimiento por vacante</div>
+      <div style="font-family:var(--f-tit);font-size:14px;font-weight:700;margin-bottom:10px">Rendimiento por vacante</div>
       ${det.map(d => `
         <div style="background:var(--negro);border:1px solid var(--gris-borde);border-radius:8px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
           <div style="font-weight:600;font-size:13px">${escHtml(d.cargo)}</div>
@@ -5660,7 +5834,7 @@ async function buscarEmpleo() {
         <div style="width:110px;height:110px;border:4px solid rgba(var(--verde-rgb),0.1);border-top-color:var(--verde);border-radius:50%;animation:spin 1.5s linear infinite"></div>
         <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px">👨‍💼</div>
       </div>
-      <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:700;color:var(--verde);margin-bottom:14px">TalentoEC está trabajando</div>
+      <div style="font-family:var(--f-tit);font-size:28px;font-weight:700;color:var(--verde);margin-bottom:14px">TalentoEC está trabajando</div>
       <div style="font-size:14px;color:var(--texto-secundario);margin-bottom:24px;max-width:380px">Encontrando las mejores oportunidades laborales para ti</div>
       <div style="font-size:12px;color:var(--texto-secundario);font-style:italic;opacity:0.7">Por favor espera unos segundos...</div>
     </div>
@@ -5766,7 +5940,7 @@ async function buscarEmpleo() {
     document.getElementById('candResultados').innerHTML = `
       <div style="text-align:center;padding:60px 20px">
         <div style="font-size:48px;margin-bottom:14px">⏳</div>
-        <h3 style="font-family:'Syne',sans-serif;font-size:20px;margin-bottom:10px">Límite diario alcanzado</h3>
+        <h3 style="font-family:var(--f-tit);font-size:20px;margin-bottom:10px">Límite diario alcanzado</h3>
         <p style="color:var(--texto-secundario);font-size:13px;max-width:400px;margin:0 auto 18px">${escHtml(eb.message)}</p>
         <button class="btn-sm-outline" onclick="showPage('landing');setTimeout(()=>document.querySelector('.plan-card')?.scrollIntoView({behavior:'smooth'}),300)">Ver planes</button>
       </div>`;
@@ -5779,7 +5953,7 @@ async function buscarEmpleo() {
   document.getElementById('candResultados').innerHTML = `
     <div style="text-align:center;padding:50px 20px">
       <div style="font-size:44px;margin-bottom:12px">🔎</div>
-      <h3 style="font-family:'Syne',sans-serif;font-size:19px;margin-bottom:8px">No encontramos ofertas verificables para <span style="color:var(--verde)">${escHtml(query)}</span></h3>
+      <h3 style="font-family:var(--f-tit);font-size:19px;margin-bottom:8px">No encontramos ofertas verificables para <span style="color:var(--verde)">${escHtml(query)}</span></h3>
       <p style="color:var(--texto-secundario);font-size:13px;max-width:440px;margin:0 auto 18px">Solo te mostramos ofertas reales con una forma de postular desde TalentoEC. Prueba con un término más general${sugerencia && sugerencia !== String(query).toLowerCase() ? ' (por ejemplo, <b>' + escHtml(sugerencia) + '</b>)' : ''} o con otra ciudad.</p>
       <button class="btn-sm-green" onclick="candTab('busqueda')">🔍 Ajustar búsqueda</button>
       <p style="color:var(--texto-secundario);font-size:11px;margin-top:10px">Cada búsqueda nueva usa 1 de tus búsquedas diarias</p>
@@ -5858,7 +6032,7 @@ function renderJobCards(jobs) {
 
   const el = document.getElementById('candResultados');
   if (jobs.length === 0 && filtrados > 0) {
-    el.innerHTML = '<div style="text-align:center;padding:40px 20px"><div style="font-size:48px;margin-bottom:14px">✅</div><h3 style="font-family:\'Syne\',sans-serif;font-size:20px;margin-bottom:10px">Ya postulaste a todos estos empleos</h3><p style="color:var(--texto-secundario);font-size:13px">Realiza una nueva búsqueda para ver más oportunidades.</p></div>';
+    el.innerHTML = '<div style="text-align:center;padding:40px 20px"><div style="font-size:48px;margin-bottom:14px">✅</div><h3 style="font-family:var(--f-tit);font-size:20px;margin-bottom:10px">Ya postulaste a todos estos empleos</h3><p style="color:var(--texto-secundario);font-size:13px">Realiza una nueva búsqueda para ver más oportunidades.</p></div>';
     return;
   }
 
@@ -5874,12 +6048,12 @@ function renderJobCards(jobs) {
     ${filtrados > 0 ? '<div style="background:rgba(var(--verde-rgb),0.06);border:1px solid rgba(var(--verde-rgb),0.2);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--verde)">✓ Se ocultaron ' + filtrados + ' empleo(s) a los que ya postulaste</div>' : ''}
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
       <div style="font-size:12px;color:var(--texto-secundario)">${jobs.length} oportunidades encontradas en Ecuador</div>
-      <button onclick="candTab('busqueda')" style="background:var(--verde);color:var(--negro);border:none;padding:8px 16px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer">🔍 Nueva búsqueda</button>
+      <button onclick="candTab('busqueda')" style="background:var(--verde);color:var(--negro);border:none;padding:8px 16px;border-radius:8px;font-family:var(--f-tit);font-weight:700;font-size:12px;cursor:pointer">🔍 Nueva búsqueda</button>
     </div>
     ${(conCorreo + porBuscar) > 0 ? `
     <div class="auto-bar">
       <div>
-        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px">🤖 Postulación automática</div>
+        <div style="font-family:var(--f-tit);font-weight:700;font-size:14px">🤖 Postulación automática</div>
         <div style="font-size:12px;color:var(--texto-secundario);margin-top:2px">Postula a todas de una vez: TalentoEC consigue el correo de cada empresa y le envía tu CV con tu carta.</div>
       </div>
       <button class="btn-sm-green" onclick="abrirAutoPostulacion()">⚡ Postular a todas →</button>
@@ -6203,7 +6377,7 @@ function buscarOfertaReal(cargo, empresa, ciudad, portales) {
   modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
   modal.innerHTML = `
     <div style="background:var(--negro);border:1px solid var(--gris-borde);border-radius:14px;padding:24px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
-      <h3 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--verde);margin-bottom:6px">Buscar esta oferta</h3>
+      <h3 style="font-family:var(--f-tit);font-size:18px;font-weight:700;color:var(--verde);margin-bottom:6px">Buscar esta oferta</h3>
       <p style="font-size:13px;color:var(--texto-secundario);margin-bottom:16px">${cargo} en ${empresa}</p>
       <p style="font-size:12px;color:var(--texto-secundario);margin-bottom:14px">Búscalo en los portales más confiables:</p>
       <div style="display:flex;flex-direction:column;gap:10px">
@@ -6225,7 +6399,7 @@ async function buscarCandidatos() {
   document.getElementById('empResults').innerHTML = `
     <div style="text-align:center;padding:60px 20px">
       <div style="font-size:52px;margin-bottom:16px">📢</div>
-      <h3 style="font-family:'Syne',sans-serif;font-size:20px;margin-bottom:10px">Los mejores candidatos llegan a ti</h3>
+      <h3 style="font-family:var(--f-tit);font-size:20px;margin-bottom:10px">Los mejores candidatos llegan a ti</h3>
       <p style="color:var(--texto-secundario);font-size:13.5px;max-width:440px;margin:0 auto 8px;line-height:1.7">
         En vez de buscar perfiles uno por uno, <strong style="color:var(--verde)">publica tu vacante gratis</strong>:
         aparecerá destacada ante todos los candidatos que buscan empleo en TalentoEC y recibirás
@@ -6603,7 +6777,7 @@ function abrirAutoPostulacion() {
   m.innerHTML = `
     <div class="email-modal-inner" style="position:relative;max-height:90vh;overflow-y:auto">
       <button type="button" onclick="cerrarAutoPostulacion()" aria-label="Cerrar" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--texto-secundario);font-size:22px;cursor:pointer;line-height:1;padding:4px">✕</button>
-      <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:4px">🤖 Postulación automática</h2>
+      <h2 style="font-family:var(--f-tit);font-size:18px;font-weight:700;margin-bottom:4px">🤖 Postulación automática</h2>
       <p style="font-size:12px;color:var(--texto-secundario);margin-bottom:14px">TalentoEC envía tu CV en PDF y una carta personalizada a cada empresa. Las respuestas llegan a tu correo.</p>
       <div id="autoLista" style="margin-bottom:12px">${lista.map(function (j, k) {
         return `<label class="auto-item"><input type="checkbox" data-k="${k}" checked>
@@ -6685,7 +6859,7 @@ async function ejecutarAutoPostulacion() {
 
   _autoEnCurso = false;
   try { localStorage.setItem('ultimo_correo_ts', String(Date.now())); } catch (e) {}
-  prog.innerHTML = `<div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:6px">${enviados > 0 ? '✅' : 'ℹ️'} Postulación automática terminada</div>
+  prog.innerHTML = `<div style="font-family:var(--f-tit);font-weight:700;font-size:15px;margin-bottom:6px">${enviados > 0 ? '✅' : 'ℹ️'} Postulación automática terminada</div>
     <div>📨 <b>${enviados}</b> postulación(es) enviadas</div>
     ${sinContacto ? `<div>🚫 ${sinContacto} empresa(s) no publican correo de contacto</div>` : ''}
     ${porRevisar ? `<div>⚠ ${porRevisar} correo(s) sin confirmar: revísalos y envíalos a mano desde la oferta</div>` : ''}
@@ -7096,7 +7270,7 @@ function exportarUsuarios() {
 
   modal.innerHTML = `
     <div style="background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:16px;padding:28px;max-width:440px;width:100%">
-      <h3 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin:0 0 16px">📥 Exportar usuarios</h3>
+      <h3 style="font-family:var(--f-tit);font-size:20px;font-weight:700;margin:0 0 16px">📥 Exportar usuarios</h3>
       <p style="color:var(--texto-secundario);font-size:13px;margin-bottom:18px">Elige qué exportar y el formato</p>
 
       <div class="field">
@@ -7274,7 +7448,7 @@ function mostrarLimiteAlcanzado(maxDiario) {
   modal.innerHTML = `
     <div style="background:var(--gris-oscuro);border:1px solid var(--rojo);border-radius:16px;padding:32px;max-width:420px;text-align:center">
       <div style="width:64px;height:64px;background:rgba(255,77,109,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:32px">⏰</div>
-      <h3 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin:0 0 10px;color:var(--texto-primario)">Límite diario alcanzado</h3>
+      <h3 style="font-family:var(--f-tit);font-size:20px;font-weight:700;margin:0 0 10px;color:var(--texto-primario)">Límite diario alcanzado</h3>
       <p style="color:var(--texto-secundario);font-size:14px;line-height:1.6;margin:0 0 20px">
         Ya usaste tus <strong style="color:var(--verde)">${maxDiario} búsquedas</strong> de hoy con tu plan actual.
         Vuelve mañana o mejora tu plan para más búsquedas diarias.
@@ -7351,7 +7525,7 @@ async function ejecutarCorreosFrio() {
     document.getElementById('frioResultados').innerHTML = `
       <div style="text-align:center;padding:50px 20px">
         <div style="font-size:44px;margin-bottom:12px">${esLimite ? '⏳' : '⚠️'}</div>
-        <h3 style="font-family:'Syne',sans-serif;font-size:18px;margin-bottom:8px">${esLimite ? 'Límite diario alcanzado' : 'No pudimos completar la búsqueda'}</h3>
+        <h3 style="font-family:var(--f-tit);font-size:18px;margin-bottom:8px">${esLimite ? 'Límite diario alcanzado' : 'No pudimos completar la búsqueda'}</h3>
         <p style="color:var(--texto-secundario);font-size:13px;max-width:380px;margin:0 auto 16px">${escHtml(e ? e.message : 'Error inesperado')}</p>
         ${esLimite ? '' : '<button class="btn-sm-green" onclick="ejecutarCorreosFrio()">🔄 Reintentar</button>'}
       </div>`;
@@ -7442,6 +7616,128 @@ function renderCorreos() {
         <div style="text-align:right"><span style="color:var(--verde);font-size:11px">✓ ${c.estado}</span><div style="font-size:10px;color:var(--texto-secundario);margin-top:2px">${c.fecha}</div></div>
       </div>
     </div>`).join('');
+}
+
+
+// ═══════════ MIS POSTULACIONES ═══════════
+// Lista de todo lo enviado (nube + este navegador). El estado lo pone la persona
+// (nadie puede saber solo si la empresa respondió); se guarda en la nube si se puede
+// y siempre en este navegador como respaldo.
+let mpFiltro = 'todas';
+const MP_ESTADOS = [
+  ['enviado', 'Enviado · esperando'],
+  ['respondieron', 'Me respondieron'],
+  ['entrevista', 'Entrevista'],
+  ['contratado', '¡Me contrataron!'],
+  ['descartado', 'No seleccionado']
+];
+function mpNorm(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9ñ]/g, ''); }
+function mpClave(c) { return c.id ? 'id:' + c.id : mpNorm(c.empresa) + '|' + mpNorm(c.cargo || c.subject) + '|' + String(c.to || '').toLowerCase(); }
+// Lee fechas ISO (nube) y "d/m/aaaa, hh:mm:ss" (guardadas antes en el navegador)
+function mpFecha(f) {
+  if (!f) return null;
+  if (f instanceof Date) return isNaN(f) ? null : f;
+  const t = String(f).trim();
+  let m = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[ ,]+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+  if (m) { const d = new Date(+m[3], +m[2] - 1, +m[1], +(m[4] || 0), +(m[5] || 0), +(m[6] || 0)); return isNaN(d) ? null : d; }
+  const d = new Date(t);
+  return isNaN(d) ? null : d;
+}
+function mpEstadosLocales() {
+  try { return JSON.parse(localStorage.getItem('mp_estados_' + ((currentUser && currentUser.email) || 'guest')) || '{}') || {}; } catch (e) { return {}; }
+}
+function mpGuardarEstadoLocal(clave, estado) {
+  const m = mpEstadosLocales(); m[clave] = estado;
+  try { localStorage.setItem('mp_estados_' + ((currentUser && currentUser.email) || 'guest'), JSON.stringify(m)); } catch (e) {}
+}
+function mpEstadoDe(c) {
+  const loc = mpEstadosLocales()[mpClave(c)];
+  const e = loc || c.estadoNube || 'enviado';
+  return MP_ESTADOS.some(x => x[0] === e) ? e : 'enviado';
+}
+function mpLista() {
+  const vistos = new Set(); const out = [];
+  (correosEnviados || []).forEach(function (c) {
+    if (!c || !(c.empresa || c.to || c.cargo || c.subject)) return;
+    const k = mpNorm(c.empresa) + '|' + mpNorm(c.cargo || c.subject) + '|' + String(c.to || '').toLowerCase();
+    if (vistos.has(k)) return; vistos.add(k);
+    out.push(c);
+  });
+  return out.sort(function (a, b) { return ((mpFecha(b.fecha) || 0) - (mpFecha(a.fecha) || 0)); });
+}
+function mpTiempo(d) {
+  if (!d) return '';
+  const dias = Math.floor((Date.now() - d.getTime()) / 86400000);
+  if (dias <= 0) return 'hoy';
+  if (dias === 1) return 'ayer';
+  if (dias < 30) return 'hace ' + dias + ' días';
+  return d.toLocaleDateString('es-EC', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+function mpSeguimiento(c) {
+  const nombre = (currentUser && currentUser.nombre) || '';
+  const cargo = c.cargo || c.subject || 'el puesto';
+  const asunto = 'Seguimiento de mi postulación — ' + cargo;
+  const cuerpo = 'Estimado equipo de ' + (c.empresa || 'Recursos Humanos') + ':\n\nHace unos días les envié mi CV para ' + cargo +
+    '. Quería saber si mi postulación sigue en proceso y reiterar mi interés en el puesto.\n\nQuedo atento(a) a su respuesta.\n\nSaludos cordiales,\n' + nombre;
+  return 'mailto:' + encodeURIComponent(c.to) + '?subject=' + encodeURIComponent(asunto) + '&body=' + encodeURIComponent(cuerpo);
+}
+function mpCambiarFiltro(f) { mpFiltro = f; renderPostulaciones(); }
+async function mpCambiarEstado(sel, idx) {
+  const c = (window.__mpVista || [])[idx]; if (!c) return;
+  const estado = sel.value;
+  sel.className = 'mp-estado mp-e-' + estado;
+  mpGuardarEstadoLocal(mpClave(c), estado);
+  c.estadoNube = estado;
+  if (c.id) {
+    try { await apiCall('/api/auth/postulacion-estado', { method: 'POST', body: JSON.stringify({ id: c.id, estado: estado }) }); } catch (e) {}
+  }
+  if (estado === 'contratado') showToast('🎉 ¡Felicitaciones! Mucho éxito en tu nuevo trabajo');
+  else showToast('✓ Estado actualizado');
+  renderPostulaciones();
+}
+function renderPostulaciones() {
+  const lista = mpLista();
+  const cuenta = { todas: lista.length, esperando: 0, respuesta: 0, entrevista: 0 };
+  lista.forEach(function (c) {
+    const e = mpEstadoDe(c);
+    if (e === 'enviado') cuenta.esperando++;
+    else if (e === 'respondieron') cuenta.respuesta++;
+    else if (e === 'entrevista' || e === 'contratado') cuenta.entrevista++;
+  });
+  const res = document.getElementById('mpResumen');
+  if (res) {
+    const k = [['todas', 'Enviadas'], ['esperando', 'Esperando respuesta'], ['respuesta', 'Respondieron'], ['entrevista', 'Entrevistas']];
+    res.innerHTML = k.map(function (x) {
+      return '<button type="button" class="mp-kpi' + (mpFiltro === x[0] ? ' on' : '') + '" onclick="mpCambiarFiltro(\'' + x[0] + '\')" aria-pressed="' + (mpFiltro === x[0]) + '"><b>' + cuenta[x[0]] + '</b><span>' + x[1] + '</span></button>';
+    }).join('');
+  }
+  const q = mpNorm((document.getElementById('mpBuscar') || {}).value || '');
+  const vista = lista.filter(function (c) {
+    const e = mpEstadoDe(c);
+    if (mpFiltro === 'esperando' && e !== 'enviado') return false;
+    if (mpFiltro === 'respuesta' && e !== 'respondieron') return false;
+    if (mpFiltro === 'entrevista' && e !== 'entrevista' && e !== 'contratado') return false;
+    if (q && mpNorm((c.empresa || '') + ' ' + (c.cargo || c.subject || '') + ' ' + (c.to || '')).indexOf(q) < 0) return false;
+    return true;
+  });
+  window.__mpVista = vista;
+  const el = document.getElementById('mpLista'); if (!el) return;
+  if (!lista.length) {
+    el.innerHTML = '<div class="mp-vacio"><div style="font-size:34px">📭</div><b>Todavía no has enviado postulaciones</b>Busca empleos y postula: cada envío aparecerá aquí.<div style="margin-top:16px"><button class="btn-sm-green" onclick="candTab(\'busqueda\')">🔍 Buscar empleos</button></div></div>';
+    return;
+  }
+  if (!vista.length) { el.innerHTML = '<div class="mp-vacio">No hay postulaciones con este filtro.</div>'; return; }
+  el.innerHTML = vista.map(function (c, i) {
+    const e = mpEstadoDe(c);
+    const d = mpFecha(c.fecha);
+    const dias = d ? Math.floor((Date.now() - d.getTime()) / 86400000) : 0;
+    const seg = (e === 'enviado' && c.to && dias >= 7) ? '<a class="mp-seg" href="' + escHtml(mpSeguimiento(c)) + '">✉ Hacer seguimiento</a>' : '';
+    const opts = MP_ESTADOS.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === e ? ' selected' : '') + '>' + x[1] + '</option>'; }).join('');
+    return '<div class="mp-item"><div style="min-width:0"><div class="mp-emp">' + escHtml(c.empresa || c.to || 'Empresa') + '</div>' +
+      '<div class="mp-cargo">' + escHtml(c.cargo || c.subject || '') + '</div>' +
+      '<div class="mp-meta">' + (d ? 'Enviado ' + mpTiempo(d) : '') + (c.to ? ' · ' + escHtml(c.to) : (c.estado ? ' · ' + escHtml(c.estado) : '')) + '</div></div>' +
+      '<div class="mp-der"><select class="mp-estado mp-e-' + e + '" onchange="mpCambiarEstado(this,' + i + ')" aria-label="Estado de la postulación a ' + escHtml(c.empresa || '') + '">' + opts + '</select>' + seg + '</div></div>';
+  }).join('');
 }
 
 // ======= PAYPHONE (Cajita de Pago real) =======
@@ -7593,15 +7889,15 @@ function mostrarPlanesRegistro() {
     <div style="background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:18px;max-width:520px;width:100%;padding:28px 22px;margin:auto">
       <div style="text-align:center;margin-bottom:8px">
         <div style="font-size:13px;color:var(--verde);font-weight:700;letter-spacing:1px">ÚLTIMO PASO</div>
-        <h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin:8px 0 6px">Elige tu plan para empezar</h2>
+        <h2 style="font-family:var(--f-tit);font-size:22px;font-weight:800;margin:8px 0 6px">Elige tu plan para empezar</h2>
         <p style="color:var(--texto-secundario);font-size:13px;margin:0 0 18px;line-height:1.5">Para activar tu cuenta y empezar a buscar empleo, elige el plan que más te convenga. Puedes cambiarlo después desde tu panel.</p>
       </div>
 
       <div style="display:flex;flex-direction:column;gap:12px">
         <div style="border:1px solid var(--gris-borde);border-radius:12px;padding:16px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700">Básico</div>
-            <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--verde)">$9.99<span style="font-size:11px;color:var(--texto-secundario)">/mes</span></div>
+            <div style="font-family:var(--f-tit);font-size:17px;font-weight:700">Básico</div>
+            <div style="font-family:var(--f-tit);font-size:20px;font-weight:800;color:var(--verde)">$9.99<span style="font-size:11px;color:var(--texto-secundario)">/mes</span></div>
           </div>
           <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:12px">3 búsquedas/día · 12 postulaciones/día</div>
           <button onclick="elegirPlanRegistro('Básico','9.99')" class="btn-full">Elegir Básico</button>
@@ -7610,8 +7906,8 @@ function mostrarPlanesRegistro() {
         <div style="border:2px solid var(--verde);border-radius:12px;padding:16px;position:relative">
           <div style="position:absolute;top:-10px;left:16px;background:var(--verde);color:var(--negro);font-size:10px;font-weight:700;padding:2px 10px;border-radius:20px">MÁS POPULAR</div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700">Estándar</div>
-            <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--verde)">$19.99<span style="font-size:11px;color:var(--texto-secundario)">/mes</span></div>
+            <div style="font-family:var(--f-tit);font-size:17px;font-weight:700">Estándar</div>
+            <div style="font-family:var(--f-tit);font-size:20px;font-weight:800;color:var(--verde)">$19.99<span style="font-size:11px;color:var(--texto-secundario)">/mes</span></div>
           </div>
           <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:12px">6 búsquedas/día · 35 postulaciones/día</div>
           <button onclick="elegirPlanRegistro('Estándar','19.99')" class="btn-full">Elegir Estándar</button>
@@ -7619,8 +7915,8 @@ function mostrarPlanesRegistro() {
 
         <div style="border:1px solid var(--gris-borde);border-radius:12px;padding:16px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700">Pro</div>
-            <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--verde)">$29.99<span style="font-size:11px;color:var(--texto-secundario)">/mes</span></div>
+            <div style="font-family:var(--f-tit);font-size:17px;font-weight:700">Pro</div>
+            <div style="font-family:var(--f-tit);font-size:20px;font-weight:800;color:var(--verde)">$29.99<span style="font-size:11px;color:var(--texto-secundario)">/mes</span></div>
           </div>
           <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:12px">10 búsquedas/día · 55 postulaciones/día · 10 correos en frío</div>
           <button onclick="elegirPlanRegistro('Pro','29.99')" class="btn-full">Elegir Pro</button>
@@ -8571,6 +8867,19 @@ function cerrarBannerInstalar() {
 })();
 </script>
 <!-- Selector de tema -->
+<script>
+// Botones flotantes (temas + WhatsApp): en pantallas táctiles se esconden al bajar y vuelven al subir
+(function () {
+  var ultimo = window.scrollY || 0, mq = window.matchMedia('(max-width:960px),(pointer:coarse)');
+  window.addEventListener('scroll', function () {
+    var y = window.scrollY || 0;
+    if (!mq.matches) { document.body.classList.remove('flot-oculto'); ultimo = y; return; }
+    if (y > ultimo + 6 && y > 80) document.body.classList.add('flot-oculto');
+    else if (y < ultimo - 6 || y <= 80) document.body.classList.remove('flot-oculto');
+    ultimo = y;
+  }, { passive: true });
+})();
+</script>
 <div class="tema-sel" role="group" aria-label="Tema de la página">
   <span class="tema-sel-lbl">Tema</span>
   <button class="tema-btn" data-tema-btn="verde" onclick="cambiarTema('verde')" title="Tema Verde" aria-label="Tema Verde" aria-pressed="true"><i style="background:linear-gradient(135deg,#1BD07F,#0A2B1F)"></i><span>Verde</span></button>
