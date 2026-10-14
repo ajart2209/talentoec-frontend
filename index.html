@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-EC">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,11 +8,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TalentoEC">
-<meta name="description" content="TalentoEC by Proyectart. Encuentra trabajo en Ecuador con inteligencia artificial. Sube tu CV y nosotros buscamos por ti en LinkedIn, Computrabajo, Multitrabajos y más.">
+<meta name="description" content="Encuentra trabajo en Ecuador con TalentoEC: sube tu CV, buscamos ofertas reales con correo verificable y enviamos tu postulación con tu carta. Empresas publican vacantes gratis.">
+<link rel="canonical" href="https://talentoec.com/">
 <!-- Open Graph: cómo se ve el link al compartirlo en WhatsApp, Facebook, Instagram, etc. -->
 <meta property="og:title" content="TalentoEC — Encuentra trabajo en Ecuador con IA">
-<meta property="og:description" content="Sube tu CV y nosotros buscamos empleo por ti en LinkedIn, Computrabajo, Multitrabajos y más. Postulaciones automáticas con carta personalizada.">
-<meta property="og:url" content="https://talentoec.com">
+<meta property="og:description" content="Sube tu CV: buscamos ofertas reales en Ecuador y enviamos tu postulación con tu carta. Empresas publican gratis.">
+<meta property="og:url" content="https://talentoec.com/">
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://talentoec.com/talentoec-og.jpg">
 <meta property="og:image:width" content="1200">
@@ -22,11 +23,16 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://talentoec.com/talentoec-og.jpg">
 <meta name="twitter:title" content="TalentoEC — Encuentra trabajo en Ecuador con IA">
-<meta name="twitter:description" content="Sube tu CV y nosotros buscamos empleo por ti en los principales portales del Ecuador.">
+<meta name="twitter:description" content="Sube tu CV: buscamos ofertas reales en Ecuador y enviamos tu postulación con tu carta.">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%2300C48C'/%3E%3Ctext x='90' y='115' font-family='Arial,sans-serif' font-size='90' font-weight='bold' fill='%230A0F0D' text-anchor='middle'%3ETE%3C/text%3E%3C/svg%3E">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TalentoEC — Conectando Ecuador</title>
+<title>TalentoEC — Empleo en Ecuador: sube tu CV y postulamos por ti</title>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+ {"@type":"Organization","@id":"https://talentoec.com/#org","name":"TalentoEC","url":"https://talentoec.com/","logo":"https://talentoec.com/talentoec-og.jpg","email":"hola@talentoec.com","parentOrganization":{"@type":"Organization","name":"Proyectart"},"areaServed":"EC"},
+ {"@type":"WebSite","@id":"https://talentoec.com/#web","url":"https://talentoec.com/","name":"TalentoEC","inLanguage":"es-EC","publisher":{"@id":"https://talentoec.com/#org"}}
+]}
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Anton&family=Permanent+Marker&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&family=Archivo:wdth,wght@100..125,400..700&display=swap" rel="stylesheet">
 <script>
 (function(){try{var t=localStorage.getItem('tec-tema');if(t==='burger'||t==='motorex')document.documentElement.setAttribute('data-tema',t);}catch(e){}})();
@@ -271,7 +277,7 @@ h1.hero-title span{color:var(--verde)}
 
 /* MISC */
 .empty-state{text-align:center;padding:60px 24px;color:var(--texto-secundario)}
-.empty-state div:first-child{font-size:36px;margin-bottom:14px}
+.empty-state > div:first-child{font-size:36px;margin-bottom:14px}
 .empty-state p{font-size:14px}
 .badge-free{background:var(--gris-medio);border:1px solid var(--gris-borde);color:var(--texto-secundario);font-size:10px;padding:3px 9px;border-radius:20px}
 .badge-pro{background:rgba(var(--verde-rgb),.12);border:1px solid rgba(var(--verde-rgb),.25);color:var(--verde);font-size:10px;padding:3px 9px;border-radius:20px}
@@ -1184,7 +1190,7 @@ nav{background:rgba(var(--t-fondo),.86);border-bottom-color:rgba(var(--t-claro),
 .tipo-card:hover,.tipo-card.selected{border-color:rgb(var(--t-acento));background:rgba(var(--t-acento),.08)}
 .profile-menu{border-radius:18px;background:var(--t-tarjeta);border-color:rgba(var(--t-claro),.1);box-shadow:0 20px 50px -10px rgba(0,0,0,.6)}
 .profile-menu-item{border-radius:12px}
-.toast{border-radius:999px;font-family:var(--f-ui);background:rgb(var(--t-acento));color:rgb(var(--t-fondo));bottom:150px;right:24px;max-width:calc(100vw - 48px)}
+.toast{border-radius:999px;font-family:var(--f-ui);background:rgb(var(--t-acento));color:rgb(var(--t-fondo));bottom:28px;right:96px;max-width:min(520px,calc(100vw - 140px))}
 .toast.error{background:var(--rojo);color:#fff}
 .user-avatar{background:rgb(var(--t-acento));color:rgb(var(--t-fondo))}
 
@@ -1192,6 +1198,18 @@ nav{background:rgba(var(--t-fondo),.86);border-bottom-color:rgba(var(--t-claro),
 .job-card-top{gap:12px}
 .empty-state .job-card,.empty-state .section-box{text-align:left}
 .pp-header{padding:28px 52px}
+.aviso-plan{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:0 0 18px;padding:16px 18px;border-radius:18px;
+  background:rgba(245,190,40,.1);border:1px solid rgba(245,190,40,.35);color:rgb(var(--t-claro))}
+.aviso-plan b{display:block;font-family:var(--f-tit);font-size:15px;margin-bottom:3px}
+.aviso-plan span{font-size:13px;color:rgba(var(--t-claro),.7);line-height:1.5}
+.aviso-plan>div{flex:1 1 260px;min-width:0}
+.aviso-plan-urgente{background:rgba(255,120,60,.12);border-color:rgba(255,120,60,.45)}
+.aviso-plan-vencido{background:rgba(255,77,109,.1);border-color:rgba(255,77,109,.45)}
+.directo-badge{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.05em;color:rgb(var(--t-fondo));background:rgb(var(--t-acento));padding:4px 10px;border-radius:999px;margin-bottom:10px}
+.filtro-directo{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.job-fecha{font-size:11.5px;color:rgba(var(--t-claro),.55);margin-top:8px}
+.card-actions{flex-wrap:wrap}
+a.btn-wa{text-decoration:none;display:inline-flex;align-items:center;border-color:rgba(37,211,102,.45);color:#5BE38F}
 /* Mis postulaciones */
 .mp-resumen{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
 .mp-kpi{background:var(--t-tarjeta);border:1px solid rgba(var(--t-claro),.08);border-radius:18px;padding:14px 16px;text-align:left;cursor:pointer;color:inherit;transition:border-color .2s}
@@ -1652,6 +1670,7 @@ if (window.pdfjsLib) {
         <p>Una empresa de Proyectart · Ecuador</p>
       </div>
       <div class="lx-pie-links">
+        <a href="/empleos.html">Empleos publicados</a>
         <button onclick="showPage('terminos')">Términos y Condiciones</button>
         <a href="https://wa.me/593982238005" target="_blank" rel="noopener">WhatsApp</a>
         <a href="mailto:hola@talentoec.com">hola@talentoec.com</a>
@@ -1711,6 +1730,7 @@ if (window.pdfjsLib) {
       <span class="plan-pill" id="candPlanPill">BÁSICO $9.99</span>
     </div>
 
+    <div id="avisoPlan" class="aviso-plan" role="status" style="display:none"></div>
     <div class="dash-cards">
       <div class="dash-card">
         <div class="dash-card-num" id="statBusquedas">0</div>
@@ -2697,6 +2717,12 @@ async function apiCall(endpoint, options = {}) {
       throw e;
     }
     const data = await res.json().catch(() => ({}));
+    if (!res.ok && res.status === 403 && data && data.planVencido && currentUser && currentUser.tipo === 'candidato') {
+      // El servidor dice que el plan venció (manda sobre lo guardado en el navegador)
+      if (!estadoPlan().vencido) { currentUser.planVence = new Date(Date.now() - 1000).toISOString(); window._planVence = null; }
+      try { localStorage.removeItem('pago_ok_' + currentUser.email); } catch (e2) {}
+      setTimeout(function () { try { revisarVigenciaPlan(); mostrarPlanesRegistro('renovar'); } catch (e3) {} }, 300);
+    }
     if (!res.ok) { const e = new Error(data.error || data.message || 'Error de servidor'); e.status = res.status; e.data = data; throw e; }
     return data;
   } catch(err) {
@@ -3270,6 +3296,7 @@ async function refrescarSesionDesdeNube() {
         id: u.id, nombre: u.nombre, email: u.email,
         tipo: u.tipo, rol: u.rol, plan: u.plan, empresa: u.empresa,
         emailVerificado: u.emailVerificado === true,
+        planVence: u.planVence || null,
         ciudad: u.ciudad || (currentUser && currentUser.ciudad) || null,
         telefono: u.telefono || (currentUser && currentUser.telefono) || null,
         stats: u.stats || (currentUser && currentUser.stats) || {}
@@ -3282,6 +3309,7 @@ async function refrescarSesionDesdeNube() {
       userTipo = u.tipo;
       try { setLoggedInUI(); } catch(e){}
       if (u.tipo === 'candidato' || u.rol === 'admin') { try { cargarPostulacionesNube(); } catch(e){} }
+      try { revisarVigenciaPlan(); } catch(e){}
       try { await saveToStorage('talento_user', currentUser); } catch(e){}
       try { updateLimitBar(); } catch(e){}
       // Pre-verificar el pago (candidatos sin marca local) para que NO parpadee
@@ -4641,6 +4669,7 @@ async function iniciarSesion() {
     plan: user.plan || 'basico',
     creado: user.creado,
     emailVerificado: user.emailVerificado === true,
+    planVence: user.planVence || null,
     stats: user.stats || { busquedas: 0, correos: 0 },
     sessionToken
   };
@@ -4862,7 +4891,7 @@ function showPage(page) {
   // Despertar el servidor apenas el usuario navega (gana segundos antes de cargar datos)
   if (['empleador','candidato','admin'].includes(page) && typeof despertarServidor === 'function') despertarServidor();
   // Al entrar al panel del candidato: reflejar el CV guardado (si existe)
-  if (page === 'candidato') setTimeout(() => { if (typeof sincronizarVistaCV === 'function') sincronizarVistaCV(); }, 150);
+  if (page === 'candidato') setTimeout(() => { if (typeof sincronizarVistaCV === 'function') sincronizarVistaCV(); try { revisarVigenciaPlan(); } catch (e) {} }, 150);
   if (page === 'admin') setTimeout(() => { if (typeof cargarVacantesAdmin === 'function') cargarVacantesAdmin('pendiente'); }, 400);
   // Protección de páginas - requieren login
   const paginasProtegidas = ['candidato', 'empleador', 'perfil', 'admin'];
@@ -5596,6 +5625,7 @@ function registrarAnalisisCV() {
 }
 
 async function guardarYAnalizar() {
+  if (bloqueoPorPlanVencido()) return;
   const texto = prepararTextoCV(document.getElementById('cvText').value);
   const nombre = document.getElementById('cvNombre').value.trim();
   const email = document.getElementById('cvEmail').value.trim();
@@ -5751,6 +5781,7 @@ async function guardarYAnalizar() {
 
 async function buscarEmpleo() {
   if (!currentUser) { openAuth('register'); return; }
+  if (bloqueoPorPlanVencido()) return;
 
   // RATE LIMITING — 1 búsqueda cada 5 segundos
   const ultimaBusqueda = parseInt(localStorage.getItem('ultima_busqueda_ts') || '0');
@@ -6022,6 +6053,7 @@ function renderJobCards(jobs) {
   const filtrados = jobsOriginales - jobs.length;
 
   const el = document.getElementById('candResultados');
+  el.classList.remove('empty-state');   // el estilo de "vacío" no debe afectar a las tarjetas
   if (jobs.length === 0 && filtrados > 0) {
     el.innerHTML = '<div style="text-align:center;padding:40px 20px"><div style="font-size:48px;margin-bottom:14px">✅</div><h3 style="font-family:var(--f-tit);font-size:20px;margin-bottom:10px">Ya postulaste a todos estos empleos</h3><p style="color:var(--texto-secundario);font-size:13px">Realiza una nueva búsqueda para ver más oportunidades.</p></div>';
     return;
@@ -6033,14 +6065,24 @@ function renderJobCards(jobs) {
 
   const conCorreo = jobs.filter(j => !j.exclusiva && j.email).length;
   const porBuscar = jobs.filter(j => !j.exclusiva && !j.email && !j.sinContacto).length;
+  const directos = jobs.filter(j => j.exclusiva || j.email).length;
+  const totalAntesFiltro = jobs.length;
+  if (window._soloDirecto && directos > 0) jobs = jobs.filter(j => j.exclusiva || j.email);
+  else if (window._soloDirecto) window._soloDirecto = false;
+  const nombreYo = (currentUser && currentUser.nombre) || '';
   const S = (v) => escHtml(JSON.stringify(String(v == null ? '' : v)));
 
   el.innerHTML = `
     ${filtrados > 0 ? '<div style="background:rgba(var(--verde-rgb),0.06);border:1px solid rgba(var(--verde-rgb),0.2);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--verde)">✓ Se ocultaron ' + filtrados + ' empleo(s) a los que ya postulaste</div>' : ''}
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
-      <div style="font-size:12px;color:var(--texto-secundario)">${jobs.length} oportunidades encontradas en Ecuador</div>
+      <div style="font-size:12px;color:var(--texto-secundario)">${totalAntesFiltro} oportunidades encontradas en Ecuador · <b style="color:var(--verde)">${directos} con envío directo</b></div>
       <button onclick="candTab('busqueda')" style="background:var(--verde);color:var(--negro);border:none;padding:8px 16px;border-radius:8px;font-family:var(--f-tit);font-weight:700;font-size:12px;cursor:pointer">🔍 Nueva búsqueda</button>
     </div>
+    ${directos > 0 && directos < totalAntesFiltro ? `
+    <div class="filtro-directo" role="group" aria-label="Filtrar ofertas">
+      <button type="button" class="chip${window._soloDirecto ? '' : ' on'}" onclick="filtrarDirecto(false)" aria-pressed="${!window._soloDirecto}">Todas (${totalAntesFiltro})</button>
+      <button type="button" class="chip${window._soloDirecto ? ' on' : ''}" onclick="filtrarDirecto(true)" aria-pressed="${!!window._soloDirecto}">✉ Solo envío directo (${directos})</button>
+    </div>` : ''}
     ${(conCorreo + porBuscar) > 0 ? `
     <div class="auto-bar">
       <div>
@@ -6053,8 +6095,15 @@ function renderJobCards(jobs) {
       const exclusiva = !!j.exclusiva;
       const conEmail = !exclusiva && !!j.email;
       const etiqueta = exclusiva ? '' :
+        (conEmail && j.contactoVerificado !== false) ? '<div class="directo-badge">✉ ENVÍO DIRECTO · la empresa publicó su correo</div>' :
         j.verificada ? '<div class="verificada-badge">✓ OFERTA REAL · vía Jooble</div>' :
         j.porIA ? '<div class="ia-badge">Encontrada por IA · verificable</div>' : '';
+      const tel = /^593\d{8,9}$/.test(String(j.telefono || '')) ? String(j.telefono) : '';
+      const msjWa = 'Hola, vi la oferta de ' + (j.cargo || 'empleo') + ' en ' + (j.empresa || 'su empresa') + ' y me gustaría postular.' + (nombreYo ? ' Soy ' + nombreYo + '.' : '') + ' ¿Puedo enviarles mi hoja de vida?';
+      const extras = (j.url ? `<button class="btn-sm-outline" onclick='abrirOferta(${S(j.url)},${S(j.empresa)},${S(j.cargo)},this)'>🔗 Ver oferta</button>` : '') +
+        (tel ? `<a class="btn-sm-outline btn-wa" href="${escHtml('https://wa.me/' + tel + '?text=' + encodeURIComponent(msjWa))}" target="_blank" rel="noopener">📱 WhatsApp</a>` : '');
+      const dias = j.fecha ? (function () { const f = new Date(j.fecha + 'T00:00:00'), t = new Date(); t.setHours(0, 0, 0, 0); return Math.round((t - f) / 86400000); })() : null;
+      const fechaTxt = dias === null || !isFinite(dias) ? '' : (dias <= 0 ? 'Publicada hoy' : dias === 1 ? 'Publicada ayer' : 'Publicada hace ' + dias + ' días');
       let acciones;
       if (exclusiva) {
         acciones = puedeEnviarPostulacion()
@@ -6080,25 +6129,30 @@ function renderJobCards(jobs) {
         <div><div class="job-title">${escHtml(j.cargo)}</div><div class="job-company">${escHtml(j.empresa)} · ${escHtml(j.ciudad)}</div></div>
         <div class="match-badge">${parseInt(j.match) || 0}%</div>
       </div>
-      <div class="tags-row"><span class="tag">${escHtml(j.fuente || '')}</span><span class="tag">${escHtml(j.salario || 'A convenir')}</span><span class="tag">${escHtml(j.ciudad || '')}</span>${conEmail ? (j.contactoVerificado === false ? '<span class="tag" style="color:var(--amarillo)">⚠ correo por confirmar</span>' : '<span class="tag" style="color:var(--verde)">✉ contacto disponible</span>') : ''}</div>
+      <div class="tags-row"><span class="tag">${escHtml(j.fuente || '')}</span><span class="tag">${escHtml(j.salario || 'A convenir')}</span><span class="tag">${escHtml(j.ciudad || '')}</span>${conEmail && j.contactoVerificado === false ? '<span class="tag" style="color:var(--amarillo)">⚠ correo por confirmar</span>' : ''}</div>
       <div style="font-size:12px;color:var(--texto-secundario)">${escHtml(j.descripcion || '')}</div>
+      ${fechaTxt ? '<div class="job-fecha">🕒 ' + fechaTxt + '</div>' : ''}
       <div class="card-actions">
         ${acciones}
+        ${extras}
         ${exclusiva ? '' : `<button class="btn-sm-outline" onclick='confirmarPostulacion(${S(j.empresa)},${S(j.cargo)},this)'>✅ Ya postulé</button>`}
       </div>
     </div>`;
     }).join('');
 }
 
+function filtrarDirecto(solo) { window._soloDirecto = !!solo; renderJobCards(ultimosResultados || []); }
 // Abrir oferta externa: la marca como VISTA (atenuada) pero NO la borra.
 // Solo desaparece cuando el usuario confirma que postuló.
 function abrirOferta(url, empresa, cargo, btn) {
-  window.open(url, '_blank');
+  url = urlSegura(url); if (!url) return;
+  window.open(url, '_blank', 'noopener');
   const key = (empresa||'') + '|' + (cargo||'');
   if (!empleosVistos.includes(key)) empleosVistos.push(key);
   // Transformar la tarjeta: atenuar + ofrecer confirmar postulación
+  // (las de envío directo conservan su botón "Postular ahora")
   const card = btn.closest('.job-card');
-  if (card) {
+  if (card && !card.querySelector('.directo-badge')) {
     card.style.opacity = '0.6';
     const acciones = card.querySelector('.card-actions');
     if (acciones) {
@@ -6108,7 +6162,7 @@ function abrirOferta(url, empresa, cargo, btn) {
     }
   }
 }
-function reabrirOferta(url, btn) { window.open(url, '_blank'); }
+function reabrirOferta(url, btn) { url = urlSegura(url); if (url) window.open(url, '_blank', 'noopener'); }
 
 // Al hacer clic en un portal: marca el empleo como visto (sin borrarlo)
 function marcarVisto(empresa, cargo) {
@@ -6592,6 +6646,14 @@ async function enviarPostulacionCore(d) {
     return { ok: false, error: (res && res.error) || 'No se pudo enviar la postulación' };
   } catch (e) {
     const msg = (e && e.message) || 'No se pudo enviar la postulación';
+    // El servidor dice que ya se envió antes (o se está enviando): marcarla y no repetir
+    if (e && e.status === 409 && e.data && e.data.yaPostulado) {
+      if (!yaPostulado(d.empresa, d.cargo)) {
+        correosEnviados.push({ to: d.to, subject: d.asunto, empresa: d.empresa || '', cargo: d.cargo || '', fecha: new Date().toLocaleString('es-EC'), estado: 'Enviado' });
+        try { guardarCorreosEnviados(); } catch (e2) {}
+      }
+      return { ok: false, yaPostulado: true, error: 'Ya habías postulado a este cargo en esta empresa.' };
+    }
     return { ok: false, error: msg,
       limite: /límite|Alcanzaste|Vuelve mañana/i.test(msg),
       requierePlan: /plan|renueva|venci/i.test(msg) && !/dominio/i.test(msg) };
@@ -7457,6 +7519,7 @@ function mostrarLimiteAlcanzado(maxDiario) {
 }
 
 async function ejecutarCorreosFrio() {
+  if (bloqueoPorPlanVencido()) return;
   if (!currentUser) { openAuth('register'); return; }
 
   // VERIFICAR PLAN - Correos en frío EXCLUSIVOS del plan Pro
@@ -7755,7 +7818,60 @@ function tienePagoOk() {
   if (!currentUser) return false;
   if (currentUser.rol === 'admin') return true;
   if (currentUser.tipo === 'empleador') return true;
+  if (estadoPlan().vencido) return false;   // el plan venció: hay que renovar
   return localStorage.getItem('pago_ok_' + currentUser.email) === 'true';
+}
+
+// ═══════════ VIGENCIA DEL PLAN (30 días; al renovar antes, los días se suman) ═══════════
+// La fecha la da el SERVIDOR (plan_vence). Si no la hay, se calcula con el último pago.
+const DIA_MS = 24 * 60 * 60 * 1000;
+function estadoPlan() {
+  if (!currentUser || currentUser.rol === 'admin' || currentUser.tipo === 'empleador') return { vence: null, dias: null, vencido: false };
+  let vence = currentUser.planVence ? new Date(currentUser.planVence).getTime() : (window._planVence || null);
+  if (!vence || !isFinite(vence)) return { vence: null, dias: null, vencido: false };
+  const ms = vence - Date.now();
+  return { vence: vence, ms: ms, dias: ms > 0 ? Math.ceil(ms / DIA_MS) : 0, vencido: ms <= 0 };
+}
+function fechaLarga(ms) {
+  try { return new Date(ms).toLocaleDateString('es-EC', { day: 'numeric', month: 'long', timeZone: 'America/Guayaquil' }); } catch (e) { return ''; }
+}
+// Pinta el aviso del panel y, si el plan venció, pide renovar (una vez por carga).
+function revisarVigenciaPlan() {
+  const el = document.getElementById('avisoPlan');
+  const st = estadoPlan();
+  if (currentUser && currentUser.tipo === 'candidato' && currentUser.rol !== 'admin' && !currentUser.planVence && !window._planVence && !window._vigenciaConsultada) {
+    window._vigenciaConsultada = true;            // sin fecha del servidor: calcular con el historial
+    verificarPagoBackend().then(function () { revisarVigenciaPlan(); });
+  }
+  if (!el) return st;
+  if (st.vencido) {
+    if (currentUser && currentUser.email) { try { localStorage.removeItem('pago_ok_' + currentUser.email); } catch (e) {} }
+    el.className = 'aviso-plan aviso-plan-vencido';
+    el.innerHTML = '<div><b>🔒 Tu plan venció' + (st.vence ? ' el ' + fechaLarga(st.vence) : '') + '</b><span>Renuévalo para seguir buscando y postulando. Tu CV, tus datos y tus postulaciones siguen guardados.</span></div><button class="btn-sm-green" onclick="renovarPlan()">Renovar plan</button>';
+    el.style.display = '';
+    if (!window._avisoVencidoMostrado && document.getElementById('page-candidato') && document.getElementById('page-candidato').classList.contains('active')) {
+      window._avisoVencidoMostrado = true;
+      setTimeout(function () { mostrarPlanesRegistro('renovar'); }, 500);
+    }
+  } else if (st.dias !== null && st.dias <= 5) {
+    const hoy = st.ms < DIA_MS;
+    el.className = 'aviso-plan' + (st.dias <= 2 ? ' aviso-plan-urgente' : '');
+    el.innerHTML = '<div><b>⏳ ' + (hoy ? 'Tu plan vence hoy' : 'Tu plan vence en ' + st.dias + ' día' + (st.dias === 1 ? '' : 's')) + (hoy ? '' : ' (el ' + fechaLarga(st.vence) + ')') + '</b><span>Renueva ahora: los días que te quedan se suman al nuevo mes, no pierdes nada.</span></div><button class="btn-sm-green" onclick="renovarPlan()">Renovar ahora</button>';
+    el.style.display = '';
+    const k = 'aviso_plan_' + (currentUser && currentUser.email) + '_' + new Date().toDateString();
+    if (!sessionStorage.getItem(k)) { try { sessionStorage.setItem(k, '1'); } catch (e) {} setTimeout(function () { showToast(hoy ? '⏳ Tu plan vence hoy. Renuévalo para no perder acceso.' : '⏳ Tu plan vence en ' + st.dias + ' día' + (st.dias === 1 ? '' : 's') + '. Renuévalo para no perder acceso.'); }, 1200); }
+  } else {
+    el.style.display = 'none'; el.innerHTML = '';
+  }
+  return st;
+}
+function renovarPlan() { mostrarPlanesRegistro(estadoPlan().vencido ? 'renovar' : 'renovar-antes'); }
+// Antes de usar algo que cuesta (buscar, analizar, correos en frío): ¿el plan sigue vigente?
+function bloqueoPorPlanVencido() {
+  if (!estadoPlan().vencido) return false;
+  showToast('🔒 Tu plan venció. Renuévalo para seguir usando TalentoEC.', true);
+  mostrarPlanesRegistro('renovar');
+  return true;
 }
 function marcarPagoOk() {
   if (currentUser && currentUser.email) {
@@ -7801,15 +7917,13 @@ async function verificarPagoBackend() {
           .sort((a, b) => b - a)[0];
         const DIA = 24 * 60 * 60 * 1000;
         if (!ultimo) { marcarPagoOk(); return true; } // sin fechas legibles: no bloquear
-        const vence = ultimo + 30 * DIA;
+        const vence = (currentUser && currentUser.planVence && isFinite(new Date(currentUser.planVence).getTime()))
+          ? new Date(currentUser.planVence).getTime()   // fecha real del servidor (incluye días sumados)
+          : ultimo + 30 * DIA;
         window._planVence = vence;
         if (Date.now() <= vence) {
           marcarPagoOk();
-          // Aviso amable si vence en 5 días o menos
-          const diasRestantes = Math.ceil((vence - Date.now()) / DIA);
-          if (diasRestantes <= 5) {
-            setTimeout(() => showToast('⏳ Tu plan vence en ' + diasRestantes + ' día' + (diasRestantes === 1 ? '' : 's') + '. Renuévalo para no perder acceso.'), 1200);
-          }
+          // (el aviso de días restantes lo pinta revisarVigenciaPlan en el panel)
           return true;
         }
         // VENCIDO: quitar la marca local y pedir renovación
@@ -7817,8 +7931,8 @@ async function verificarPagoBackend() {
           localStorage.removeItem('pago_ok_' + currentUser.email);
         }
         setTimeout(() => {
-          showToast('⏳ Tu plan venció. Renuévalo para seguir postulando (ver empleos es gratis).', true);
-          if (typeof mostrarPlanesRegistro === 'function') mostrarPlanesRegistro();
+          showToast('🔒 Tu plan venció. Renuévalo para seguir buscando y postulando.', true);
+          if (typeof mostrarPlanesRegistro === 'function') mostrarPlanesRegistro('renovar');
         }, 800);
         return false;
       }
@@ -7848,6 +7962,8 @@ function cerrarVerificandoPago() {
 function forzarPagoSiCandidato() {
   if (!currentUser) return false;
   if (currentUser.rol === 'admin' || currentUser.tipo === 'empleador') return false;
+  // Plan vencido: la cuenta queda bloqueada hasta renovar (los datos se conservan)
+  if (estadoPlan().vencido) { mostrarPlanesRegistro('renovar'); return true; }
   if (tienePagoOk()) return false;
 
   // Ya consultamos el backend en esta sesión y NO hay pago → mostrar planes directo.
@@ -7871,17 +7987,19 @@ function forzarPagoSiCandidato() {
 }
 
 // Modal OBLIGATORIO con los 3 planes de candidato (al registrarse o si no ha pagado)
-function mostrarPlanesRegistro() {
+function mostrarPlanesRegistro(modo) {
   if (document.getElementById('modalPlanesReg')) return; // ya está abierto
+  const renov = modo === 'renovar' || modo === 'renovar-antes';
+  const stP = (typeof estadoPlan === 'function') ? estadoPlan() : {};
   const modal = document.createElement('div');
   modal.id = 'modalPlanesReg';
   modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:10000;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto';
   modal.innerHTML = `
     <div style="background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:18px;max-width:520px;width:100%;padding:28px 22px;margin:auto">
       <div style="text-align:center;margin-bottom:8px">
-        <div style="font-size:13px;color:var(--verde);font-weight:700;letter-spacing:1px">ÚLTIMO PASO</div>
-        <h2 style="font-family:var(--f-tit);font-size:22px;font-weight:800;margin:8px 0 6px">Elige tu plan para empezar</h2>
-        <p style="color:var(--texto-secundario);font-size:13px;margin:0 0 18px;line-height:1.5">Para activar tu cuenta y empezar a buscar empleo, elige el plan que más te convenga. Puedes cambiarlo después desde tu panel.</p>
+        <div style="font-size:13px;color:${modo==='renovar'?'var(--rojo)':'var(--verde)'};font-weight:700;letter-spacing:1px">${modo==='renovar'?'TU PLAN VENCIÓ':(modo==='renovar-antes'?'RENOVAR PLAN':'ÚLTIMO PASO')}</div>
+        <h2 style="font-family:var(--f-tit);font-size:22px;font-weight:800;margin:8px 0 6px">${renov?'Renueva tu plan':'Elige tu plan para empezar'}</h2>
+        ${renov ? '<p style="color:var(--texto-secundario);font-size:13px;margin:0 0 18px;line-height:1.5">' + (modo==='renovar' ? 'Tu plan venció' + (stP.vence ? ' el ' + fechaLarga(stP.vence) : '') + '. Tu CV, tus datos y tus postulaciones siguen guardados: apenas renueves, sigues donde te quedaste.' : (stP.dias===1 ? 'Te queda 1 día' : 'Te quedan ' + (stP.dias||0) + ' días') + '. Si renuevas ahora, esos días se suman al nuevo mes.') + '</p>' : `<p style="color:var(--texto-secundario);font-size:13px;margin:0 0 18px;line-height:1.5">Para activar tu cuenta y empezar a buscar empleo, elige el plan que más te convenga. Puedes cambiarlo después desde tu panel.</p>`}
       </div>
 
       <div style="display:flex;flex-direction:column;gap:12px">
@@ -7915,7 +8033,7 @@ function mostrarPlanesRegistro() {
       </div>
 
       <div style="text-align:center;margin-top:16px">
-        <button onclick="salirDeRegistro()" style="background:none;border:none;color:var(--texto-secundario);font-size:12px;cursor:pointer;text-decoration:underline">Cancelar y salir</button>
+        ${modo==='renovar-antes' ? '<button onclick="cerrarPlanesRegistro()" style="background:none;border:none;color:var(--texto-secundario);font-size:12px;cursor:pointer;text-decoration:underline">Ahora no</button>' : (modo==='renovar' ? '<button onclick="salirDeRegistro()" style="background:none;border:none;color:var(--texto-secundario);font-size:12px;cursor:pointer;text-decoration:underline">Cerrar sesión</button>' : '<button onclick="salirDeRegistro()" style="background:none;border:none;color:var(--texto-secundario);font-size:12px;cursor:pointer;text-decoration:underline">Cancelar y salir</button>')}
       </div>
     </div>`;
   document.body.appendChild(modal);
@@ -8084,6 +8202,11 @@ async function verificarRetornoPayphone() {
       }
       // El pago quedó hecho: marcar al candidato como "ya pagó".
       try { marcarPagoOk(); } catch(e){}
+      // Traer la nueva fecha de vencimiento (si renovó antes, los días se suman)
+      window._planVence = null; window._avisoVencidoMostrado = false;
+      if (currentUser) currentUser.planVence = new Date(Math.max(Date.now(), (currentUser.planVence ? new Date(currentUser.planVence).getTime() : 0) || 0) + 30 * 24 * 60 * 60 * 1000).toISOString();
+      try { cerrarPlanesRegistro(); } catch(e){}
+      try { refrescarSesionDesdeNube().then(function(){ try { revisarVigenciaPlan(); } catch(e){} }); } catch(e){}
       // Mostrar pantalla de éxito.
       document.getElementById('ppModal').classList.add('open');
       document.getElementById('ppPayView').style.display = 'none';
@@ -8110,6 +8233,30 @@ async function verificarRetornoPayphone() {
 }
 if (typeof window !== 'undefined') {
   window.addEventListener('load', verificarRetornoPayphone);
+  // Enlaces desde empleos.html / vacante.html:  /?vacante=ID&q=cargo  ·  /?empresas=1
+  window.addEventListener('load', function () {
+    try {
+      const p = new URLSearchParams(window.location.search);
+      if (p.get('vacante')) {
+        const q = String(p.get('q') || '').slice(0, 80);
+        history.replaceState({}, '', window.location.pathname);
+        setTimeout(function () {
+          if (!currentUser) { openAuth('register'); showToast('Crea tu cuenta gratis para postular a esta vacante'); return; }
+          showPage('bolsa');
+          const inp = document.getElementById('bolsaQuery'); if (inp) inp.value = q;
+          if (typeof cargarBolsa === 'function') cargarBolsa();
+        }, 900);
+      } else if (p.get('empresas')) {
+        history.replaceState({}, '', window.location.pathname);
+        setTimeout(function () {
+          if (currentUser) { if (typeof irEmpleadores === 'function') irEmpleadores(); return; }
+          openAuth('register');
+          const card = [...document.querySelectorAll('.tipo-card')].find(c => /Empleador/.test(c.innerText));
+          if (card) selectTipo('empleador', card);
+        }, 900);
+      }
+    } catch (e) {}
+  });
 }
 
 // ======= UTILS =======

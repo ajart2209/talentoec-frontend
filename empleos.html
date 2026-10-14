@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es-EC">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Empleos en Ecuador publicados por empresas · TalentoEC</title>
+<meta name="description" content="Vacantes de trabajo en Quito, Guayaquil, Cuenca y todo Ecuador publicadas directamente por empresas en TalentoEC. Postula con tu CV en un clic.">
+<link rel="canonical" href="https://talentoec.com/empleos.html">
+<meta name="theme-color" content="#1BD07F">
+<meta property="og:title" content="Empleos en Ecuador · TalentoEC">
+<meta property="og:description" content="Vacantes publicadas directamente por empresas ecuatorianas. Postula con tu CV en un clic.">
+<meta property="og:url" content="https://talentoec.com/empleos.html">
+<meta property="og:image" content="https://talentoec.com/talentoec-og.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--fondo:#09100D;--tarjeta:#161C19;--claro:#EEF7F2;--suave:rgba(238,247,242,.65);--linea:rgba(238,247,242,.1);--verde:#1BD07F}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--fondo);color:var(--claro);min-height:100vh;line-height:1.6}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px clamp(16px,4vw,40px);border-bottom:1px solid var(--linea)}
+  .logo{font-weight:800;font-size:19px;letter-spacing:-.02em;color:var(--claro);text-decoration:none;display:flex;align-items:center;gap:8px}
+  .logo span{background:var(--verde);color:var(--fondo);font-size:9px;font-weight:800;padding:2px 7px;border-radius:999px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;border:none;border-radius:999px;font:700 14px 'Plus Jakarta Sans',sans-serif;padding:11px 20px;cursor:pointer;text-decoration:none;min-height:42px;background:var(--verde);color:var(--fondo)}
+  main{max-width:900px;margin:0 auto;padding:clamp(28px,5vw,56px) 16px 80px}
+  h1{font-size:clamp(28px,4.4vw,42px);letter-spacing:-.03em;line-height:1.12;margin-bottom:8px}
+  .sub{color:var(--suave);margin-bottom:24px}
+  .filtros{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+  .filtros input,.filtros select{flex:1 1 220px;min-width:0;background:rgba(9,16,13,.7);border:1px solid rgba(238,247,242,.14);border-radius:999px;padding:12px 18px;color:var(--claro);font:500 16px 'Plus Jakarta Sans',sans-serif;outline:none}
+  .filtros select{flex:0 1 200px}
+  .filtros :focus{border-color:var(--verde)}
+  .lista{display:grid;gap:12px}
+  .vac{display:block;text-decoration:none;color:inherit;background:var(--tarjeta);border:1px solid var(--linea);border-radius:20px;padding:18px 20px;transition:border-color .2s}
+  .vac:hover,.vac:focus-visible{border-color:var(--verde);outline:none}
+  .vac b{display:block;font-size:17px;letter-spacing:-.01em;overflow-wrap:anywhere}
+  .vac .e{color:var(--suave);font-size:14px;overflow-wrap:anywhere}
+  .vac .d{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .vac .d span{font-size:12px;background:rgba(238,247,242,.06);border:1px solid var(--linea);border-radius:999px;padding:4px 10px}
+  .estado{text-align:center;padding:50px 20px;color:var(--suave);background:var(--tarjeta);border:1px dashed rgba(238,247,242,.14);border-radius:22px}
+  .estado b{display:block;color:var(--claro);font-size:18px;margin:8px 0 4px}
+  .empresas{margin-top:34px;background:var(--tarjeta);border:1px solid var(--linea);border-radius:22px;padding:22px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+  footer{text-align:center;font-size:12px;color:var(--suave);padding:24px 16px;border-top:1px solid var(--linea)}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="/">TalentoEC <span>ECUADOR</span></a>
+  <a class="btn" href="/">Subir mi CV</a>
+</header>
+<main>
+  <h1>Empleos en Ecuador</h1>
+  <p class="sub">Vacantes publicadas directamente por empresas en TalentoEC. Tu CV llega directo a su correo.</p>
+  <div class="filtros">
+    <input type="search" id="q" placeholder="Cargo o empresa (ej: contador, diseñador…)" aria-label="Buscar cargo o empresa">
+    <select id="ciudad" aria-label="Ciudad"><option value="">Todas las ciudades</option></select>
+  </div>
+  <div id="lista" class="lista" aria-live="polite"><div class="estado">Cargando vacantes…</div></div>
+  <div class="empresas">
+    <div><b>¿Tienes una empresa?</b><br><span style="color:var(--suave);font-size:14px">Publica tus vacantes gratis y recibe postulantes con CV en tu correo.</span></div>
+    <a class="btn" href="/?empresas=1">Publicar gratis</a>
+  </div>
+</main>
+<footer>TalentoEC by Proyectart · Empleo en Quito, Guayaquil, Cuenca y todo Ecuador</footer>
+<script>
+(function () {
+  var API = 'https://talentoec-backend-production.up.railway.app/api/auth';
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var norm = function (s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); };
+  var todas = [];
+  var lista = document.getElementById('lista'), q = document.getElementById('q'), ciudad = document.getElementById('ciudad');
+  function pintar() {
+    var t = norm(q.value).trim(), c = ciudad.value;
+    var v = todas.filter(function (x) { return (!c || x.ciudad === c) && (!t || norm(x.cargo + ' ' + x.empresa).indexOf(t) >= 0); });
+    if (!todas.length) { lista.innerHTML = '<div class="estado"><div style="font-size:34px">🏢</div><b>Pronto habrá vacantes aquí</b>Las empresas están empezando a publicar. Mientras tanto, sube tu CV y TalentoEC busca por ti.</div>'; return; }
+    if (!v.length) { lista.innerHTML = '<div class="estado">No hay vacantes con ese filtro.</div>'; return; }
+    lista.innerHTML = v.map(function (x) {
+      var dias = Math.max(0, Math.floor((Date.now() - new Date(x.publicada).getTime()) / 86400000));
+      return '<a class="vac" href="/vacante.html?id=' + encodeURIComponent(x.id) + '"><b>' + esc(x.cargo) + '</b><span class="e">' + esc(x.empresa) + '</span>' +
+        '<div class="d"><span>📍 ' + esc(x.ciudad) + '</span><span>💼 ' + esc(x.modalidad || 'Presencial') + '</span><span>💰 ' + esc(x.salario || 'A convenir') + '</span><span>🕒 ' + (dias === 0 ? 'hoy' : dias === 1 ? 'ayer' : 'hace ' + dias + ' días') + '</span></div></a>';
+    }).join('');
+  }
+  q.addEventListener('input', pintar); ciudad.addEventListener('change', pintar);
+  fetch(API + '/vacantes/indice').then(function (r) { return r.json(); }).then(function (j) {
+    todas = (j && Array.isArray(j.vacantes)) ? j.vacantes : [];
+    var cs = Array.from(new Set(todas.map(function (x) { return x.ciudad; }).filter(Boolean))).sort();
+    cs.forEach(function (c) { var o = document.createElement('option'); o.value = c; o.textContent = c; ciudad.appendChild(o); });
+    pintar();
+  }).catch(function () { lista.innerHTML = '<div class="estado">No pudimos cargar las vacantes. Intenta de nuevo en un momento.</div>'; });
+})();
+</script>
+</body>
+</html>
