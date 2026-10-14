@@ -1210,6 +1210,23 @@ nav{background:rgba(var(--t-fondo),.86);border-bottom-color:rgba(var(--t-claro),
 .job-fecha{font-size:11.5px;color:rgba(var(--t-claro),.55);margin-top:8px}
 .card-actions{flex-wrap:wrap}
 a.btn-wa{text-decoration:none;display:inline-flex;align-items:center;border-color:rgba(37,211,102,.45);color:#5BE38F}
+/* Piloto automático */
+.pil-lead{font-size:13.5px;line-height:1.6;color:rgba(var(--t-claro),.75)}
+.pil-limites{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.pil-limites span{font-size:12.5px;font-weight:600;background:rgba(var(--t-acento),.1);border:1px solid rgba(var(--t-acento),.3);color:rgb(var(--t-claro));padding:6px 12px;border-radius:999px}
+.pil-nota{font-size:11.5px;color:rgba(var(--t-claro),.55);font-weight:500}
+.pil-aviso{margin:0 0 14px;padding:14px 16px;border-radius:16px;background:rgba(245,190,40,.1);border:1px solid rgba(245,190,40,.35);font-size:13.5px;line-height:1.5}
+.pil-estado{margin:0 0 14px;padding:16px 18px;border-radius:18px;display:flex;align-items:flex-start;gap:12px;font-size:14px;line-height:1.5}
+.pil-estado .pil-punto{margin-top:6px}
+.pil-estado.on{background:rgba(var(--t-acento),.12);border:1px solid rgba(var(--t-acento),.45)}
+.pil-estado.off{background:rgba(var(--t-claro),.05);border:1px solid rgba(var(--t-claro),.12)}
+.pil-estado b{font-family:var(--f-tit)}
+.pil-punto{width:10px;height:10px;border-radius:50%;flex:0 0 auto;background:rgba(var(--t-claro),.35)}
+.pil-estado.on .pil-punto{background:rgb(var(--t-acento));box-shadow:0 0 0 4px rgba(var(--t-acento),.2);animation:pulse 2s infinite}
+.pil-botones{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.pil-res-lista{list-style:none;margin:10px 0 0;padding:0}
+.pil-res-lista li{font-size:13.5px;padding:8px 0;border-top:1px solid rgba(var(--t-claro),.08);overflow-wrap:anywhere}
+.pil-mejora{margin-top:12px;font-size:13px;padding:12px 14px;border-radius:14px;background:rgba(var(--t-lima),.1);border:1px solid rgba(var(--t-lima),.3)}
 /* Mis postulaciones */
 .mp-resumen{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
 .mp-kpi{background:var(--t-tarjeta);border:1px solid rgba(var(--t-claro),.08);border-radius:18px;padding:14px 16px;text-align:left;cursor:pointer;color:inherit;transition:border-color .2s}
@@ -1568,7 +1585,7 @@ if (window.pdfjsLib) {
           <div class="pl-pista"><span style="width:22%"></span></div>
           <div class="pl-medidor-nota">3 búsquedas al día · 30 días de vigencia</div>
         </div>
-        <ul class="pl-lista"><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Análisis de tu CV con IA (3 al mes)</span></li><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Carta personalizada para cada empresa</span></li><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Postulación por correo verificado</span></li><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>⭐ Acceso a vacantes exclusivas de TalentoEC</span></li><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Historial de postulaciones</span></li><li class="pl-no"><span class="pl-x" aria-hidden="true">—</span><span>Correos en frío</span></li></ul>
+        <ul class="pl-lista"><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>🤖 Piloto automático: 3 postulaciones, lunes, miércoles y viernes</span></li><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Análisis de tu CV con IA (3 al mes)</span></li><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Carta personalizada para cada empresa</span></li><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>✉ Ofertas con correo verificado primero</span></li><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>📋 Mis postulaciones con aviso de seguimiento</span></li><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>⭐ Vacantes exclusivas de TalentoEC</span></li><li class="pl-no"><span class="pl-x" aria-hidden="true">—</span><span>Correos en frío</span></li></ul>
         <button class="btn-plan pl-btn" onclick="abrirPago('Básico','9.99')">Contratar con PayPhone<span class="lx-flecha" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
       </article>
       <article class="plan-card pl-card destacado">
@@ -1580,7 +1597,7 @@ if (window.pdfjsLib) {
           <div class="pl-pista"><span style="width:64%"></span></div>
           <div class="pl-medidor-nota">6 búsquedas al día · 30 días de vigencia</div>
         </div>
-        <ul class="pl-lista"><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Todo lo del plan Básico</span></li><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Casi el triple de postulaciones al día</span></li><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Postular a todas las ofertas en lote</span></li><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Historial de postulaciones</span></li><li class="pl-no"><span class="pl-x" aria-hidden="true">—</span><span>Correos en frío (solo Pro)</span></li></ul>
+        <ul class="pl-lista"><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Todo lo del plan Básico</span></li><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>🤖 Piloto automático todos los días: hasta 10 al día</span></li><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Casi el triple de postulaciones al día</span></li><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>⚡ Postular a todas las ofertas en un clic</span></li><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Elige la ciudad del piloto</span></li><li class="pl-no"><span class="pl-x" aria-hidden="true">—</span><span>Correos en frío (solo Pro)</span></li></ul>
         <button class="btn-plan pl-btn" onclick="abrirPago('Estándar','19.99')">Contratar con PayPhone<span class="lx-flecha" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
       </article>
       <article class="plan-card pl-card">
@@ -1592,7 +1609,7 @@ if (window.pdfjsLib) {
           <div class="pl-pista"><span style="width:100%"></span></div>
           <div class="pl-medidor-nota">10 búsquedas al día · 30 días de vigencia</div>
         </div>
-        <ul class="pl-lista"><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Todo lo del plan Estándar</span></li><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>🔥 10 correos en frío al día a empresas de tu área</span></li><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>La mayor cantidad de postulaciones al día</span></li><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Soporte prioritario por WhatsApp</span></li></ul>
+        <ul class="pl-lista"><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Todo lo del plan Estándar</span></li><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>🤖 Piloto automático con 2 áreas: hasta 30 al día</span></li><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>🔥 10 correos en frío al día a empresas de tu área</span></li><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Análisis de tu CV con IA (5 al mes)</span></li><li><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Soporte prioritario por WhatsApp</span></li></ul>
         <button class="btn-plan pl-btn" onclick="abrirPago('Pro','29.99')">Contratar con PayPhone<span class="lx-flecha" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
       </article>
     </div>
@@ -1602,7 +1619,7 @@ if (window.pdfjsLib) {
       <div class="pl-tabla-scroll">
         <table class="pl-tabla">
           <thead><tr><th scope="col"><span class="sr">Característica</span></th><th scope="col">Básico</th><th scope="col">Estándar</th><th scope="col">Pro</th></tr></thead>
-          <tbody><tr><th scope="row">Búsquedas al día</th><td>3</td><td>6</td><td>10</td></tr><tr><th scope="row">Postulaciones por correo al día</th><td>12</td><td>35</td><td>55</td></tr><tr><th scope="row">Correos en frío al día</th><td class="no">—</td><td class="no">—</td><td>10</td></tr><tr><th scope="row">Análisis de CV con IA</th><td>3/mes</td><td>3/mes</td><td>3/mes</td></tr><tr><th scope="row">Carta personalizada</th><td class="ok"><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></td><td class="ok"><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></td><td class="ok"><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr><tr><th scope="row">Vacantes exclusivas</th><td class="ok"><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></td><td class="ok"><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></td><td class="ok"><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr><tr><th scope="row">Soporte prioritario por WhatsApp</th><td class="no">—</td><td class="no">—</td><td class="ok"><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr></tbody>
+          <tbody><tr><th scope="row">Búsquedas al día</th><td>3</td><td>6</td><td>10</td></tr><tr><th scope="row">Postulaciones por correo al día</th><td>12</td><td>35</td><td>55</td></tr><tr><th scope="row">Piloto automático</th><td>3 al día · lun, mié y vie</td><td>10 al día · todos los días</td><td>30 al día · 2 áreas</td></tr><tr><th scope="row">Análisis de CV con IA</th><td>3/mes</td><td>3/mes</td><td>5/mes</td></tr><tr><th scope="row">Postular a todas en un clic</th><td class="no">—</td><td class="ok"><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></td><td class="ok"><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr><tr><th scope="row">Correos en frío al día</th><td class="no">—</td><td class="no">—</td><td>10</td></tr><tr><th scope="row">Carta personalizada</th><td class="ok"><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></td><td class="ok"><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></td><td class="ok"><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr><tr><th scope="row">Mis postulaciones y seguimiento</th><td class="ok"><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></td><td class="ok"><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></td><td class="ok"><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr><tr><th scope="row">Vacantes exclusivas</th><td class="ok"><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></td><td class="ok"><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></td><td class="ok"><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr><tr><th scope="row">Soporte prioritario por WhatsApp</th><td class="no">—</td><td class="no">—</td><td class="ok"><svg class="pl-ok" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></td></tr></tbody>
           <tfoot><tr><th scope="row">Precio al mes</th><td>$9,99</td><td>$19,99</td><td>$29,99</td></tr></tfoot>
         </table>
       </div>
@@ -1768,6 +1785,7 @@ if (window.pdfjsLib) {
       <button class="tab-btn" onclick="candTab('resultados')">Resultados</button>
       <button class="tab-btn" onclick="candTab('frio')" style="color:var(--amarillo)">🎯 Correos en frío</button>
       <button class="tab-btn" onclick="candTab('postulaciones')">📋 Mis postulaciones</button>
+      <button class="tab-btn" onclick="candTab('piloto')">🤖 Piloto automático</button>
     </div>
 
     <!-- TAB: CV -->
@@ -2058,6 +2076,51 @@ if (window.pdfjsLib) {
       </div>
 
       <div id="frioResultados"></div>
+    </div>
+
+    <!-- TAB: PILOTO AUTOMÁTICO -->
+    <div id="cand-tab-piloto" style="display:none">
+      <div class="section-box pil-cab">
+        <div class="section-box-title" style="margin-bottom:6px">🤖 Piloto automático</div>
+        <div class="pil-lead">Actívalo una vez y TalentoEC postula por ti: busca ofertas nuevas de tu área, envía tu CV y tu carta <b>solo a empresas que publicaron su correo</b> (lo comprobamos en la oferta) y te manda un resumen por correo.</div>
+        <div id="pilLimites" class="pil-limites"></div>
+      </div>
+      <div id="pilAviso" class="pil-aviso" style="display:none" role="status"></div>
+      <div id="pilEstado" class="pil-estado" style="display:none"></div>
+      <div class="section-box" id="pilForm">
+        <div class="field">
+          <label for="pilArea1">Área o cargo que buscas</label>
+          <input type="text" id="pilArea1" maxlength="60" placeholder="Ej: Diseño de Interiores, Contador, Ventas…" autocomplete="off">
+        </div>
+        <div class="field" id="pilArea2Wrap" style="display:none">
+          <label for="pilArea2">Segunda área (opcional, plan Pro)</label>
+          <input type="text" id="pilArea2" maxlength="60" placeholder="Ej: Arquitectura" autocomplete="off">
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label for="pilCiudad">Ciudad</label>
+            <input type="text" id="pilCiudad" maxlength="60" placeholder="Ej: Quito">
+            <div class="pil-nota" id="pilCiudadNota"></div>
+          </div>
+          <div class="field">
+            <label for="pilModalidad">Modalidad</label>
+            <select id="pilModalidad"><option>Cualquiera</option><option>Presencial</option><option>Remoto</option><option>Híbrido</option></select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="pilPorDia">Postulaciones por día</label>
+          <select id="pilPorDia"></select>
+        </div>
+        <div class="field">
+          <label for="pilCarta">Carta que se enviará <span class="pil-nota">(usa {empresa} y {cargo}: se cambian solos en cada correo)</span></label>
+          <textarea id="pilCarta" rows="7" maxlength="4000"></textarea>
+        </div>
+        <div class="pil-botones">
+          <button class="btn-full btn-buscar-grande" id="pilActivar" onclick="guardarPiloto(true)">🤖 Activar piloto automático</button>
+          <button class="btn-sm-outline" id="pilPausar" onclick="guardarPiloto(false)" style="display:none">⏸ Pausar</button>
+        </div>
+      </div>
+      <div class="section-box" id="pilResumen" style="display:none"></div>
     </div>
 
     <!-- TAB: MIS POSTULACIONES -->
@@ -4977,7 +5040,7 @@ function verPlanes() {
 
 // ======= TABS =======
 function candTab(tab) {
-  ['cv','busqueda','resultados','frio','postulaciones'].forEach(t => {
+  ['cv','busqueda','resultados','frio','postulaciones','piloto'].forEach(t => {
     const el = document.getElementById('cand-tab-'+t); if (el) el.style.display = t===tab?'block':'none';
   });
   // Al entrar al tab CV: vigilar cambios y reflejar si ya está analizado
@@ -4998,9 +5061,10 @@ function candTab(tab) {
   }
   // Restaurar última búsqueda guardada si entra a Resultados y está vacío
   if (tab === 'resultados') restaurarResultados();
+  if (tab === 'piloto') cargarPiloto();
   if (tab === 'postulaciones') { mpFiltro = 'todas'; renderPostulaciones(); cargarPostulacionesNube().then(renderPostulaciones); }
   document.querySelectorAll('#page-candidato .tab-btn').forEach((b,i) => {
-    b.classList.toggle('active', ['cv','busqueda','resultados','frio','postulaciones'][i]===tab);
+    b.classList.toggle('active', ['cv','busqueda','resultados','frio','postulaciones','piloto'][i]===tab);
   });
 
   // Autocompletar búsqueda con CV cuando entra a tab búsqueda o frío
@@ -5602,7 +5666,8 @@ function vigilarCambiosCV() {
 }
 
 // ── Límite de análisis de CV: 3 por mes (se reinicia cada mes) ──
-const LIMITE_ANALISIS_MES = 3;
+// Análisis de CV al mes según el plan (Pro: 5). Se calcula al usarse.
+Object.defineProperty(window, 'LIMITE_ANALISIS_MES', { configurable: true, get: function () { const p = String((currentUser && currentUser.plan) || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); return (currentUser && currentUser.rol === 'admin') ? 999 : (p === 'pro' ? 5 : 3); } });
 function mesActual() {
   const d = new Date();
   return d.getFullYear() + '-' + (d.getMonth()+1);  // ej: "2026-6"
@@ -6086,10 +6151,10 @@ function renderJobCards(jobs) {
     ${(conCorreo + porBuscar) > 0 ? `
     <div class="auto-bar">
       <div>
-        <div style="font-family:var(--f-tit);font-weight:700;font-size:14px">🤖 Postulación automática</div>
-        <div style="font-size:12px;color:var(--texto-secundario);margin-top:2px">Postula a todas de una vez: TalentoEC consigue el correo de cada empresa y le envía tu CV con tu carta.</div>
+        <div style="font-family:var(--f-tit);font-weight:700;font-size:14px">⚡ Postular a todas en un clic</div>
+        <div style="font-size:12px;color:var(--texto-secundario);margin-top:2px">${planActual() === 'basico' ? 'Disponible en los planes Estándar y Pro. En el Básico postulas una por una o con el Piloto automático.' : 'TalentoEC envía tu CV con tu carta a todas estas empresas de una vez.'}</div>
       </div>
-      <button class="btn-sm-green" onclick="abrirAutoPostulacion()">⚡ Postular a todas →</button>
+      <button class="btn-sm-green" onclick="abrirAutoPostulacion()">${planActual() === 'basico' ? '🔒 Ver planes' : '⚡ Postular a todas →'}</button>
     </div>` : ''}` +
     jobs.map((j, i) => {
       const exclusiva = !!j.exclusiva;
@@ -6639,7 +6704,7 @@ async function enviarPostulacionCore(d) {
   try {
     const res = await apiCall('/api/auth/enviar-postulacion', {
       method: 'POST',
-      body: JSON.stringify({ empresa_email: d.to, empresa_nombre: d.empresa, cargo: d.cargo,
+      body: JSON.stringify({ lote: !!d.lote, empresa_email: d.to, empresa_nombre: d.empresa, cargo: d.cargo,
         asunto: d.asunto, mensaje: d.mensaje, esFrio: !!d.esFrio })
     });
     if (res && res.success) return { ok: true };
@@ -6816,8 +6881,18 @@ async function buscarContacto(empresa, cargo, ciudad, btn) {
 
 // ── Postulación automática por lotes ──
 let _autoEnCurso = false;
+function planActual() {
+  if (currentUser && currentUser.rol === 'admin') return 'pro';
+  const p = String((currentUser && currentUser.plan) || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return p === 'pro' || p === 'estandar' ? p : 'basico';
+}
 function abrirAutoPostulacion() {
   if (bloqueoCorreoSinPlan()) return;
+  if (planActual() === 'basico') {
+    showToast('⚡ Postular a todas en un clic es del plan Estándar o Pro. En el Básico postulas una por una (o con el Piloto automático).');
+    setTimeout(function () { if (typeof mostrarPlanesRegistro === 'function') mostrarPlanesRegistro('mejorar'); }, 700);
+    return;
+  }
   const lista = (ultimosResultados || []).filter(function (j) {
     return !j.exclusiva && !j.sinContacto && j.contactoVerificado !== false && !yaPostulado(j.empresa, j.cargo);
   });
@@ -6899,7 +6974,7 @@ async function ejecutarAutoPostulacion() {
     // 2) Enviar
     const asunto = 'Postulación — ' + j.cargo + ' — ' + nombre;
     const mensaje = plantillaPostulacion(j.empresa, j.cargo, nombre) + bloqueDatosPostulacion(p);
-    const r = await enviarPostulacionCore({ to: email, empresa: j.empresa, cargo: j.cargo, asunto: asunto, mensaje: mensaje });
+    const r = await enviarPostulacionCore({ lote: true, to: email, empresa: j.empresa, cargo: j.cargo, asunto: asunto, mensaje: mensaje });
     if (r.ok) {
       enviados++;
       await registrarPostulacionLocal({ to: email, asunto: asunto, empresa: j.empresa, cargo: j.cargo });
@@ -7673,6 +7748,102 @@ function renderCorreos() {
 }
 
 
+
+// ═══════════ PILOTO AUTOMÁTICO (panel) ═══════════
+let pilDatos = null;
+function pilCartaBase() {
+  const nombre = (currentUser && currentUser.nombre) || '';
+  return 'Estimado equipo de {empresa}:\n\nMe dirijo a ustedes para postular al puesto de {cargo}. Considero que mi experiencia y mi formación se ajustan a lo que buscan y me permitirían aportar a su equipo desde el inicio.\n\nAdjunto mi hoja de vida para su consideración y quedo atento(a) a una entrevista cuando lo estimen conveniente.\n\nAtentamente,\n' + nombre;
+}
+function pilMsg(t, tipo) {
+  const el = document.getElementById('pilAviso'); if (!el) return;
+  if (!t) { el.style.display = 'none'; el.innerHTML = ''; return; }
+  el.style.display = ''; el.innerHTML = t;
+}
+async function cargarPiloto() {
+  pilMsg('');
+  let r;
+  try { r = await apiCall('/api/empleos/piloto', { method: 'GET' }); }
+  catch (e) {
+    if (e && e.data && e.data.sinColumna) pilMsg('El Piloto automático se está activando. Vuelve a intentarlo en un rato.');
+    else pilMsg('No pudimos cargar el piloto. Revisa tu conexión e inténtalo de nuevo.');
+    return;
+  }
+  pilDatos = r; pintarPiloto();
+}
+function pintarPiloto() {
+  const r = pilDatos; if (!r) return;
+  const L = r.limites, nombrePlan = { basico: 'Básico', estandar: 'Estándar', pro: 'Pro' }[r.plan] || r.plan;
+  const diasTxt = L.dias.length === 7 ? 'todos los días' : L.dias.join(', ');
+  document.getElementById('pilLimites').innerHTML =
+    '<span>Plan ' + escHtml(nombrePlan) + '</span><span>Hasta ' + L.porDia + ' por día</span><span>Trabaja: ' + escHtml(diasTxt) + '</span><span>' + L.areas + ' área' + (L.areas > 1 ? 's' : '') + '</span>';
+  const c = r.config || {};
+  const a1 = document.getElementById('pilArea1'), a2 = document.getElementById('pilArea2');
+  const sugerida = (cvData && cvData.areasDetectadas && cvData.areasDetectadas[0]) || '';
+  a1.value = (c.areas && c.areas[0]) || a1.value || sugerida;
+  document.getElementById('pilArea2Wrap').style.display = L.areas > 1 ? '' : 'none';
+  if (a2) a2.value = (c.areas && c.areas[1]) || a2.value || '';
+  const ciu = document.getElementById('pilCiudad');
+  ciu.value = c.ciudad || r.ciudadPerfil || ciu.value || '';
+  const fija = !L.ciudadLibre && !!r.ciudadPerfil;
+  ciu.readOnly = fija;
+  document.getElementById('pilCiudadNota').textContent = fija ? 'En el plan Básico busca en tu ciudad. Con Estándar o Pro puedes elegir otra.' : '';
+  document.getElementById('pilModalidad').value = c.modalidad || 'Cualquiera';
+  const sel = document.getElementById('pilPorDia');
+  sel.innerHTML = Array.from({ length: L.porDia }, (_, i) => '<option value="' + (i + 1) + '">' + (i + 1) + '</option>').join('');
+  sel.value = String(Math.min(c.porDia || L.porDia, L.porDia));
+  const carta = document.getElementById('pilCarta');
+  if (!carta.value.trim()) carta.value = c.carta || pilCartaBase();
+  // Estado
+  const est = document.getElementById('pilEstado');
+  est.style.display = '';
+  if (c.activo) {
+    const p = r.proxima;
+    est.className = 'pil-estado on';
+    est.innerHTML = '<span class="pil-punto"></span><div><b>Piloto activado.</b> ' + (p ? (p.hoy ? 'Trabaja hoy a partir de las 8:00.' : 'Próxima vez: el ' + escHtml(p.dia) + ' a partir de las 8:00.') : '') + ' Te enviamos un resumen por correo cada vez que trabaja.</div>';
+    document.getElementById('pilActivar').textContent = '💾 Guardar cambios';
+    document.getElementById('pilPausar').style.display = '';
+  } else {
+    est.className = 'pil-estado off';
+    est.innerHTML = '<span class="pil-punto"></span><div><b>' + (r.config ? 'Piloto en pausa.' : 'Piloto apagado.') + '</b> Revisa los datos y actívalo cuando quieras.</div>';
+    document.getElementById('pilActivar').textContent = '🤖 Activar piloto automático';
+    document.getElementById('pilPausar').style.display = 'none';
+  }
+  if (!r.tieneCV) pilMsg('📄 Primero sube tu CV en la pestaña <b>Mi CV</b>: el piloto lo adjunta en cada postulación. <button class="btn-sm-green" style="margin-left:8px" onclick="candTab(\'cv\')">Subir CV</button>');
+  // Último resumen
+  const rs = r.ultimoResumen, box = document.getElementById('pilResumen');
+  if (rs) {
+    const f = new Date(rs.fecha + 'T12:00:00').toLocaleDateString('es-EC', { weekday: 'long', day: 'numeric', month: 'long' });
+    box.style.display = '';
+    box.innerHTML = '<div class="section-box-title" style="margin-bottom:4px">Última vez: ' + escHtml(f) + '</div>' +
+      (rs.enviados && rs.enviados.length
+        ? '<div class="pil-lead">Postulamos a ' + rs.enviados.length + ' empresa' + (rs.enviados.length > 1 ? 's' : '') + ':</div><ul class="pil-res-lista">' + rs.enviados.map(x => '<li><b>' + escHtml(x.empresa) + '</b> — ' + escHtml(x.cargo) + '</li>').join('') + '</ul>'
+        : '<div class="pil-lead">No encontramos ofertas nuevas con correo publicado y verificado, así que no enviamos nada.</div>') +
+      (r.plan === 'basico' && rs.extra > 0 ? '<div class="pil-mejora">Había ' + rs.extra + ' oferta' + (rs.extra > 1 ? 's' : '') + ' más con correo verificado. Con el plan <b>Estándar</b> el piloto trabaja todos los días y envía hasta 10. <button class="btn-sm-green" style="margin-top:8px" onclick="renovarPlan()">Ver planes</button></div>' : '');
+  } else { box.style.display = 'none'; box.innerHTML = ''; }
+}
+async function guardarPiloto(activar) {
+  if (activar && typeof bloqueoPorPlanVencido === 'function' && bloqueoPorPlanVencido()) return;
+  const btn = document.getElementById(activar ? 'pilActivar' : 'pilPausar');
+  const original = btn.textContent; btn.disabled = true; btn.textContent = activar ? 'Guardando…' : 'Pausando…';
+  const body = activar ? {
+    activo: true,
+    areas: [document.getElementById('pilArea1').value, document.getElementById('pilArea2').value].map(x => String(x || '').trim()).filter(Boolean),
+    ciudad: document.getElementById('pilCiudad').value.trim(),
+    modalidad: document.getElementById('pilModalidad').value,
+    porDia: parseInt(document.getElementById('pilPorDia').value, 10),
+    carta: document.getElementById('pilCarta').value
+  } : { activo: false };
+  try {
+    const r = await apiCall('/api/empleos/piloto', { method: 'POST', body: JSON.stringify(body) });
+    pilDatos = r; pilMsg(''); pintarPiloto();
+    showToast(activar ? '🤖 Piloto automático activado' : '⏸ Piloto en pausa');
+  } catch (e) {
+    pilMsg('⚠ ' + escHtml((e && e.message) || 'No se pudo guardar'));
+    showToast('⚠ ' + ((e && e.message) || 'No se pudo guardar'), true);
+  } finally { btn.disabled = false; if (btn.textContent.endsWith('…')) btn.textContent = original; }
+}
+
 // ═══════════ MIS POSTULACIONES ═══════════
 // Lista de todo lo enviado (nube + este navegador). El estado lo pone la persona
 // (nadie puede saber solo si la empresa respondió); se guarda en la nube si se puede
@@ -7990,6 +8161,7 @@ function forzarPagoSiCandidato() {
 function mostrarPlanesRegistro(modo) {
   if (document.getElementById('modalPlanesReg')) return; // ya está abierto
   const renov = modo === 'renovar' || modo === 'renovar-antes';
+  const mejorar = modo === 'mejorar';
   const stP = (typeof estadoPlan === 'function') ? estadoPlan() : {};
   const modal = document.createElement('div');
   modal.id = 'modalPlanesReg';
@@ -7997,9 +8169,9 @@ function mostrarPlanesRegistro(modo) {
   modal.innerHTML = `
     <div style="background:var(--gris-oscuro);border:1px solid var(--gris-borde);border-radius:18px;max-width:520px;width:100%;padding:28px 22px;margin:auto">
       <div style="text-align:center;margin-bottom:8px">
-        <div style="font-size:13px;color:${modo==='renovar'?'var(--rojo)':'var(--verde)'};font-weight:700;letter-spacing:1px">${modo==='renovar'?'TU PLAN VENCIÓ':(modo==='renovar-antes'?'RENOVAR PLAN':'ÚLTIMO PASO')}</div>
-        <h2 style="font-family:var(--f-tit);font-size:22px;font-weight:800;margin:8px 0 6px">${renov?'Renueva tu plan':'Elige tu plan para empezar'}</h2>
-        ${renov ? '<p style="color:var(--texto-secundario);font-size:13px;margin:0 0 18px;line-height:1.5">' + (modo==='renovar' ? 'Tu plan venció' + (stP.vence ? ' el ' + fechaLarga(stP.vence) : '') + '. Tu CV, tus datos y tus postulaciones siguen guardados: apenas renueves, sigues donde te quedaste.' : (stP.dias===1 ? 'Te queda 1 día' : 'Te quedan ' + (stP.dias||0) + ' días') + '. Si renuevas ahora, esos días se suman al nuevo mes.') + '</p>' : `<p style="color:var(--texto-secundario);font-size:13px;margin:0 0 18px;line-height:1.5">Para activar tu cuenta y empezar a buscar empleo, elige el plan que más te convenga. Puedes cambiarlo después desde tu panel.</p>`}
+        <div style="font-size:13px;color:${modo==='renovar'?'var(--rojo)':'var(--verde)'};font-weight:700;letter-spacing:1px">${modo==='renovar'?'TU PLAN VENCIÓ':(modo==='renovar-antes'?'RENOVAR PLAN':(mejorar?'MEJORA TU PLAN':'ÚLTIMO PASO'))}</div>
+        <h2 style="font-family:var(--f-tit);font-size:22px;font-weight:800;margin:8px 0 6px">${renov?'Renueva tu plan':(mejorar?'Postula más y más rápido':'Elige tu plan para empezar')}</h2>
+        ${mejorar ? '<p style="color:var(--texto-secundario);font-size:13px;margin:0 0 18px;line-height:1.5">Con Estándar o Pro el Piloto automático trabaja todos los días y puedes postular a todas las ofertas en un clic. Los días que te quedan de tu plan actual se suman.</p>' : renov ? '<p style="color:var(--texto-secundario);font-size:13px;margin:0 0 18px;line-height:1.5">' + (modo==='renovar' ? 'Tu plan venció' + (stP.vence ? ' el ' + fechaLarga(stP.vence) : '') + '. Tu CV, tus datos y tus postulaciones siguen guardados: apenas renueves, sigues donde te quedaste.' : (stP.dias===1 ? 'Te queda 1 día' : 'Te quedan ' + (stP.dias||0) + ' días') + '. Si renuevas ahora, esos días se suman al nuevo mes.') + '</p>' : `<p style="color:var(--texto-secundario);font-size:13px;margin:0 0 18px;line-height:1.5">Para activar tu cuenta y empezar a buscar empleo, elige el plan que más te convenga. Puedes cambiarlo después desde tu panel.</p>`}
       </div>
 
       <div style="display:flex;flex-direction:column;gap:12px">
@@ -8008,7 +8180,7 @@ function mostrarPlanesRegistro(modo) {
             <div style="font-family:var(--f-tit);font-size:17px;font-weight:700">Básico</div>
             <div style="font-family:var(--f-tit);font-size:20px;font-weight:800;color:var(--verde)">$9.99<span style="font-size:11px;color:var(--texto-secundario)">/mes</span></div>
           </div>
-          <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:12px">3 búsquedas/día · 12 postulaciones/día</div>
+          <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:12px">3 búsquedas/día · 12 postulaciones/día · Piloto automático 3 días por semana</div>
           <button onclick="elegirPlanRegistro('Básico','9.99')" class="btn-full">Elegir Básico</button>
         </div>
 
@@ -8018,7 +8190,7 @@ function mostrarPlanesRegistro(modo) {
             <div style="font-family:var(--f-tit);font-size:17px;font-weight:700">Estándar</div>
             <div style="font-family:var(--f-tit);font-size:20px;font-weight:800;color:var(--verde)">$19.99<span style="font-size:11px;color:var(--texto-secundario)">/mes</span></div>
           </div>
-          <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:12px">6 búsquedas/día · 35 postulaciones/día</div>
+          <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:12px">6 búsquedas/día · 35 postulaciones/día · Piloto automático diario (10)</div>
           <button onclick="elegirPlanRegistro('Estándar','19.99')" class="btn-full">Elegir Estándar</button>
         </div>
 
@@ -8027,13 +8199,13 @@ function mostrarPlanesRegistro(modo) {
             <div style="font-family:var(--f-tit);font-size:17px;font-weight:700">Pro</div>
             <div style="font-family:var(--f-tit);font-size:20px;font-weight:800;color:var(--verde)">$29.99<span style="font-size:11px;color:var(--texto-secundario)">/mes</span></div>
           </div>
-          <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:12px">10 búsquedas/día · 55 postulaciones/día · 10 correos en frío</div>
+          <div style="font-size:12px;color:var(--texto-secundario);margin-bottom:12px">10 búsquedas/día · 55 postulaciones/día · Piloto diario (30) · 10 correos en frío</div>
           <button onclick="elegirPlanRegistro('Pro','29.99')" class="btn-full">Elegir Pro</button>
         </div>
       </div>
 
       <div style="text-align:center;margin-top:16px">
-        ${modo==='renovar-antes' ? '<button onclick="cerrarPlanesRegistro()" style="background:none;border:none;color:var(--texto-secundario);font-size:12px;cursor:pointer;text-decoration:underline">Ahora no</button>' : (modo==='renovar' ? '<button onclick="salirDeRegistro()" style="background:none;border:none;color:var(--texto-secundario);font-size:12px;cursor:pointer;text-decoration:underline">Cerrar sesión</button>' : '<button onclick="salirDeRegistro()" style="background:none;border:none;color:var(--texto-secundario);font-size:12px;cursor:pointer;text-decoration:underline">Cancelar y salir</button>')}
+        ${modo==='renovar-antes' || mejorar ? '<button onclick="cerrarPlanesRegistro()" style="background:none;border:none;color:var(--texto-secundario);font-size:12px;cursor:pointer;text-decoration:underline">Ahora no</button>' : (modo==='renovar' ? '<button onclick="salirDeRegistro()" style="background:none;border:none;color:var(--texto-secundario);font-size:12px;cursor:pointer;text-decoration:underline">Cerrar sesión</button>' : '<button onclick="salirDeRegistro()" style="background:none;border:none;color:var(--texto-secundario);font-size:12px;cursor:pointer;text-decoration:underline">Cancelar y salir</button>')}
       </div>
     </div>`;
   document.body.appendChild(modal);
