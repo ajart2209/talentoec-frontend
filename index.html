@@ -8807,9 +8807,19 @@ document.addEventListener('keydown', function(e){
 // Register Service Worker for PWA
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').then(reg => {
-      
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(reg => {
+      try { reg.update(); } catch (e) {}
     }).catch(err => {});
+    // Cuando se activa una versión nueva del service worker, recargar UNA vez para mostrar lo último
+    // (solo si ya había una versión anterior controlando la página; en la primera visita no hace falta)
+    let recargando = false;
+    const habiaControlador = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!habiaControlador || recargando || sessionStorage.getItem('sw_recargado')) return;
+      recargando = true;
+      try { sessionStorage.setItem('sw_recargado', '1'); } catch (e) {}
+      location.reload();
+    });
   });
 }
 
