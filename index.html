@@ -1210,6 +1210,16 @@ nav{background:rgba(var(--t-fondo),.86);border-bottom-color:rgba(var(--t-claro),
 .job-fecha{font-size:11.5px;color:rgba(var(--t-claro),.55);margin-top:8px}
 .card-actions{flex-wrap:wrap}
 a.btn-wa{text-decoration:none;display:inline-flex;align-items:center;border-color:rgba(37,211,102,.45);color:#5BE38F}
+.pa-faq{display:grid;gap:10px;margin-top:14px}
+.pa-faq details{background:var(--lx-panel);border:1px solid var(--lx-linea);border-radius:18px;padding:0 20px}
+.pa-faq summary{cursor:pointer;list-style:none;padding:16px 0;font-weight:700;font-size:15px;display:flex;justify-content:space-between;gap:12px;min-height:44px;align-items:center}
+.pa-faq summary::-webkit-details-marker{display:none}
+.pa-faq summary::after{content:'+';font-size:20px;color:rgb(var(--t-acento));flex:0 0 auto}
+.pa-faq details[open] summary::after{content:'–'}
+.pa-faq p{padding:0 0 16px;color:rgba(var(--t-claro),.72);font-size:14px;line-height:1.6}
+.pil-que{margin-top:12px}
+.pil-que summary{cursor:pointer;font-size:13px;font-weight:700;color:rgb(var(--t-acento));min-height:40px;display:flex;align-items:center}
+.pil-que ol{margin:6px 0 0 18px;font-size:13px;line-height:1.7;color:rgba(var(--t-claro),.75)}
 /* Piloto automático */
 .pil-lead{font-size:13.5px;line-height:1.6;color:rgba(var(--t-claro),.75)}
 .pil-limites{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
@@ -1348,15 +1358,15 @@ if (window.pdfjsLib) {
     <ol class="lx-pasos" aria-label="Cómo funciona">
       <li><span class="lx-num"><b>#</b>01</span>Sube tu CV</li>
       <li><span class="lx-num"><b>#</b>02</span>Detectamos tu área</li>
-      <li><span class="lx-num"><b>#</b>03</span>Buscamos en los portales</li>
+      <li><span class="lx-num"><b>#</b>03</span>Buscamos ofertas reales</li>
       <li><span class="lx-num"><b>#</b>04</span>Postulamos por ti</li>
     </ol>
   </section>
 
-  <section class="lx-portales" aria-label="Portales donde buscamos">
-    <p class="lx-portales-lbl">Buscamos ofertas en</p>
+  <section class="lx-portales" aria-label="Dónde buscamos ofertas">
+    <p class="lx-portales-lbl">Dónde buscamos</p>
     <ul class="lx-portales-lista">
-      <li>LinkedIn</li><li>Multitrabajos</li><li>Computrabajo</li><li>Indeed</li><li>PorfinEmpleo</li><li>Encuentra Empleo</li>
+      <li>Portales de empleo</li><li>Páginas de empresas</li><li>Vacantes de TalentoEC</li><li>Ofertas con correo publicado</li>
     </ul>
   </section>
 
@@ -1443,16 +1453,17 @@ if (window.pdfjsLib) {
 
         <!-- Dona: cobertura -->
         <div class="kpi-panel dx-card">
-          <div class="dx-card-cab"><h3>Cobertura de portales</h3></div>
+          <div class="dx-card-cab"><h3>Dónde buscamos</h3></div>
           <div class="kpi-donut-wrap dx-dona">
-            <svg viewBox="0 0 120 120" width="150" height="150" role="img" aria-label="Seis portales consultados en cada búsqueda">
+            <svg viewBox="0 0 120 120" width="150" height="150" role="img" aria-label="Cuatro tipos de fuentes de ofertas públicas">
                 <circle cx="60" cy="60" r="46" fill="none" stroke="rgba(238,247,242,.06)" stroke-width="13"/>
-                <circle class="kpi-seg" style="--arc:14.6;--sd:0ms" cx="60" cy="60" r="46" fill="none" stroke="#1BD07F" stroke-width="13" stroke-linecap="round" pathLength="100" stroke-dashoffset="-0.00" transform="rotate(-90 60 60)"/><circle class="kpi-seg" style="--arc:14.6;--sd:120ms" cx="60" cy="60" r="46" fill="none" stroke="#C6F86A" stroke-width="13" stroke-linecap="round" pathLength="100" stroke-dashoffset="-16.67" transform="rotate(-90 60 60)"/><circle class="kpi-seg" style="--arc:14.6;--sd:240ms" cx="60" cy="60" r="46" fill="none" stroke="#EEFBDD" stroke-width="13" stroke-linecap="round" pathLength="100" stroke-dashoffset="-33.33" transform="rotate(-90 60 60)"/><circle class="kpi-seg" style="--arc:14.6;--sd:360ms" cx="60" cy="60" r="46" fill="none" stroke="#0E8F57" stroke-width="13" stroke-linecap="round" pathLength="100" stroke-dashoffset="-50.00" transform="rotate(-90 60 60)"/><circle class="kpi-seg" style="--arc:14.6;--sd:480ms" cx="60" cy="60" r="46" fill="none" stroke="#7CFFD4" stroke-width="13" stroke-linecap="round" pathLength="100" stroke-dashoffset="-66.67" transform="rotate(-90 60 60)"/><circle class="kpi-seg" style="--arc:14.6;--sd:600ms" cx="60" cy="60" r="46" fill="none" stroke="#4D6B5B" stroke-width="13" stroke-linecap="round" pathLength="100" stroke-dashoffset="-83.33" transform="rotate(-90 60 60)"/>
-                <text x="60" y="61" text-anchor="middle" font-family="Plus Jakarta Sans,sans-serif" font-weight="800" font-size="26" fill="#EEF7F2">6</text>
-                <text x="60" y="76" text-anchor="middle" font-family="Plus Jakarta Sans,sans-serif" font-size="9" fill="rgba(238,247,242,.55)">portales</text>
+                <circle class="kpi-seg" style="--arc:22.5;--sd:0ms" cx="60" cy="60" r="46" fill="none" stroke="#1BD07F" stroke-width="13" stroke-linecap="round" pathLength="100" stroke-dashoffset="-0.00" transform="rotate(-90 60 60)"/><circle class="kpi-seg" style="--arc:22.5;--sd:120ms" cx="60" cy="60" r="46" fill="none" stroke="#C6F86A" stroke-width="13" stroke-linecap="round" pathLength="100" stroke-dashoffset="-25.00" transform="rotate(-90 60 60)"/><circle class="kpi-seg" style="--arc:22.5;--sd:240ms" cx="60" cy="60" r="46" fill="none" stroke="#EEFBDD" stroke-width="13" stroke-linecap="round" pathLength="100" stroke-dashoffset="-50.00" transform="rotate(-90 60 60)"/><circle class="kpi-seg" style="--arc:22.5;--sd:360ms" cx="60" cy="60" r="46" fill="none" stroke="#7CFFD4" stroke-width="13" stroke-linecap="round" pathLength="100" stroke-dashoffset="-75.00" transform="rotate(-90 60 60)"/>
+                <text x="60" y="61" text-anchor="middle" font-family="Plus Jakarta Sans,sans-serif" font-weight="800" font-size="26" fill="#EEF7F2">4</text>
+                <text x="60" y="76" text-anchor="middle" font-family="Plus Jakarta Sans,sans-serif" font-size="9" fill="rgba(238,247,242,.55)">fuentes</text>
               </svg>
-            <ul class="dx-leyenda"><li><i class="kpi-dot" style="background:#1BD07F"></i>LinkedIn</li><li><i class="kpi-dot" style="background:#C6F86A"></i>Multitrabajos</li><li><i class="kpi-dot" style="background:#EEFBDD"></i>Computrabajo</li><li><i class="kpi-dot" style="background:#0E8F57"></i>Indeed</li><li><i class="kpi-dot" style="background:#7CFFD4"></i>PorfinEmpleo</li><li><i class="kpi-dot" style="background:#4D6B5B"></i>Encuentra Empleo</li></ul>
+            <ul class="dx-leyenda"><li><i class="kpi-dot" style="background:#1BD07F"></i>Portales de empleo</li><li><i class="kpi-dot" style="background:#C6F86A"></i>Páginas de empresas</li><li><i class="kpi-dot" style="background:#EEFBDD"></i>Vacantes de TalentoEC</li><li><i class="kpi-dot" style="background:#7CFFD4"></i>Correo publicado</li></ul>
           </div>
+          <p class="dx-card-pie">Solo ofertas públicas. No entramos a tus cuentas ni postulamos dentro de otros portales.</p>
         </div>
 
         <!-- Tiempo de búsqueda -->
@@ -1545,8 +1556,8 @@ if (window.pdfjsLib) {
       <article class="cf-card">
         <div class="cf-cab"><span class="cf-ico"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></g></svg></span><span class="lx-num"><b>#</b>02</span></div>
         <h3>Buscamos ofertas reales</h3>
-        <p>Revisamos las vacantes exclusivas de TalentoEC y los principales portales del Ecuador. Solo te mostramos ofertas con empresa real y un enlace o correo de contacto.</p>
-        <ul class="cf-chips"><li>Vacantes exclusivas</li><li>LinkedIn</li><li>Multitrabajos</li><li>Computrabajo</li><li>Encuentra Empleo</li></ul>
+        <p>Revisamos las vacantes exclusivas de TalentoEC y ofertas públicas de internet: portales de empleo y páginas de empresas. Solo te mostramos ofertas con empresa real y un enlace o correo de contacto.</p>
+        <ul class="cf-chips"><li>Vacantes exclusivas</li><li>Portales de empleo</li><li>Páginas de empresas</li><li>Correo publicado</li></ul>
       </article>
       <article class="cf-card">
         <div class="cf-cab"><span class="cf-ico"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3L10 14"/><path d="M21 3l-6.5 18-4.5-7-7-4.5z"/></g></svg></span><span class="lx-num"><b>#</b>03</span></div>
@@ -1563,6 +1574,34 @@ if (window.pdfjsLib) {
         <p>Las empresas te contestan directo a tu correo. Las ofertas a las que ya postulaste no vuelven a aparecer, y con el plan Pro postulas hasta 55 veces al día.</p>
         <button class="lx-btn-pill cta-reg" onclick="openAuth('register')">Empezar gratis<span class="lx-flecha" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
       </article>
+    </div>
+  </section>
+
+
+  <!-- ═══════ PILOTO AUTOMÁTICO ═══════ -->
+  <section class="cf pa" id="piloto" aria-label="Piloto automático">
+    <div class="dx-cab">
+      <div>
+        <p class="lx-etiqueta">Nuevo · Piloto automático</p>
+        <h2 class="lx-titulo-2">TalentoEC postula por ti,<br>aunque no entres</h2>
+      </div>
+      <p class="dx-intro">Lo activas una vez desde tu panel y, cada mañana, buscamos ofertas nuevas de tu área y enviamos tu CV con tu carta a las empresas que publicaron su correo. Tú solo revisas quién te responde.</p>
+    </div>
+    <div class="cf-grid">
+      <article class="cf-card"><div class="cf-cab"><span class="cf-ico"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="5"/></g></svg></span><span class="lx-num"><b>#</b>01</span></div><h3>Lo activas una vez</h3><p>Eliges tu área, tu ciudad, cuántas postulaciones al día y revisas tu carta. Desde ahí no tienes que hacer nada más.</p><ul class="cf-chips"><li>Tu área</li><li>Tu ciudad</li><li class="lima">Tu carta</li></ul></article>
+      <article class="cf-card"><div class="cf-cab"><span class="cf-ico"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></g></svg></span><span class="lx-num"><b>#</b>02</span></div><h3>Cada mañana busca por ti</h3><p>Desde las 8:00 buscamos ofertas nuevas de tu área, primero donde las empresas publican su correo para recibir hojas de vida.</p></article>
+      <article class="cf-card"><div class="cf-cab"><span class="cf-ico"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z"/><path d="M9 12l2 2 4-4"/></g></svg></span><span class="lx-num"><b>#</b>03</span></div><h3>Solo correos verificados</h3><p>Enviamos tu postulación únicamente si el correo aparece escrito en la oferta. Nunca inventamos ofertas ni correos, y no repetimos la misma empresa.</p></article>
+      <article class="cf-card cf-final">
+        <div class="cf-cab"><span class="cf-ico"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></g></svg></span><span class="lx-num"><b>#</b>04</span></div>
+        <h3>Te llega el resumen</h3>
+        <p>Cada vez que trabaja te mandamos un correo con las empresas a las que postuló. Todo queda en "Mis postulaciones" y puedes pausarlo cuando quieras.</p>
+        <button class="lx-btn-pill" onclick="irAlPiloto()">Activar mi piloto<span class="lx-flecha" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+      </article>
+    </div>
+    <div class="pa-faq">
+      <details><summary>¿Cuántas postulaciones envía?</summary><p>Básico: hasta 3 los lunes, miércoles y viernes. Estándar: hasta 10 todos los días. Pro: hasta 30 todos los días con 2 áreas. Siempre dentro del límite diario de tu plan.</p></details>
+      <details><summary>¿Y si un día no hay ofertas con correo?</summary><p>Ese día no enviamos nada, para no mandar tu CV a direcciones dudosas, y te lo decimos en el resumen. Al día siguiente volvemos a buscar.</p></details>
+      <details><summary>¿Puedo pausarlo o cambiar mi carta?</summary><p>Sí, en tu panel, pestaña "Piloto automático", cuando quieras. Si tu plan vence, el piloto se pausa solo y vuelve al renovar.</p></details>
     </div>
   </section>
 
@@ -2084,6 +2123,15 @@ if (window.pdfjsLib) {
         <div class="section-box-title" style="margin-bottom:6px">🤖 Piloto automático</div>
         <div class="pil-lead">Actívalo una vez y TalentoEC postula por ti: busca ofertas nuevas de tu área, envía tu CV y tu carta <b>solo a empresas que publicaron su correo</b> (lo comprobamos en la oferta) y te manda un resumen por correo.</div>
         <div id="pilLimites" class="pil-limites"></div>
+        <details class="pil-que"><summary>¿Qué es y cómo funciona?</summary>
+          <ol>
+            <li>Escribes tu área, ciudad y cuántas postulaciones quieres por día, y revisas tu carta.</li>
+            <li>Cada mañana (desde las 8:00) buscamos ofertas nuevas de tu área.</li>
+            <li>Solo enviamos tu CV y tu carta si el correo de la empresa aparece escrito en la oferta. Nunca repetimos empresa.</li>
+            <li>Te llega un correo con el resumen y todo queda en "Mis postulaciones".</li>
+            <li>Puedes pausarlo cuando quieras; si tu plan vence, se pausa solo.</li>
+          </ol>
+        </details>
       </div>
       <div id="pilAviso" class="pil-aviso" style="display:none" role="status"></div>
       <div id="pilEstado" class="pil-estado" style="display:none"></div>
@@ -6206,6 +6254,12 @@ function renderJobCards(jobs) {
     }).join('');
 }
 
+function irAlPiloto() {
+  if (!currentUser) { openAuth('register'); showToast('Crea tu cuenta y elige un plan para activar tu piloto'); return; }
+  if (currentUser.tipo === 'empleador') { showToast('El Piloto automático es para candidatos.'); return; }
+  showPage('candidato');
+  setTimeout(function () { if (document.getElementById('page-candidato').classList.contains('active')) candTab('piloto'); }, 250);
+}
 function filtrarDirecto(solo) { window._soloDirecto = !!solo; renderJobCards(ultimosResultados || []); }
 // Abrir oferta externa: la marca como VISTA (atenuada) pero NO la borra.
 // Solo desaparece cuando el usuario confirma que postuló.
