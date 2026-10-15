@@ -723,7 +723,7 @@ nav{z-index:100}
   .lx-enfoque-pie{flex-direction:column;align-items:flex-start}
 }
 @media(max-width:480px){
-  .btn-nav-cta,.btn-nav-login{white-space:nowrap;font-size:11.5px;padding:6px 11px}
+  .btn-nav-cta,.btn-nav-login{white-space:nowrap;font-size:12px;padding:8px 13px;min-height:36px}
   .nav-right{gap:6px}
   /* Pestañas en una segunda fila deslizable: antes quedaban tapadas por los botones */
   nav{flex-wrap:wrap;height:auto;padding:8px 10px 0;row-gap:4px}
@@ -1090,7 +1090,7 @@ html[data-tema="motorex"] .lx-enfoque-texto{max-width:34ch}
 
 /* Barra superior: textos en una sola línea; en pantallas medianas, pestañas en segunda fila */
 .ntab,.btn-nav-login,.btn-nav-cta{white-space:nowrap}
-@media(max-width:1180px){ .ntab{padding:7px 10px;font-size:12.5px} .btn-nav-login,.btn-nav-cta{padding:7px 13px;font-size:12.5px} nav{padding:0 18px} }
+@media(max-width:1180px){ .ntab{padding:7px 10px;font-size:12.5px} .btn-nav-login,.btn-nav-cta{padding:7px 13px;font-size:12.5px;min-height:34px} nav{padding:0 18px} }
 @media(min-width:481px) and (max-width:960px){
   nav{flex-wrap:wrap;height:auto;padding:8px 14px 0;row-gap:4px}
   .nav-center{order:3;width:100%;justify-content:flex-start;padding-bottom:6px;overflow-x:auto;scrollbar-width:none}
@@ -2730,7 +2730,7 @@ if (window.pdfjsLib) {
 </div>
 
 <!-- WhatsApp flotante -->
-<a id="waFlotante" aria-label="Escríbenos por WhatsApp" href="https://wa.me/593982238005?text=Hola,%20necesito%20ayuda%20con%20TalentoEC" target="_blank"
+<a id="waFlotante" aria-label="Escríbenos por WhatsApp" href="https://wa.me/593982238005?text=Hola,%20necesito%20ayuda%20con%20TalentoEC" target="_blank" rel="noopener noreferrer"
    style="position:fixed;bottom:20px;right:20px;background:#25D366;color:#fff;width:56px;height:56px;border-radius:50%;
    display:flex;align-items:center;justify-content:center;text-decoration:none;box-shadow:0 4px 16px rgba(37,211,102,0.4);
    z-index:998;transition:transform .2s;font-size:0"
@@ -3879,7 +3879,7 @@ function contactarWhatsApp(vacanteId, idx) {
 
   const mensaje = `Hola ${nombreCand}, te contactamos de ${empresa} por tu postulación en TalentoEC. Vimos tu CV y nos gustaría conversar contigo. ¿Tienes disponibilidad?`;
   const url = `https://wa.me/${tel}?text=${encodeURIComponent(mensaje)}`;
-  window.open(url, '_blank');
+  window.open(url, '_blank', 'noopener');
   showToast('💬 Abriendo WhatsApp con ' + (nombreCand || 'el candidato'));
 }
 
@@ -4034,7 +4034,7 @@ function revisarVacante(id) {
         ${emp.telefono ? '<div><strong>Teléfono:</strong> ' + escHtml(emp.telefono) + '</div>' : ''}
         <div><strong>Email de contacto vacante:</strong> ${escHtml(v.email_contacto)}</div>
         ${emp.empresa_sector ? '<div><strong>Sector:</strong> ' + escHtml(emp.empresa_sector) + '</div>' : ''}
-        ${emp.empresa_web ? '<div><strong>Web:</strong> <a href="' + escHtml(emp.empresa_web) + '" target="_blank" style="color:var(--verde)">' + escHtml(emp.empresa_web) + '</a></div>' : '<div style="color:var(--texto-secundario)">Sin sitio web registrado</div>'}
+        ${emp.empresa_web ? (urlSegura(emp.empresa_web) ? '<div><strong>Web:</strong> <a href="' + escHtml(urlSegura(emp.empresa_web)) + '" target="_blank" rel="noopener noreferrer" style="color:var(--verde)">' + escHtml(emp.empresa_web) + '</a></div>' : '<div><strong>Web:</strong> ' + escHtml(emp.empresa_web) + '</div>') : '<div style="color:var(--texto-secundario)">Sin sitio web registrado</div>'}
         ${emp.empresa_descripcion ? '<div style="margin-top:6px"><strong>Sobre la empresa:</strong> ' + escHtml(emp.empresa_descripcion) + '</div>' : ''}
         ${diasEmpresa !== null ? '<div style="color:var(--texto-secundario);margin-top:4px">Cuenta creada hace ' + diasEmpresa + ' día(s)</div>' : ''}
       </div>
@@ -6495,7 +6495,7 @@ function buscarOfertaReal(cargo, empresa, ciudad, portales) {
   ];
 
   const botones = portalesFijos.map(p =>
-    `<a href="${p.url}" target="_blank" style="background:${p.color};color:#fff;padding:12px;border-radius:8px;text-decoration:none;font-weight:600;text-align:center;font-size:13px">${p.nombre}</a>`
+    `<a href="${p.url}" target="_blank" rel="noopener noreferrer" style="background:${p.color};color:#fff;padding:12px;border-radius:8px;text-decoration:none;font-weight:600;text-align:center;font-size:13px">${p.nombre}</a>`
   ).join('');
 
   // Marcar como postulado cuando el usuario abre el modal de buscar
@@ -7738,8 +7738,8 @@ function renderEmpresasFrio(empresas, nombre, area) {
       </div>
       <div class="card-actions">
         ${e.email_rrhh && e.email_rrhh.includes('@') ? `<button class="btn-sm-green" onclick='abrirEmailFrio(${escHtml(JSON.stringify(String(e.email_rrhh)))},${escHtml(JSON.stringify(String(e.nombre||'')))},${escHtml(JSON.stringify(String(area||'')))},${escHtml(JSON.stringify(String(nombre||'')))})'>✉ Correo en frío (email verificado)</button>` : ''}
-        ${urlSegura(e.web) ? `<button class="btn-sm-outline" onclick="window.open(${escHtml(JSON.stringify(urlSegura(e.web)))},'_blank')">🌐 Sitio oficial</button>` : ''}
-        <button class="btn-sm-outline" onclick="window.open('https://google.com/search?q=${encodeURIComponent(e.nombre + ' Ecuador contacto rrhh')}')">🔎 Investigar contacto</button>
+        ${urlSegura(e.web) ? `<button class="btn-sm-outline" onclick="window.open(${escHtml(JSON.stringify(urlSegura(e.web)))},'_blank','noopener')">🌐 Sitio oficial</button>` : ''}
+        <button class="btn-sm-outline" onclick="window.open('https://google.com/search?q=${encodeURIComponent(e.nombre + ' Ecuador contacto rrhh')}','_blank','noopener')">🔎 Investigar contacto</button>
       </div>
     </div>`).join('');
 }
@@ -9054,11 +9054,14 @@ let deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
+  // Solo en celular, y si lo cerró no vuelve a salir en 30 días
+  const esCelular = window.matchMedia('(pointer:coarse)').matches && window.innerWidth <= 820;
+  let cerrado = 0;
+  try { cerrado = Number(localStorage.getItem('install_dismissed_at') || 0); } catch (err) {}
+  if (!esCelular || (Date.now() - cerrado) < 30 * 864e5) return;
   setTimeout(() => {
-    if (deferredPrompt && !sessionStorage.getItem('install_dismissed')) {
-      mostrarBannerInstalar();
-    }
-  }, 5000);
+    if (deferredPrompt && !document.getElementById('installBanner')) mostrarBannerInstalar();
+  }, 8000);
 });
 
 function mostrarBannerInstalar() {
@@ -9088,7 +9091,7 @@ async function instalarApp() {
 function cerrarBannerInstalar() {
   const banner = document.getElementById('installBanner');
   if (banner) banner.remove();
-  sessionStorage.setItem('install_dismissed', '1');
+  try { localStorage.setItem('install_dismissed_at', String(Date.now())); } catch (err) {}
 }
 
 /* ════════════ EFECTOS VISUALES v3 ════════════ */
