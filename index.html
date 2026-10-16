@@ -869,6 +869,8 @@ nav{z-index:100}
 .pl-pista{height:8px;border-radius:999px;background:rgba(var(--t-claro),.07);margin:8px 0 8px;overflow:hidden}
 .pl-pista span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,rgb(var(--t-acento)),var(--lx-lima))}
 .pl-medidor-nota{font-size:11.5px;color:rgba(var(--t-claro),.45)}
+.portales-directos{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:560px;margin:0 auto}
+.portales-directos a{text-decoration:none;min-height:38px;display:inline-flex;align-items:center}
 .gratis-box{border:2px dashed var(--verde);background:rgba(var(--verde-rgb),0.06);border-radius:12px;padding:14px 16px;margin:0 0 14px;text-align:center}
 .gratis-box.usada{border-style:solid;border-width:1px;border-color:rgba(var(--verde-rgb),0.35)}
 .gratis-tit{font-family:var(--f-tit);font-weight:800;font-size:15px;color:var(--verde);margin-bottom:4px}
@@ -5963,6 +5965,7 @@ async function buscarEmpleo() {
     return;
   }
   localStorage.setItem(diaKey, String(usadasHoy + 1));
+  window.__revertirBusquedaLocal = function () { try { localStorage.setItem(diaKey, String(usadasHoy)); } catch (e) {} };
   // Incrementar también el contador TOTAL del usuario
   const totalKey = 'busquedas_total_' + userKey;
   const totalActual = parseInt(localStorage.getItem(totalKey) || '0');
@@ -6074,6 +6077,8 @@ async function buscarEmpleo() {
     });
     parsed = { jobs: Array.isArray(r && r.jobs) ? r.jobs : [] };
     if (r && r.gratis) marcarGratisUsada();
+    window.__busqDevuelta = !!(r && r.devuelta);
+    if (r && r.devuelta && typeof window.__revertirBusquedaLocal === 'function') window.__revertirBusquedaLocal();
     if (r && r.desdeMemoria) console.log('[BÚSQUEDA] ' + r.desdeMemoria + ' área(s) servidas desde la memoria (sin costo de API)');
   } catch(e) {
     console.error('Error en búsqueda:', e);
@@ -6137,17 +6142,39 @@ async function buscarEmpleo() {
     return;
   }
 
-  // CASO 2: no hubo ofertas verificables. No se inventa nada ni se manda a portales externos:
-  // se orienta al usuario para afinar la búsqueda dentro de TalentoEC.
+  // CASO 2: ni la búsqueda amplia encontró ofertas con enlace o correo. No se inventa nada:
+  // se dan los enlaces DIRECTOS a esa misma búsqueda en los portales, y la búsqueda no se cobra.
   const sugerencia = (typeof nucleoCargo === 'function') ? nucleoCargo(query) : '';
+  const devuelta = !!window.__busqDevuelta; window.__busqDevuelta = false;
   document.getElementById('candResultados').innerHTML = `
-    <div style="text-align:center;padding:50px 20px">
+    <div style="text-align:center;padding:40px 16px">
       <div style="font-size:44px;margin-bottom:12px">🔎</div>
-      <h3 style="font-family:var(--f-tit);font-size:19px;margin-bottom:8px">No encontramos ofertas verificables para <span style="color:var(--verde)">${escHtml(query)}</span></h3>
-      <p style="color:var(--texto-secundario);font-size:13px;max-width:440px;margin:0 auto 18px">Solo te mostramos ofertas reales con una forma de postular desde TalentoEC. Prueba con un término más general${sugerencia && sugerencia !== String(query).toLowerCase() ? ' (por ejemplo, <b>' + escHtml(sugerencia) + '</b>)' : ''} o con otra ciudad.</p>
+      <h3 style="font-family:var(--f-tit);font-size:19px;margin-bottom:8px">Hoy no encontramos ofertas con correo para <span style="color:var(--verde)">${escHtml(query)}</span></h3>
+      <p style="color:var(--texto-secundario);font-size:13px;max-width:460px;margin:0 auto 16px">Míralas directo en los portales: te abrimos la búsqueda ya hecha${ciudad && !/^todas?$/i.test(ciudad) ? ' en <b>' + escHtml(ciudad) + '</b>' : ''}.</p>
+      ${enlacesPortales(query, ciudad)}
+      <p style="color:var(--texto-secundario);font-size:12.5px;max-width:440px;margin:18px auto 14px">También puedes probar con un término más general${sugerencia && sugerencia !== String(query).toLowerCase() ? ' (por ejemplo, <b>' + escHtml(sugerencia) + '</b>)' : ''} o con otra ciudad.</p>
       <button class="btn-sm-green" onclick="candTab('busqueda')">🔍 Ajustar búsqueda</button>
-      <p style="color:var(--texto-secundario);font-size:11px;margin-top:10px">${enPrueba ? 'Ya usaste tu búsqueda gratis. <a href="#" onclick="mostrarPlanesRegistro();return false" style="color:var(--verde)">Elige un plan desde $9,99</a> para seguir buscando y postular.' : 'Cada búsqueda nueva usa 1 de tus búsquedas diarias'}</p>
+      <p style="color:var(--verde);font-size:11.5px;margin-top:10px">${devuelta ? (enPrueba ? '✓ Tu búsqueda gratis sigue disponible: no se contó.' : '✓ Esta búsqueda no se descontó de tus búsquedas del día.') : (enPrueba ? 'Ya usaste tu búsqueda gratis. <a href="#" onclick="mostrarPlanesRegistro();return false" style="color:var(--verde)">Elige un plan desde $9,99</a> para seguir buscando y postular.' : '')}</p>
     </div>`;
+}
+
+// Enlaces DIRECTOS a la misma búsqueda en los portales (solo texto, sin logos de terceros)
+function enlacesPortales(query, ciudad) {
+  const q = String(query || '').split(',')[0].trim();
+  const c = (ciudad && !/^todas?$/i.test(ciudad)) ? String(ciudad).trim() : '';
+  const slug = (t) => String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  const e = encodeURIComponent;
+  const lista = [
+    ['LinkedIn Empleos', 'https://www.linkedin.com/jobs/search/?keywords=' + e(q) + '&location=' + e((c ? c + ', ' : '') + 'Ecuador')],
+    ['Computrabajo', 'https://ec.computrabajo.com/trabajo-de-' + slug(q) + (c ? '-en-' + slug(c) : '')],
+    ['Multitrabajos', 'https://www.multitrabajos.com/empleos-busqueda-' + slug(q) + '.html'],
+    ['Indeed', 'https://ec.indeed.com/jobs?q=' + e(q) + '&l=' + e(c || 'Ecuador')],
+    ['Google Empleos', 'https://www.google.com/search?q=' + e('empleo ' + q + ' ' + (c || '') + ' Ecuador') + '&ibp=htl;jobs'],
+    ['Facebook Empleos', 'https://www.facebook.com/search/posts/?q=' + e('empleo ' + q + ' ' + (c || 'Ecuador'))]
+  ];
+  return '<div class="portales-directos">' + lista.map(function (x) {
+    return '<a class="btn-sm-outline" href="' + escHtml(x[1]) + '" target="_blank" rel="noopener">🔗 ' + escHtml(x[0]) + '</a>';
+  }).join('') + '</div>';
 }
 
 async function restaurarResultados() {
