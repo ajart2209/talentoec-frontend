@@ -869,6 +869,12 @@ nav{z-index:100}
 .pl-pista{height:8px;border-radius:999px;background:rgba(var(--t-claro),.07);margin:8px 0 8px;overflow:hidden}
 .pl-pista span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,rgb(var(--t-acento)),var(--lx-lima))}
 .pl-medidor-nota{font-size:11.5px;color:rgba(var(--t-claro),.45)}
+.gratis-box{border:2px dashed var(--verde);background:rgba(var(--verde-rgb),0.06);border-radius:12px;padding:14px 16px;margin:0 0 14px;text-align:center}
+.gratis-box.usada{border-style:solid;border-width:1px;border-color:rgba(var(--verde-rgb),0.35)}
+.gratis-tit{font-family:var(--f-tit);font-weight:800;font-size:15px;color:var(--verde);margin-bottom:4px}
+.gratis-txt{font-size:12.5px;color:var(--texto-secundario);line-height:1.5;margin-bottom:10px}
+.aviso-gratis{background:rgba(var(--verde-rgb),0.08);border:1px solid rgba(var(--verde-rgb),0.3);border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:1.5;margin-bottom:10px;text-align:center}
+.aviso-gratis button{background:none;border:none;color:var(--verde);font-weight:700;text-decoration:underline;cursor:pointer;font-size:inherit;padding:0;min-height:0}
 .pil-turnos{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .pil-turno{display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;font-size:12.5px;font-weight:600;border:1px solid rgba(var(--t-claro),.14);color:rgba(var(--t-claro),.75);background:rgba(var(--t-claro),.04)}
 .pil-turno.hecho{border-color:rgba(27,208,127,.45);color:#1BD07F}
@@ -2017,6 +2023,7 @@ if (window.pdfjsLib) {
             <span class="chip on" onclick="toggleChip(this)">Encuentra Empleo</span>
           </div>
         </div>
+        <div id="avisoGratis" class="aviso-gratis" style="display:none"></div>
         <button class="btn-full btn-buscar-grande" id="btnBuscarEmpleo" onclick="buscarEmpleo()">🔍 Buscar empleos ahora</button>
         <div style="text-align:center;font-size:11px;color:var(--texto-secundario);margin-top:8px" id="busqCupoInfo">Cada búsqueda usa 1 de tus búsquedas diarias</div>
       </div>
@@ -3180,6 +3187,13 @@ function mostrarVerificacionEmail() {
 function cerrarVerificacion() {
   const m = document.getElementById('modalVerifEmail');
   if (m) m.remove();
+  // Veníamos de "Probar mi búsqueda gratis": si ya verificó, entra a buscar; si no, vuelve a los planes
+  if (window.__trasVerificar === 'gratis') {
+    window.__trasVerificar = null;
+    if (currentUser && currentUser.emailVerificado === true) entrarModoPrueba('busqueda');
+    else mostrarPlanesRegistro();
+    return;
+  }
   // Si veníamos del registro (pagó y luego verificó), entrar al panel.
   if (window.__flujoRegistro) {
     window.__flujoRegistro = false;
@@ -3415,6 +3429,7 @@ async function refrescarSesionDesdeNube() {
         tipo: u.tipo, rol: u.rol, plan: u.plan, empresa: u.empresa,
         emailVerificado: u.emailVerificado === true,
         planVence: u.planVence || null,
+        busquedaGratisUsada: u.busquedaGratisUsada === true,
         ciudad: u.ciudad || (currentUser && currentUser.ciudad) || null,
         telefono: u.telefono || (currentUser && currentUser.telefono) || null,
         stats: u.stats || (currentUser && currentUser.stats) || {}
@@ -4788,6 +4803,7 @@ async function iniciarSesion() {
     creado: user.creado,
     emailVerificado: user.emailVerificado === true,
     planVence: user.planVence || null,
+    busquedaGratisUsada: user.busquedaGratisUsada === true,
     stats: user.stats || { busquedas: 0, correos: 0 },
     sessionToken
   };
@@ -5095,6 +5111,7 @@ function verPlanes() {
 
 // ======= TABS =======
 function candTab(tab) {
+  try { pintarAvisoGratis(); } catch (e) {}
   ['cv','busqueda','resultados','frio','postulaciones','piloto'].forEach(t => {
     const el = document.getElementById('cand-tab-'+t); if (el) el.style.display = t===tab?'block':'none';
   });
@@ -5902,6 +5919,20 @@ async function guardarYAnalizar() {
 async function buscarEmpleo() {
   if (!currentUser) { openAuth('register'); return; }
   if (bloqueoPorPlanVencido()) return;
+  // 🎁 Sin plan: solo su búsqueda gratis (el servidor decide y la cuenta una sola vez)
+  const enPrueba = esCandidatoSinPlan();
+  if (enPrueba && currentUser.busquedaGratisUsada) {
+    showToast('Ya usaste tu búsqueda gratis. Elige un plan desde $9,99 para seguir buscando y postular.', true);
+    mostrarPlanesRegistro();
+    return;
+  }
+  if (enPrueba && currentUser.emailVerificado !== true) {
+    window.__trasVerificar = 'gratis';
+    mostrarVerificacionEmail();
+    showToast('📧 Verifica tu correo para usar tu búsqueda gratis');
+    return;
+  }
+  if (enPrueba && !document.getElementById('busquedaQuery').value.trim()) { showToast('⚠ Describe qué trabajo buscas', true); return; }
 
   // RATE LIMITING — 1 búsqueda cada 5 segundos
   const ultimaBusqueda = parseInt(localStorage.getItem('ultima_busqueda_ts') || '0');
@@ -5913,6 +5944,7 @@ async function buscarEmpleo() {
   }
   localStorage.setItem('ultima_busqueda_ts', String(ahora));
 
+  if (!enPrueba) {
   // Verificar limite diario de busquedas (POR USUARIO)
   const limites = { basico: 3, estandar: 6, pro: 10, emp_basico: 999, emp_pro: 999, emp_enterprise: 999 };
   const planUser = (currentUser && currentUser.plan) || 'basico';
@@ -5956,6 +5988,7 @@ async function buscarEmpleo() {
     }
     return;
   }
+  }  // fin del control de cupo de planes pagados
 
   const query = document.getElementById('busquedaQuery').value.trim();
   if (!query) { showToast('⚠ Describe qué trabajo buscas', true); return; }
@@ -6040,10 +6073,14 @@ async function buscarEmpleo() {
       body: JSON.stringify({ consulta: query, ciudad: ciudad, modalidad: modalidad, fuentes: fuentesTexto })
     });
     parsed = { jobs: Array.isArray(r && r.jobs) ? r.jobs : [] };
+    if (r && r.gratis) marcarGratisUsada();
     if (r && r.desdeMemoria) console.log('[BÚSQUEDA] ' + r.desdeMemoria + ' área(s) servidas desde la memoria (sin costo de API)');
   } catch(e) {
     console.error('Error en búsqueda:', e);
     if (e && e.data && e.data.limite) e.limite = true;
+    if (e && e.data && e.data.gratisUsada) { marcarGratisUsada(); e.gratis = true; }
+    if (e && e.data && (e.data.requierePlan || e.data.gratisDevuelta)) e.gratis = true;
+    if (e && e.data && e.data.requiereVerificar && currentUser) { currentUser.emailVerificado = false; window.__trasVerificar = 'gratis'; setTimeout(function () { mostrarVerificacionEmail(); }, 300); }
     window.__errBusqueda = e;
   }
   }  // Close the if (!parsed) block
@@ -6077,6 +6114,17 @@ async function buscarEmpleo() {
   const esLimite = eb && (eb.limite || String(eb.message||'').includes('límite') || String(eb.message||'').includes('Alcanzaste'));
   window.__errBusqueda = null;
 
+  // CASO 0: búsqueda gratis (ya usada, falló el sistema o hace falta un plan)
+  if (eb && eb.gratis) {
+    document.getElementById('candResultados').innerHTML = `
+      <div style="text-align:center;padding:60px 20px">
+        <div style="font-size:48px;margin-bottom:14px">${eb.data && eb.data.gratisDevuelta ? '⏳' : '🎁'}</div>
+        <p style="color:var(--texto-secundario);font-size:14px;max-width:420px;margin:0 auto 18px">${escHtml(eb.message)}</p>
+        ${eb.data && eb.data.gratisDevuelta ? '<button class="btn-sm-green" onclick="candTab(\'busqueda\')">🔍 Intentar de nuevo</button>' : '<button class="btn-sm-green" onclick="mostrarPlanesRegistro()">Ver planes</button>'}
+      </div>`;
+    return;
+  }
+
   // CASO 1: límite del plan alcanzado → mostrar opción de mejorar plan
   if (esLimite) {
     document.getElementById('candResultados').innerHTML = `
@@ -6098,7 +6146,7 @@ async function buscarEmpleo() {
       <h3 style="font-family:var(--f-tit);font-size:19px;margin-bottom:8px">No encontramos ofertas verificables para <span style="color:var(--verde)">${escHtml(query)}</span></h3>
       <p style="color:var(--texto-secundario);font-size:13px;max-width:440px;margin:0 auto 18px">Solo te mostramos ofertas reales con una forma de postular desde TalentoEC. Prueba con un término más general${sugerencia && sugerencia !== String(query).toLowerCase() ? ' (por ejemplo, <b>' + escHtml(sugerencia) + '</b>)' : ''} o con otra ciudad.</p>
       <button class="btn-sm-green" onclick="candTab('busqueda')">🔍 Ajustar búsqueda</button>
-      <p style="color:var(--texto-secundario);font-size:11px;margin-top:10px">Cada búsqueda nueva usa 1 de tus búsquedas diarias</p>
+      <p style="color:var(--texto-secundario);font-size:11px;margin-top:10px">${enPrueba ? 'Ya usaste tu búsqueda gratis. <a href="#" onclick="mostrarPlanesRegistro();return false" style="color:var(--verde)">Elige un plan desde $9,99</a> para seguir buscando y postular.' : 'Cada búsqueda nueva usa 1 de tus búsquedas diarias'}</p>
     </div>`;
 }
 
@@ -6110,7 +6158,7 @@ async function restaurarResultados() {
   if (ultimosResultados && ultimosResultados.length) { renderJobCards(ultimosResultados); return; }
   try {
     const guardado = await getFromStorage('talento_ultimos_resultados_' + (currentUser?.email||'guest'));
-    if (guardado && guardado.jobs && guardado.jobs.length) {
+    if (guardado && guardado.jobs && guardado.jobs.length && !(tienePagoOk() && guardado.jobs.some(j => j && j.tieneCorreo && !j.email))) {
       // Resultados válidos por 24h
       if (Date.now() - (guardado.fecha||0) < 24*3600*1000) {
         ultimosResultados = guardado.jobs;
@@ -6183,16 +6231,19 @@ function renderJobCards(jobs) {
   const rango = (j) => j.exclusiva ? 0 : (j.email ? 1 : (j.sinContacto ? 3 : 2));
   jobs = jobs.map((j, k) => ({ j, k })).sort((a, b) => rango(a.j) - rango(b.j) || a.k - b.k).map(x => x.j);
 
-  const conCorreo = jobs.filter(j => !j.exclusiva && j.email).length;
-  const porBuscar = jobs.filter(j => !j.exclusiva && !j.email && !j.sinContacto).length;
-  const directos = jobs.filter(j => j.exclusiva || j.email).length;
+  const conCorreo = jobs.filter(j => !j.exclusiva && (j.email || j.tieneCorreo)).length;
+  const porBuscar = jobs.filter(j => !j.exclusiva && !j.email && !j.tieneCorreo && !j.sinContacto).length;
+  const directos = jobs.filter(j => j.exclusiva || j.email || j.tieneCorreo).length;
   const totalAntesFiltro = jobs.length;
-  if (window._soloDirecto && directos > 0) jobs = jobs.filter(j => j.exclusiva || j.email);
+  if (window._soloDirecto && directos > 0) jobs = jobs.filter(j => j.exclusiva || j.email || j.tieneCorreo);
   else if (window._soloDirecto) window._soloDirecto = false;
   const nombreYo = (currentUser && currentUser.nombre) || '';
   const S = (v) => escHtml(JSON.stringify(String(v == null ? '' : v)));
 
-  el.innerHTML = `
+  const bannerGratis = esCandidatoSinPlan()
+    ? '<div class="gratis-box usada" style="margin-bottom:14px;text-align:left"><div class="gratis-tit">🎁 Estas son las ofertas de tu búsqueda gratis</div><div class="gratis-txt">Ya usaste tu búsqueda gratis. Elige un plan desde $9,99 para seguir buscando y postular con tu CV y tu carta.</div><button type="button" class="btn-sm-green" onclick="mostrarPlanesRegistro()">Ver planes</button></div>'
+    : '';
+  el.innerHTML = bannerGratis + `
     ${filtrados > 0 ? '<div style="background:rgba(var(--verde-rgb),0.06);border:1px solid rgba(var(--verde-rgb),0.2);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--verde)">✓ Se ocultaron ' + filtrados + ' empleo(s) a los que ya postulaste</div>' : ''}
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
       <div style="font-size:12px;color:var(--texto-secundario)">${totalAntesFiltro} oportunidades encontradas en Ecuador · <b style="color:var(--verde)">${directos} con envío directo</b></div>
@@ -6213,7 +6264,7 @@ function renderJobCards(jobs) {
     </div>` : ''}` +
     jobs.map((j, i) => {
       const exclusiva = !!j.exclusiva;
-      const conEmail = !exclusiva && !!j.email;
+      const conEmail = !exclusiva && (!!j.email || !!j.tieneCorreo);
       const etiqueta = exclusiva ? '' :
         (conEmail && j.contactoVerificado !== false) ? '<div class="directo-badge">✉ ENVÍO DIRECTO · la empresa publicó su correo</div>' :
         j.verificada ? '<div class="verificada-badge">✓ OFERTA REAL · vía Jooble</div>' :
@@ -8125,6 +8176,10 @@ function marcarPagoOk() {
   if (currentUser && currentUser.email) {
     localStorage.setItem('pago_ok_' + currentUser.email, 'true');
   }
+  // Los resultados de la búsqueda gratis no traen el correo: al tener plan se busca de nuevo
+  try { if (Array.isArray(ultimosResultados) && ultimosResultados.some(j => j && j.tieneCorreo && !j.email)) ultimosResultados = null; } catch (e) {}
+  try { window.__modoPrueba = false; } catch (e) {}
+  try { updateLimitBar(); pintarAvisoGratis(); } catch (e) {}
 }
 
 // 🔒 Ver empleos es GRATIS para todos. Pero ENVIAR la postulación (correo) requiere un
@@ -8213,6 +8268,7 @@ function forzarPagoSiCandidato() {
   // Plan vencido: la cuenta queda bloqueada hasta renovar (los datos se conservan)
   if (estadoPlan().vencido) { mostrarPlanesRegistro('renovar'); return true; }
   if (tienePagoOk()) return false;
+  if (window.__modoPrueba) return false;   // 🎁 probando su búsqueda gratis
 
   // Ya consultamos el backend en esta sesión y NO hay pago → mostrar planes directo.
   if (_pagoConsultado) {
@@ -8251,6 +8307,7 @@ function mostrarPlanesRegistro(modo) {
         ${mejorar ? '<p style="color:var(--texto-secundario);font-size:13px;margin:0 0 18px;line-height:1.5">Con Estándar el Piloto automático trabaja todos los días en la mañana y en la tarde (con Pro también en la noche), y puedes postular a todas las ofertas en un clic. Los días que te quedan de tu plan actual se suman.</p>' : renov ? '<p style="color:var(--texto-secundario);font-size:13px;margin:0 0 18px;line-height:1.5">' + (modo==='renovar' ? 'Tu plan venció' + (stP.vence ? ' el ' + fechaLarga(stP.vence) : '') + '. Tu CV, tus datos y tus postulaciones siguen guardados: apenas renueves, sigues donde te quedaste.' : (stP.dias===1 ? 'Te queda 1 día' : 'Te quedan ' + (stP.dias||0) + ' días') + '. Si renuevas ahora, esos días se suman al nuevo mes.') + '</p>' : `<p style="color:var(--texto-secundario);font-size:13px;margin:0 0 18px;line-height:1.5">Para activar tu cuenta y empezar a buscar empleo, elige el plan que más te convenga. Puedes cambiarlo después desde tu panel.</p>`}
       </div>
 
+      ${(!renov && !mejorar) ? bloqueGratisPlanes() : ''}
       <div style="display:flex;flex-direction:column;gap:12px">
         <div style="border:1px solid var(--gris-borde);border-radius:12px;padding:16px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
@@ -8282,10 +8339,58 @@ function mostrarPlanesRegistro(modo) {
       </div>
 
       <div style="text-align:center;margin-top:16px">
-        ${modo==='renovar-antes' || mejorar ? '<button onclick="cerrarPlanesRegistro()" style="background:none;border:none;color:var(--texto-secundario);font-size:12px;cursor:pointer;text-decoration:underline">Ahora no</button>' : (modo==='renovar' ? '<button onclick="salirDeRegistro()" style="background:none;border:none;color:var(--texto-secundario);font-size:12px;cursor:pointer;text-decoration:underline">Cerrar sesión</button>' : '<button onclick="salirDeRegistro()" style="background:none;border:none;color:var(--texto-secundario);font-size:12px;cursor:pointer;text-decoration:underline">Cancelar y salir</button>')}
+        ${modo==='renovar-antes' || mejorar ? '<button onclick="cerrarPlanesRegistro()" style="background:none;border:none;color:var(--texto-secundario);font-size:12px;cursor:pointer;text-decoration:underline">Ahora no</button>' : (modo==='renovar' ? '<button onclick="salirDeRegistro()" style="background:none;border:none;color:var(--texto-secundario);font-size:12px;cursor:pointer;text-decoration:underline">Cerrar sesión</button>' : (window.__modoPrueba ? '<button onclick="cerrarPlanesRegistro()" style="background:none;border:none;color:var(--verde);font-size:12px;cursor:pointer;text-decoration:underline;margin-right:14px">Seguir viendo las ofertas</button>' : '') + '<button onclick="salirDeRegistro()" style="background:none;border:none;color:var(--texto-secundario);font-size:12px;cursor:pointer;text-decoration:underline">Cancelar y salir</button>')}
       </div>
     </div>`;
   document.body.appendChild(modal);
+}
+// ═══════════ 🎁 BÚSQUEDA GRATIS (1 por cuenta, con correo verificado) ═══════════
+function esCandidatoSinPlan() {
+  return !!(currentUser && currentUser.rol !== 'admin' && currentUser.tipo !== 'empleador' && !tienePagoOk() && !estadoPlan().vencido);
+}
+function bloqueGratisPlanes() {
+  if (!esCandidatoSinPlan()) return '';
+  if (currentUser.busquedaGratisUsada) {
+    return '<div class="gratis-box usada"><div class="gratis-tit">Ya usaste tu búsqueda gratis</div><div class="gratis-txt">Elige un plan desde $9,99 para seguir buscando y postular.</div>' +
+      '<button type="button" class="btn-sm-outline" onclick="entrarModoPrueba(\'resultados\')">Ver las ofertas que encontré</button></div>';
+  }
+  return '<div class="gratis-box"><div class="gratis-tit">🎁 Tu primera búsqueda es gratis</div>' +
+    '<div class="gratis-txt">Pruébala antes de pagar: te mostramos ofertas reales de tu área. Para postular con tu CV y tu carta eliges un plan.</div>' +
+    '<button type="button" class="btn-full" onclick="probarBusquedaGratis()">🔍 Probar mi búsqueda gratis</button></div>';
+}
+function probarBusquedaGratis() {
+  if (!currentUser) { openAuth('register'); return; }
+  cerrarPlanesRegistro();
+  if (currentUser.emailVerificado !== true) {
+    window.__trasVerificar = 'gratis';
+    mostrarVerificacionEmail();
+    showToast('📧 Primero verifica tu correo para usar tu búsqueda gratis');
+    return;
+  }
+  entrarModoPrueba('busqueda');
+}
+function entrarModoPrueba(tab) {
+  window.__modoPrueba = true;
+  cerrarPlanesRegistro();
+  showPage('candidato');
+  setTimeout(function () { try { updateLimitBar(); } catch (e) {} try { candTab(tab || 'busqueda'); if (tab === 'resultados') restaurarResultados(); } catch (e) {} }, 150);
+}
+function pintarAvisoGratis() {
+  const el = document.getElementById('avisoGratis');
+  const info = document.getElementById('busqCupoInfo');
+  if (!el) return;
+  if (!esCandidatoSinPlan()) { el.style.display = 'none'; el.innerHTML = ''; if (info) info.style.display = ''; return; }
+  if (info) info.style.display = 'none';
+  el.style.display = '';
+  el.innerHTML = currentUser.busquedaGratisUsada
+    ? 'Ya usaste tu búsqueda gratis. <button type="button" onclick="mostrarPlanesRegistro()">Elige un plan desde $9,99</button> para seguir buscando y postular.'
+    : '🎁 <b>Tu primera búsqueda es gratis.</b> Busca un solo tipo de trabajo (por ejemplo: Contador).';
+}
+function marcarGratisUsada() {
+  if (!currentUser) return;
+  currentUser.busquedaGratisUsada = true;
+  try { saveToStorage('talento_user', currentUser); } catch (e) {}
+  try { pintarAvisoGratis(); } catch (e) {}
 }
 function cerrarPlanesRegistro() {
   const m = document.getElementById('modalPlanesReg');
@@ -8583,7 +8688,7 @@ function updateLimitBar() {
   if (el('correosDiaMax2'))  el('correosDiaMax2').textContent = plan.max;
   if (el('correosDiaMin'))   el('correosDiaMin').textContent  = plan.min;
   if (el('planNombreLabel')) el('planNombreLabel').textContent = plan.nombre;
-  if (el('candPlanPill'))    el('candPlanPill').textContent   = plan.nombre.toUpperCase();
+  if (el('candPlanPill'))    el('candPlanPill').textContent   = (typeof esCandidatoSinPlan === 'function' && esCandidatoSinPlan()) ? 'SIN PLAN · PRUEBA GRATIS' : plan.nombre.toUpperCase();
 }
 
 function puedeEnviarCorreo() {
